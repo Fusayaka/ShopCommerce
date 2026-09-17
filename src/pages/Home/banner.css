@@ -1,0 +1,123 @@
+.banner-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 60px 5% 0;
+  background-color: #f2f0f1;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  min-height: 85vh; 
+}
+
+.banner-content {
+  flex: 0 0 55%;
+  max-width: 450px;
+  padding-bottom: 60px;
+}
+
+.banner-title {
+  font-size: 58px;
+  font-weight: 900;
+  line-height: 1.1;
+  margin: 0 0 24px;
+  color: #000000;
+}
+
+.banner-description {
+  font-size: 16px;
+  color: #666666;
+  line-height: 1.6;
+  margin: 0 0 32px;
+}
+
+.shop-btn {
+  display: inline-block;
+  box-sizing: border-box;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 99px;
+  padding: 16px 54px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  margin-bottom: 48px;
+  text-decoration: none !important;
+}
+
+.shop-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.75;
+}
+
+.banner-stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.stat-item h3 {
+  font-size: 30px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: #000000;
+}
+
+.stat-item p {
+  font-size: 14px;
+  color: #666666;
+  margin: 0;
+}
+
+.stat-sep {
+  height: 60px;
+  width: 1px;
+  background-color: #dcdcdc;
+}
+
+.banner-img {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 100%;
+}
+
+.banner-img img {
+  width: 100%;
+  max-width: 500px;
+  height: 600px;
+  background-color: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #888888;
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+}
+
+@media (max-width: 768px){
+  .banner-container{
+    flex-direction: column;
+    padding:  40px 5% 0;
+    text-align: center;
+  }
+
+  .banner-content{
+    padding-bottom: 0;
+  }
+
+  .banner-title{
+    font-size: 36px;
+  }
+
+  .banner-stats{
+    justify-content: center;
+    flex-wrap: nowrap;
+  }
+
+  .banner-img{
+    margin-top: 40px;
+  }
+}
