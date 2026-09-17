@@ -1,7 +1,8 @@
 export interface Product{
     id: string;
-    name: string;
+    title: string;
     price: number;
+    originalPrice?: number;
     discount?: number;
     rating: number;
     imagePath: string;
@@ -11,7 +12,7 @@ export interface Product{
 export const mockProducts: Product[] = [
     {
         id: "t0001",
-        name: "Owen Blue T-Shirt",
+        title: "Owen Blue T-Shirt",
         price: 120,
         discount: 5,
         rating: 4.5,
@@ -19,15 +20,15 @@ export const mockProducts: Product[] = [
     },
     {
         id: "t0002",
-        name: "Lyn White T-Shirt",
+        title: "Lyn White T-Shirt",
         price: 144,
         discount: 15,
         rating: 3.5,
         imagePath: "/images/t-shirt-2.webp"
     },
     {
-        id: "t0001",
-        name: "AC White T-Shirt",
+        id: "t0003",
+        title: "AC White T-Shirt",
         price: 180,
         discount: 10,
         rating: 4.3,
@@ -35,7 +36,7 @@ export const mockProducts: Product[] = [
     },
     {
         id: "t0004",
-        name: "SC Black T-Shirt",
+        title: "SC Black T-Shirt",
         price: 136,
         discount: 8,
         rating: 4.5,
@@ -43,7 +44,7 @@ export const mockProducts: Product[] = [
     },
     {
         id: "t0005",
-        name: "Proclub White T-Shirt",
+        title: "Proclub White T-Shirt",
         price: 200,
         discount: 10,
         rating: 4.0,
