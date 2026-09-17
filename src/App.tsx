@@ -1,9 +1,20 @@
-// import { useState } from 'react'
 import './App.css'
+import Header from './components/Header/Header'
+import { Outlet } from 'react-router-dom';
+
 
 function App() {
-  // const [count, setCount] = useState(0)
-  return <h1></h1>
+  return (
+    <div className="app-container">
+      <Header />
+      
+      <main className="main-content">
+        <Outlet />
+      </main>
+      
+      {/* <Footer /> */}
+    </div>
+  );
 }
 
 export default App
