@@ -26,8 +26,8 @@ export default function Header() {
             <div className='header-actions'>
                 <div className='lang-selector'>
                     <select defaultValue={"vi"}>
-                        <option value={"vi"}>Vie</option>
-                        <option value={"en"}>Eng</option>
+                        <option value={"vi"}>VI</option>
+                        <option value={"en"}>EN</option>
                         <option value={"jp"}>JP</option>
                     </select>
                 </div>
