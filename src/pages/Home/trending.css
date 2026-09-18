@@ -2,6 +2,8 @@
   padding: 60px 5%;
   font-family: 'Helvetica Neue', Arial, sans-serif;
   border-bottom: 1px solid #0000001a;
+  background-color: #ffffff;
+  color: #000000
 }
 
 .trending-title {
@@ -36,11 +38,14 @@
   transition: all 0.2s ease;
 }
 
-.view-all-btn:hover {
-  border-color: #000000;
-  background-color: #000000;
-  color: #ffffff;
+@media(hover: hover){
+  .view-all-btn:hover {
+    border-color: #000000;
+    background-color: #000000;
+    color: #ffffff;
+  }
 }
+
 
 @media (max-width: 768px) {
   .trending-section {

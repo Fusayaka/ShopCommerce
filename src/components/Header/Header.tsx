@@ -4,11 +4,23 @@ import logo from '@/assets/logo-placeholder.png'
 import cart from '@/assets/icon-cart.jpg'
 import lang from '@/assets/language.png'
 import search from '@/assets/search.png'
+import { useState } from 'react';
 
 export default function Header() {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [currentLang, setCurrentLang] = useState('vi');
+    
+    const handleLangChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setCurrentLang(event.target.value);
+    }
+
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    }
+
     return (
         <header className='header-container'>
-            <button className='hamburger-btn'>
+            <button className='hamburger-btn' onClick={toggleMenu}>
                 ☰
             </button>
 
@@ -33,10 +45,10 @@ export default function Header() {
                 <button className='mobile-search-btn'>
                     <img src={search} alt='search' className='search-icon' />
                 </button>
-                
+
                 <div className='lang-selector'>
                     <img src={lang} alt='Language' className='lang-icon'/>
-                    <select defaultValue={"vi"}>
+                    <select value={currentLang} onChange={handleLangChange}>
                         <option value={"vi"}>VI</option>
                         <option value={"en"}>EN</option>
                         <option value={"jp"}>JP</option>
@@ -50,6 +62,22 @@ export default function Header() {
                 <Link to="login" className='login-btn'>
                     Login
                 </Link>
+            </div>
+
+            <div className={`mobile-menu-overlay ${isMenuOpen ? 'open' : ''}`} onClick={toggleMenu}>
+                <div className='mobile-menu-content' onClick={(e) => e.stopPropagation()}>
+                    <button className='close-menu-btn' onClick={toggleMenu}>
+                        ✕
+                    </button>
+
+                    <nav className='mobile-nav'>
+                        <Link to={'/'} onClick={toggleMenu}>Home</Link>
+                        <Link to={'/products'} onClick={toggleMenu}>Products</Link>
+                        <Link to={'/download'} onClick={toggleMenu}>Download</Link>
+                        <Link to={'/dashboard'} onClick={toggleMenu}>Dashboard</Link>
+                        <Link to={'/login'} onClick={toggleMenu}>Login</Link>
+                    </nav>
+                </div>
             </div>
 
         </header>
