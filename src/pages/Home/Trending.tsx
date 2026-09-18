@@ -1,29 +1,44 @@
 import { mockProducts, type Product } from "@/mockdata/mockProduct";
 import ProductCard from "@/components/ProductCard/ProductCard";
 import './trending.css'
-import { useState } from "react";
-
-const INITIAL_ITEMS = 2;
-const ITEMS_PER_LOAD = 2;
+import { useEffect, useState } from "react";
 
 function getProduct(): Product[]{
     return mockProducts;
 }
 
 export default function Trending(){
-    const [visibleCount, setVisibleCount] = useState(INITIAL_ITEMS);
+    const getResponsiveItemCount = () => {
+        if (typeof window !== undefined){
+            return window.innerWidth <= 768 ? 2 : 4;
+        }
+        return 2;
+    }
+
+    const [visibleCount, setVisibleCount] = useState(getResponsiveItemCount());
+    const [itemsPerLoad, setItemPerLoad] = useState(getResponsiveItemCount());
     const products = getProduct()
     const productsLength = products.length;
 
     const handleLoadMore = () => {
         if (visibleCount <= productsLength){ 
-            setVisibleCount((prev) => prev + ITEMS_PER_LOAD);
+            setVisibleCount((prev) => prev + itemsPerLoad);
         }
         else{
-            window.alert()
+            window.alert();
         }
     }
 
+    useEffect(() => {
+        const handleResize = () => {
+            const curResponsiveCount = window.innerWidth <= 768 ? 2 : 4;
+            setItemPerLoad(curResponsiveCount);
+            setVisibleCount((prev) => Math.max(prev, curResponsiveCount));
+        }
+
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    },[])
 
     return (
         <section className="trending-section">
@@ -38,6 +53,7 @@ export default function Trending(){
                         price={prod.price}
                         originalPrice={prod.originalPrice}
                         image={prod.imagePath}
+                        discount={prod.discount}
                     />
                 ))}
             </div>

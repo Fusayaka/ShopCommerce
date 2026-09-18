@@ -18,7 +18,7 @@
 }
 
 .header-logo img {
-  height: 30px;
+  height: 40px;
   width: auto;
   object-fit: contain;
 }
@@ -55,8 +55,16 @@
   background: transparent;
   outline: none;
   width: 80%;
+  flex: 1;
   font-size: 14px;
   color: var(--primary-color);
+}
+
+.search-icon {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  object-fit: contain;
 }
 
 .header-search input::placeholder {
@@ -69,14 +77,30 @@
   gap: 24px;
 }
 
+.lang-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lang-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
 .lang-selector select {
   border: none;
-  background: transparent;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
   outline: none;
+  background: transparent;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
   color: var(--primary-color);
+  position: static;
+  opacity: 1;
+  appearance: auto;
 }
 
 .cart-btn img {
@@ -108,4 +132,63 @@
 .login-btn:hover {
   transform: translateY(-1px);
   color: red;
+}
+
+.hamburger-btn,
+.mobile-search-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.hamburger-btn {
+  font-size: 24px;
+}
+
+
+@media (max-width: 768px) {
+  .header-container {
+    padding: 12px 16px;
+  }
+
+  .header-nav,
+  .header-search,
+  .login-btn {
+    display: none;
+  }
+
+  .hamburger-btn,
+  .mobile-search-btn {
+    display: flex;
+    align-items: center;
+  }
+
+  .header-actions {
+    gap: 16px;
+  }
+  .lang-selector {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    display: block;
+  }
+  
+  .lang-icon {
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .lang-selector select {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0; 
+    appearance: none;
+    font-size: 16px;
+  }
 }

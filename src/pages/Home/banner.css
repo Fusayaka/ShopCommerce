@@ -106,18 +106,51 @@
 
   .banner-content{
     padding-bottom: 0;
+    flex: none;
+    max-width: 100%;
+  }
+
+  .banner-description{
+    text-align: left;
+    font-size: 14px;
+    font-weight: 600;
   }
 
   .banner-title{
     font-size: 36px;
   }
 
+  .shop-btn {
+    width: 100%;
+    padding: 16px 0;
+  }
+
   .banner-stats{
-    justify-content: center;
-    flex-wrap: nowrap;
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    width: fit-content;
+    margin: 0 auto;
+  }
+
+  .stat-sep{
+    display: none;
+  }
+
+  .stat-item{
+    text-align: left;
+  }
+
+  .stat-item h3 {
+    font-size: 36px;
+    font-weight: 600;
   }
 
   .banner-img{
     margin-top: 40px;
+    width: 100%;
   }
 }

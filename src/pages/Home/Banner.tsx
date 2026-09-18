@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import './banner.css'
 import bannerpc from './home-banner-pc.webp'
-import banner from './home-banner.webp'
+import bannermb from './home-banner.webp'
 
 export default function Banner() {
     return (
@@ -36,7 +36,16 @@ export default function Banner() {
             </div>
 
             <div className='banner-img'>
-                <img src={bannerpc}/>
+                <picture>
+                    <source
+                        media='(max-width: 768px)'
+                        srcSet={bannermb}
+                    />
+                    <img
+                        src={bannerpc}
+                        className='banner-image'
+                    />
+                </picture>
             </div>
         </section>
     );

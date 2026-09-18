@@ -58,6 +58,7 @@
   width: 100%;
   font-size: 14px;
   font-family: inherit;
+  background-color: transparent;
 }
 
 .input-group input::placeholder {

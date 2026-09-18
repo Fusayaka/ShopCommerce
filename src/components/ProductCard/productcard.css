@@ -46,11 +46,13 @@
   align-items: center;
   gap: 8px;
   font-size: 14px;
+  justify-content: center;
 }
 
 .stars {
-  letter-spacing: 2px;
+  display: flex;
   font-size: 16px;
+  gap: 2px;
 }
 
 .score {
@@ -58,29 +60,71 @@
   font-weight: 400;
 }
 
-.product-price-row {
+.product-price {
   display: flex;
   align-items: center;
   gap: 12px;
+  justify-content: center;
 }
 
 .cur-price {
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 700;
+  line-height: 1;
 }
 
 .ori-price {
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 700;
   color: #0000004d;
   text-decoration: line-through;
+  line-height: 1;
 }
 
 .discount-badge {
   background-color: #ff33331a;
   color: #ff3333;
-  padding: 6px 14px;
+  padding: 3px 8px;
   border-radius: 62px;
-  font-size: 12px;
+  font-size: 18px;
   font-weight: 500;
+  line-height: 1;
+  justify-content: center;
+  align-items: center;
+  display: inline-flex;
+}
+
+.star-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.empty-star {
+  filter: opacity(30%) grayscale(70%);
+}
+
+@media (max-width: 768px){
+  .cur-price .ori-price{
+    font-size: 15px;
+  }
+
+  .discount-badge{
+    font-size: 12px;
+  }
+  .product-title{
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .product-img-wrapper{
+    width: 70%;
+    height: 70%;
+    align-self: center;
+  }
+
+  .product-price{
+    gap: 8px;
+  }
+
 }

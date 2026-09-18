@@ -2,10 +2,16 @@ import './header.css'
 import { Link } from 'react-router-dom';
 import logo from '@/assets/logo-placeholder.png'
 import cart from '@/assets/icon-cart.jpg'
+import lang from '@/assets/language.png'
+import search from '@/assets/search.png'
 
 export default function Header() {
     return (
         <header className='header-container'>
+            <button className='hamburger-btn'>
+                ☰
+            </button>
+
             <div className='header-logo'>
                 <Link to="/">
                     <img src={logo} alt='Shop Logo'/>
@@ -19,12 +25,17 @@ export default function Header() {
             </nav>
 
             <div className='header-search'>
-                {/* <span className='search-icon'>🔍</span> */}
                 <input type='text' placeholder='Search for products'/>
+                <img src={search} alt='search' className='search-icon' />
             </div>
 
             <div className='header-actions'>
+                <button className='mobile-search-btn'>
+                    <img src={search} alt='search' className='search-icon' />
+                </button>
+                
                 <div className='lang-selector'>
+                    <img src={lang} alt='Language' className='lang-icon'/>
                     <select defaultValue={"vi"}>
                         <option value={"vi"}>VI</option>
                         <option value={"en"}>EN</option>
