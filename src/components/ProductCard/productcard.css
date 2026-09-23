@@ -121,6 +121,7 @@
 @media (max-width: 768px) {
   .cur-price {
     font-size: 16px;
+    margin-top: 2px;
   }
   
   .ori-price {
@@ -130,5 +131,9 @@
   .product-title {
     font-size: 16px;
     text-align: center;
+  }
+
+  .product-price{
+    height: 20px;
   }
 }

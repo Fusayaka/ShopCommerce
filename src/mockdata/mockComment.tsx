@@ -4,10 +4,12 @@ export interface Comment {
   name: string;
   content: string;
   rating: number;
+  created_at?: Date | string;
+  avatar?: string;
 }
 
-export const comments: Comment[] = [
-  { id: 1, productId: "t0001", name: "Minh", content: "The shirt is comfortable and the fabric feels good.", rating: 5 },
+export const mockComments: Comment[] = [
+  { id: 1, productId: "t0001", name: "Minh", content: "The shirt is comfortable and the fabric feels good", rating: 5 },
   { id: 2, productId: "t0001", name: "An", content: "Simple design but looks really nice.", rating: 4 },
 
   { id: 3, productId: "t0002", name: "Khoa", content: "Good quality for the price.", rating: 5 },
