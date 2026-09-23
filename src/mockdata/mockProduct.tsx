@@ -5,7 +5,8 @@ export interface Product{
     originalPrice?: number;
     discount?: number;
     rating: number;
-    imagePath: string;
+    image?: string;
+    desc?: string
 }
 
 
@@ -17,7 +18,7 @@ export const mockProducts: Product[] = [
         originalPrice: 126,
         discount: 5,
         rating: 4.5,
-        imagePath: "/images/t-shirt-1.webp"
+        image: "/images/t-shirt-1.webp"
     },
     {
         id: "t0002",
@@ -26,7 +27,7 @@ export const mockProducts: Product[] = [
         originalPrice: 169,
         discount: 15,
         rating: 3.5,
-        imagePath: "/images/t-shirt-2.webp"
+        image: "/images/t-shirt-2.webp"
     },
     {
         id: "t0003",
@@ -35,7 +36,7 @@ export const mockProducts: Product[] = [
         originalPrice: 200,
         discount: 10,
         rating: 4.3,
-        imagePath: "/images/t-shirt-3.webp"
+        image: "/images/t-shirt-3.webp"
     },
     {
         id: "t0004",
@@ -44,7 +45,7 @@ export const mockProducts: Product[] = [
         originalPrice: 148,
         discount: 8,
         rating: 3.0,
-        imagePath: "/images/t-shirt-4.webp"
+        image: "/images/t-shirt-4.webp"
     },
     {
         id: "t0005",
@@ -53,14 +54,14 @@ export const mockProducts: Product[] = [
         originalPrice: 222,
         discount: 10,
         rating: 4.0,
-        imagePath: "/images/t-shirt-5.webp"
+        image: "/images/t-shirt-5.webp"
     },
     {
         id: "t0006",
         title: "Classic Black T-Shirt",
         price: 150,
         rating: 4.2,
-        imagePath: ""
+        image: ""
     },
     {
         id: "t0007",
@@ -68,7 +69,7 @@ export const mockProducts: Product[] = [
         price: 135,
         originalPrice: 150,
         rating: 4.0,
-        imagePath: "/images/t-shirt-1.webp"
+        image: "/images/t-shirt-1.webp"
     },
     {
         id: "t0008",
@@ -77,7 +78,7 @@ export const mockProducts: Product[] = [
         originalPrice: 183,
         discount: 10,
         rating: 4.4,
-        imagePath: ""
+        image: ""
     },
     {
         id: "t0009",
@@ -86,14 +87,14 @@ export const mockProducts: Product[] = [
         originalPrice: 206,
         discount: 15,
         rating: 4.6,
-        imagePath: "/images/t-shirt-2.webp"
+        image: "/images/t-shirt-2.webp"
     },
     {
         id: "t0010",
         title: "Minimal Gray T-Shirt",
         price: 190,
         rating: 4.1,
-        imagePath: ""
+        image: ""
     },
     {
         id: "t0011",
@@ -102,7 +103,7 @@ export const mockProducts: Product[] = [
         originalPrice: 140,
         discount: 11,
         rating: 4.2,
-        imagePath: "/images/t-shirt-3.webp"
+        image: "/images/t-shirt-3.webp"
     },
     {
         id: "t0012",
@@ -111,14 +112,14 @@ export const mockProducts: Product[] = [
         originalPrice: 180,
         discount: 14,
         rating: 4.5,
-        imagePath: "/images/t-shirt-4.webp"
+        image: "/images/t-shirt-4.webp"
     },
     {
         id: "t0013",
         title: "Essential Black T-Shirt",
         price: 130,
         rating: 3.8,
-        imagePath: ""
+        image: ""
     },
     {
         id: "t0014",
@@ -127,7 +128,7 @@ export const mockProducts: Product[] = [
         originalPrice: 190,
         discount: 13,
         rating: 4.3,
-        imagePath: "/images/t-shirt-5.webp"
+        image: "/images/t-shirt-5.webp"
     },
     {
         id: "t0015",
@@ -135,7 +136,7 @@ export const mockProducts: Product[] = [
         price: 145,
         originalPrice: 160,
         rating: 4.1,
-        imagePath: "/images/t-shirt-1.webp"
+        image: "/images/t-shirt-1.webp"
     },
     {
         id: "t0016",
@@ -144,14 +145,14 @@ export const mockProducts: Product[] = [
         originalPrice: 200,
         discount: 12,
         rating: 4.4,
-        imagePath: ""
+        image: ""
     },
     {
         id: "t0017",
         title: "Relax Fit Gray T-Shirt",
         price: 160,
         rating: 4.0,
-        imagePath: "/images/t-shirt-2.webp"
+        image: "/images/t-shirt-2.webp"
     },
     {
         id: "t0018",
@@ -160,14 +161,14 @@ export const mockProducts: Product[] = [
         originalPrice: 250,
         discount: 12,
         rating: 4.7,
-        imagePath: "/images/t-shirt-3.webp"
+        image: "/images/t-shirt-3.webp"
     },
     {
         id: "t0019",
         title: "Daily White T-Shirt",
         price: 110,
         rating: 3.9,
-        imagePath: ""
+        image: ""
     },
     {
         id: "t0020",
@@ -176,7 +177,7 @@ export const mockProducts: Product[] = [
         originalPrice: 210,
         discount: 12,
         rating: 4.5,
-        imagePath: "/images/t-shirt-4.webp"
+        image: "/images/t-shirt-4.webp"
     },
     {
         id: "t0021",
@@ -185,14 +186,14 @@ export const mockProducts: Product[] = [
         originalPrice: 220,
         discount: 11,
         rating: 4.6,
-        imagePath: "/images/t-shirt-5.webp"
+        image: "/images/t-shirt-5.webp"
     },
     {
         id: "t0022",
         title: "Basic Cream T-Shirt",
         price: 125,
         rating: 4.0,
-        imagePath: ""
+        image: ""
     },
     {
         id: "t0023",
@@ -201,7 +202,7 @@ export const mockProducts: Product[] = [
         originalPrice: 175,
         discount: 11,
         rating: 4.2,
-        imagePath: "/images/t-shirt-1.webp"
+        image: "/images/t-shirt-1.webp"
     },
     {
         id: "t0024",
@@ -210,14 +211,14 @@ export const mockProducts: Product[] = [
         originalPrice: 195,
         discount: 13,
         rating: 4.3,
-        imagePath: "/images/t-shirt-2.webp"
+        image: "/images/t-shirt-2.webp"
     },
     {
         id: "t0025",
         title: "Simple Black T-Shirt",
         price: 140,
         rating: 3.7,
-        imagePath: ""
+        image: ""
     },
     {
         id: "t0026",
@@ -226,7 +227,7 @@ export const mockProducts: Product[] = [
         originalPrice: 205,
         discount: 12,
         rating: 4.4,
-        imagePath: "/images/t-shirt-3.webp"
+        image: "/images/t-shirt-3.webp"
     },
     {
         id: "t0027",
@@ -235,7 +236,7 @@ export const mockProducts: Product[] = [
         originalPrice: 240,
         discount: 13,
         rating: 4.8,
-        imagePath: "/images/t-shirt-4.webp"
+        image: "/images/t-shirt-4.webp"
     },
     {
         id: "t0028",
@@ -243,7 +244,7 @@ export const mockProducts: Product[] = [
         price: 135,
         originalPrice: 150,
         rating: 4.1,
-        imagePath: ""
+        image: ""
     },
     {
         id: "t0029",
@@ -252,7 +253,7 @@ export const mockProducts: Product[] = [
         originalPrice: 185,
         discount: 11,
         rating: 4.5,
-        imagePath: "/images/t-shirt-5.webp"
+        image: "/images/t-shirt-5.webp"
     },
     {
         id: "t0030",
@@ -261,14 +262,14 @@ export const mockProducts: Product[] = [
         originalPrice: 175,
         discount: 14,
         rating: 4.2,
-        imagePath: "/images/t-shirt-1.webp"
+        image: "/images/t-shirt-1.webp"
     },
     {
         id: "t0031",
         title: "Modern Black T-Shirt",
         price: 155,
         rating: 4.0,
-        imagePath: "/images/t-shirt-2.webp"
+        image: "/images/t-shirt-2.webp"
     },
     {
         id: "t0032",
@@ -277,7 +278,7 @@ export const mockProducts: Product[] = [
         originalPrice: 170,
         discount: 15,
         rating: 4.3,
-        imagePath: ""
+        image: ""
     },
     {
         id: "t0033",
@@ -286,7 +287,7 @@ export const mockProducts: Product[] = [
         originalPrice: 260,
         discount: 12,
         rating: 4.7,
-        imagePath: "/images/t-shirt-3.webp"
+        image: "/images/t-shirt-3.webp"
     },
     {
         id: "t0034",
@@ -294,14 +295,14 @@ export const mockProducts: Product[] = [
         price: 165,
         originalPrice: 180,
         rating: 4.1,
-        imagePath: "/images/t-shirt-4.webp"
+        image: "/images/t-shirt-4.webp"
     },
     {
         id: "t0035",
         title: "Urban White T-Shirt",
         price: 135,
         rating: 3.9,
-        imagePath: ""
+        image: ""
     },
     {
         id: "t0036",
@@ -310,7 +311,7 @@ export const mockProducts: Product[] = [
         originalPrice: 145,
         discount: 14,
         rating: 4.2,
-        imagePath: "/images/t-shirt-5.webp"
+        image: "/images/t-shirt-5.webp"
     },
     {
         id: "t0037",
@@ -319,14 +320,14 @@ export const mockProducts: Product[] = [
         originalPrice: 225,
         discount: 13,
         rating: 4.6,
-        imagePath: "/images/t-shirt-1.webp"
+        image: "/images/t-shirt-1.webp"
     },
     {
         id: "t0038",
         title: "Minimal Black T-Shirt",
         price: 150,
         rating: 4.0,
-        imagePath: "/images/t-shirt-2.webp"
+        image: "/images/t-shirt-2.webp"
     },
     {
         id: "t0039",
@@ -334,7 +335,7 @@ export const mockProducts: Product[] = [
         price: 140,
         originalPrice: 155,
         rating: 4.3,
-        imagePath: ""
+        image: ""
     },
     {
         id: "t0040",
@@ -343,7 +344,7 @@ export const mockProducts: Product[] = [
         originalPrice: 185,
         discount: 14,
         rating: 4.4,
-        imagePath: "/images/t-shirt-3.webp"
+        image: "/images/t-shirt-3.webp"
     },
     {
         id: "t0041",
@@ -352,14 +353,14 @@ export const mockProducts: Product[] = [
         originalPrice: 210,
         discount: 14,
         rating: 4.5,
-        imagePath: "/images/t-shirt-4.webp"
+        image: "/images/t-shirt-4.webp"
     },
     {
         id: "t0042",
         title: "Basic Navy T-Shirt",
         price: 120,
         rating: 3.8,
-        imagePath: ""
+        image: ""
     },
     {
         id: "t0043",
@@ -368,7 +369,7 @@ export const mockProducts: Product[] = [
         originalPrice: 245,
         discount: 12,
         rating: 4.8,
-        imagePath: "/images/t-shirt-5.webp"
+        image: "/images/t-shirt-5.webp"
     },
     {
         id: "t0044",
@@ -376,14 +377,14 @@ export const mockProducts: Product[] = [
         price: 145,
         originalPrice: 165,
         rating: 4.2,
-        imagePath: "/images/t-shirt-1.webp"
+        image: "/images/t-shirt-1.webp"
     },
     {
         id: "t0045",
         title: "Casual Gray T-Shirt",
         price: 135,
         rating: 4.0,
-        imagePath: "/images/t-shirt-2.webp"
+        image: "/images/t-shirt-2.webp"
     },
     {
         id: "t0046",
@@ -392,7 +393,7 @@ export const mockProducts: Product[] = [
         originalPrice: 200,
         discount: 13,
         rating: 4.5,
-        imagePath: ""
+        image: ""
     },
     {
         id: "t0047",
@@ -401,14 +402,14 @@ export const mockProducts: Product[] = [
         originalPrice: 175,
         discount: 11,
         rating: 4.1,
-        imagePath: "/images/t-shirt-3.webp"
+        image: "/images/t-shirt-3.webp"
     },
     {
         id: "t0048",
         title: "Daily Cotton T-Shirt",
         price: 115,
         rating: 3.9,
-        imagePath: ""
+        image: ""
     },
     {
         id: "t0049",
@@ -417,7 +418,7 @@ export const mockProducts: Product[] = [
         originalPrice: 215,
         discount: 14,
         rating: 4.6,
-        imagePath: "/images/t-shirt-4.webp"
+        image: "/images/t-shirt-4.webp"
     },
     {
         id: "t0050",
@@ -426,6 +427,6 @@ export const mockProducts: Product[] = [
         originalPrice: 230,
         discount: 11,
         rating: 4.7,
-        imagePath: "/images/t-shirt-5.webp"
+        image: "/images/t-shirt-5.webp"
     }
 ];
