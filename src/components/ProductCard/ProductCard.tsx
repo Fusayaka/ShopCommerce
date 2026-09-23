@@ -46,11 +46,7 @@ export default function ProductCard({
     return (
         <Link to={`/product/${id}`}className="product-card">
             <div className="product-img-wrapper">
-                {image ? (
-                    <img src={image} alt={title} loading="lazy"/>
-                ) : (
-                    <img src={plhImg} alt={title} loading="lazy"/>
-                )}
+                <img src={image || plhImg} alt={title} loading="lazy"/>
             </div>
 
             <h4 className="product-title">{title}</h4>
@@ -63,9 +59,13 @@ export default function ProductCard({
             </div>
 
             <div className="product-price">
-                <span className="cur-price">${price} </span>
-                {originalPrice && <span className="ori-price">${originalPrice}</span>}
-                {discount && <span className="discount-badge">-{discount}%</span>}
+                <span className="cur-price">${price}</span>
+                {(originalPrice || discount) && (
+                    <div className="price-group">
+                        {originalPrice && <span className="ori-price">${originalPrice}</span>}
+                        {discount && <span className="discount-badge">-{discount}%</span>}
+                    </div>
+                )}
             </div>
         </Link>
     );

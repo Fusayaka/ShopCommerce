@@ -3,29 +3,32 @@ import ProductCard from "@/components/ProductCard/ProductCard";
 import './trending.css'
 import { useEffect, useState } from "react";
 
-function getProduct(): Product[]{
-    return mockProducts;
-}
-
 export default function Trending(){
     const getResponsiveItemCount = () => {
-        if (typeof window !== undefined){
+        if (typeof window !== "undefined"){ 
             return window.innerWidth <= 768 ? 2 : 4;
         }
         return 2;
     }
 
+    const [products, setProducts] = useState<Product[]>([]);
+    
     const [visibleCount, setVisibleCount] = useState(getResponsiveItemCount());
     const [itemsPerLoad, setItemPerLoad] = useState(getResponsiveItemCount());
-    const products = getProduct()
+    
     const productsLength = products.length;
 
+    useEffect(() => {
+        return setProducts(mockProducts);
+        // fetch("http://localhost:8000/api/products")
+        //     .then(res => res.json())
+        //     .then(data => setProducts(data))
+        //     .catch(err => console.error("Error when loading data:", err));
+    }, []);
+
     const handleLoadMore = () => {
-        if (visibleCount <= productsLength){ 
+        if (visibleCount < productsLength){ 
             setVisibleCount((prev) => prev + itemsPerLoad);
-        }
-        else{
-            window.alert();
         }
     }
 
@@ -52,7 +55,7 @@ export default function Trending(){
                         rating={prod.rating}
                         price={prod.price}
                         originalPrice={prod.originalPrice}
-                        image={prod.imagePath}
+                        image={prod.image} 
                         discount={prod.discount}
                     />
                 ))}
@@ -64,7 +67,6 @@ export default function Trending(){
                     </div>
                 )
             }
-            
         </section>
     );
 }
