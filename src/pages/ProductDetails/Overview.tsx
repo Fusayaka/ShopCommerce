@@ -1,33 +1,11 @@
 import { useEffect, useState } from 'react';
 import './overview.css'
 import { Link, useParams } from 'react-router-dom';
-import fullStar from '@/assets/fullstar.png'
-import halfStar from '@/assets/halfstar.png'
+import StarRating from '@/components/StarRating/StarRating';
 import plhImg from '/images/cloth-placeholder.jpeg'
 import { mockProducts, type Product } from '@/mockdata/mockProduct';
 
 const DEFAULT_DESC = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam, ea saepe aliquam expedita cum a commodi, aliquid autem laborum recusandae nulla sequi culpa tempore repellendus qui ad ratione, ipsam iure.";
-
-const StarRating = ({rating} : {rating: number}) => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-        if (i <= Math.floor(rating)) {
-            stars.push(
-                <img key={i} src={fullStar} alt="star" className="star-icon" />
-            );
-        } else if (i === Math.ceil(rating) && !Number.isInteger(rating)) {
-            stars.push(
-                <img key={i} src={halfStar} alt="half star" className="star-icon" />
-            );
-        } else {
-            stars.push(
-                <img key={i} src={fullStar} alt="empty star" className="star-icon empty-star" />
-            );
-        }
-    }
-    
-    return <>{stars}</>;
-}
 
 export default function Overview() {
     const {productId} = useParams<{ productId: string }>();
@@ -35,8 +13,8 @@ export default function Overview() {
     const [product, setProduct] = useState<Product | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    const [size, setSize] = useState<string>("S");
-    const [color, setColor] = useState<string>("Red");
+    const [size, setSize] = useState<string | null>(null);
+    const [color, setColor] = useState<string | null>(null);
     const [quantity, setQuantity] = useState<number | string>(1);
 
     useEffect(() => {
@@ -80,6 +58,7 @@ export default function Overview() {
             }
             else {
                 alert('Quantity must not be less than 0!');
+                setQuantity(1);
             }
         }
         else if (type === 'increase'){
@@ -104,6 +83,18 @@ export default function Overview() {
         }
     };
 
+    const handleAddtoCart =() => {
+        if (!color || !size){
+            alert("Please choose size and color!");
+        }
+
+        if (Number(quantity) < 1){
+            alert("Number of product must not be less than 1!");
+        }
+
+        // TO BE IMPLEMENTED
+    };
+
     if (isLoading || !product){
         return <div className="overview-container">Loading</div>
     }
@@ -112,7 +103,7 @@ export default function Overview() {
         <section className='detail-container'>
             <nav className='detail-breadcrumb'>
                 <Link to='/'>Home</Link> {' > '}
-                <Link to='/product'>Product</Link> {' > '}
+                <Link to='/products'>Product</Link> {' > '}
                 <span className="detail-current-page">{product.title}</span>
             </nav>
 
@@ -193,10 +184,11 @@ export default function Overview() {
                             />
                             <button onClick={() => handleQuantityChange('increase')}>+</button>
                         </div>
-                        <button className="detail-add-to-cart-btn">Add to Cart</button>
+                        <button className="detail-add-to-cart-btn" onClick={handleAddtoCart}>Add to Cart</button>
                     </div>
                 </div>
             </div>
         </section>
     );
 }
+

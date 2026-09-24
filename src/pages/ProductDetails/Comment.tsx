@@ -2,8 +2,7 @@ import { useState } from 'react';
 import './Comment.css';
 
 import { mockComments } from '@/mockdata/mockComment';
-import fullStar from '@/assets/fullstar.png';
-import halfStar from '@/assets/halfstar.png';
+import StarRating from '@/components/StarRating/StarRating';
 import { useParams } from 'react-router-dom';
 
 export interface Comment {
@@ -20,46 +19,6 @@ interface CommentCardProps {
   comment: Comment;
 }
 
-const StarRating = ({ rating }: { rating: number }) => {
-  return (
-    <>
-      {Array.from({ length: 5 }, (_, index) => {
-        const star = index + 1;
-
-        if (star <= Math.floor(rating)) {
-          return (
-            <img
-              key={star}
-              src={fullStar}
-              alt="star"
-              className="star-icon"
-            />
-          );
-        }
-
-        if (star === Math.ceil(rating) && !Number.isInteger(rating)) {
-          return (
-            <img
-              key={star}
-              src={halfStar}
-              alt="half star"
-              className="star-icon"
-            />
-          );
-        }
-
-        return (
-          <img
-            key={star}
-            src={fullStar}
-            alt="empty star"
-            className="star-icon empty-star"
-          />
-        );
-      })}
-    </>
-  );
-};
 
 const CommentCard = ({ comment }: CommentCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);

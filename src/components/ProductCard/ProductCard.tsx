@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
 import './productcard.css'
 import plhImg from '/images/cloth-placeholder.jpeg'
-import fullStar from '@/assets/fullstar.png'
-import halfStar from '@/assets/halfstar.png'
+import StarRating from "../StarRating/StarRating";
 
 interface ProductCardProps {
     id: string | number;
@@ -12,26 +11,6 @@ interface ProductCardProps {
     price: number;
     originalPrice?: number;
     discount?: number;
-}
-const StarRating = ({rating} : {rating: number}) => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-        if (i <= Math.floor(rating)) {
-            stars.push(
-                <img key={i} src={fullStar} alt="star" className="star-icon" />
-            );
-        } else if (i === Math.ceil(rating) && !Number.isInteger(rating)) {
-            stars.push(
-                <img key={i} src={halfStar} alt="half star" className="star-icon" />
-            );
-        } else {
-            stars.push(
-                <img key={i} src={fullStar} alt="empty star" className="star-icon empty-star" />
-            );
-        }
-    }
-    
-    return <>{stars}</>;
 }
 
 export default function ProductCard({
