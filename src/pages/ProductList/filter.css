@@ -1,0 +1,232 @@
+.filter-card {
+  background-color: #ffffff;
+  width: 80%;
+  max-width: 80%;
+  border-radius: 12px;
+  padding: 24px;
+  box-sizing: border-box;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  border: 1px solid #eaeaea;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filter-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+}
+
+.filter-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.filter-main-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.filter-divider {
+  border: none;
+  height: 1px;
+  background-color: #eaeaea;
+  margin: 16px 0;
+}
+
+.filter-group {
+  margin-bottom: 8px;
+}
+
+.filter-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333333;
+  margin-bottom: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.filter-arrow-icon {
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
+}
+
+.filter-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #d1d1d1;
+  border-radius: 8px;
+  background-color: #ffffff;
+  font-size: 14px;
+  color: #333333;
+  outline: none;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.filter-select:focus {
+  border-color: #000000;
+}
+
+.filter-switch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 44px;
+  height: 24px;
+}
+
+.filter-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.filter-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #cccccc;
+  transition: .3s;
+  border-radius: 24px;
+}
+
+.filter-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+}
+
+.filter-switch input:checked + .filter-slider {
+  background-color: #000000;
+}
+
+.filter-switch input:checked + .filter-slider:before {
+  transform: translateX(20px);
+}
+
+.dual-range-container {
+  width: 100%;
+  padding-top: 24px;
+  padding-bottom: 8px;
+}
+
+.price-range-values {
+  position: relative;
+  height: 20px;
+  margin-bottom: 12px;
+}
+
+.price-range-values span {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 13px;
+  font-weight: 600;
+  color: #000000;
+  white-space: nowrap;
+  left: var(--pos-percent, 0%);
+}
+
+.price-slider-track-wrapper {
+  position: relative;
+  height: 6px;
+  background-color: #eaeaea;
+  border-radius: 3px;
+}
+
+.price-slider-active-range {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  left: var(--min-pos, 0%);
+  width: calc(var(--max-pos, 100%) - var(--min-pos, 0%));
+  background-color: #000000;
+  pointer-events: none;
+}
+
+.price-range-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  pointer-events: none;
+  appearance: none;
+  -webkit-appearance: none;
+  z-index: 2;
+}
+
+.price-range-input::-webkit-slider-thumb {
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: #000000;
+  pointer-events: auto;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.price-range-input::-moz-range-thumb {
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: #000000;
+  pointer-events: auto;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.filter-apply-btn {
+  width: 100%;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 24px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.2s;
+}
+
+.filter-apply-btn:hover {
+  background-color: #333333;
+}

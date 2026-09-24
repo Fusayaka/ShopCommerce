@@ -1,0 +1,150 @@
+/* =========================================
+   LAYOUT DANH SÁCH SẢN PHẨM (PRODUCT LIST)
+   ========================================= */
+.product-result-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 24px;
+}
+
+.product-result-header h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #000000;
+}
+
+.total-products {
+  font-size: 14px;
+  color: #666666;
+  font-weight: 400;
+}
+
+/* Ép 3 cột trên PC */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); 
+  column-gap: 20px;
+  row-gap: 32px;
+}
+
+/* Ép 2 cột trên Mobile */
+@media (max-width: 768px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 12px;
+    row-gap: 24px;
+  }
+}
+
+/* =========================================
+   PAGINATION STYLES (PHÂN TRANG)
+   ========================================= */
+
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid #f0f0f0;
+  width: 100%;
+}
+
+/* --- Khung bọc các con số --- */
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* Khoảng cách vừa phải để không bị rối mắt */
+}
+
+/* --- Nút Previous / Next --- */
+.page-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background-color: #ffffff;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.page-nav-btn:hover:not(:disabled) {
+  border-color: #000000;
+  background-color: #fafafa;
+}
+
+.page-nav-btn:disabled {
+  color: #b3b3b3;
+  border-color: #f5f5f5;
+  background-color: #ffffff;
+  cursor: not-allowed;
+}
+
+/* --- Nút số trang (1, 2, 3...) --- */
+.page-number-btn {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666666;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.page-number-btn:hover:not(.active) {
+  background-color: #f2f0f1;
+  color: #000000;
+}
+
+/* Trạng thái trang đang chọn (Active) */
+.page-number-btn.active {
+  background-color: #000000;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Thêm bóng đổ nhẹ cho nổi bật */
+}
+
+/* =========================================
+   RESPONSIVE CHO ĐIỆN THOẠI (MOBILE)
+   ========================================= */
+@media (max-width: 576px) {
+  .product-result-header h2 {
+    font-size: 24px;
+  }
+
+  .pagination-container {
+    gap: 16px;
+    margin-top: 32px;
+  }
+  
+  /* Ẩn dải số đi cho gọn màn hình */
+  .page-numbers {
+    display: none;
+  }
+  
+  /* Căng đều 2 nút Prev/Next ra lấp đầy chiều ngang */
+  .page-nav-btn {
+    flex: 1;
+    padding: 12px;
+  }
+}
