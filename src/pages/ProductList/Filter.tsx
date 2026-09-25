@@ -3,6 +3,7 @@ import './filter.css'
 import upArrow from '@/assets/up-arrow.png'
 import downArrow from '@/assets/down-arrow.png'
 import filterMenu from '@/assets/filter.png'
+import { useSearchParams } from 'react-router-dom';
 
 interface FilterProps{
     isOpen?: boolean;
@@ -75,10 +76,19 @@ const DualPriceRange = ({
 };
 
 export default function Filter({isOpen = true, onClose, onApplyFilter}: FilterProps){
-    const [isDiscountOnly, setIsDiscountOnly] = useState<boolean>(false);
-    const [rating, setRating] = useState("All Ratings");
-    const [minPrice, setMinPrice] = useState<number>(0);
-    const [maxPrice, setMaxPrice] = useState<number>(400);
+    const [searchParams] = useSearchParams();
+    const [isDiscountOnly, setIsDiscountOnly] = useState<boolean>(
+        searchParams.get("discount") === "true"
+    );
+    const [rating, setRating] = useState(
+        searchParams.get("rating") || "All Ratings"
+    );
+    const [minPrice, setMinPrice] = useState<number>(
+        Number(searchParams.get("minPrice")) || 0
+    );
+    const [maxPrice, setMaxPrice] = useState<number>(
+        Number(searchParams.get("maxPrice")) || 400
+    );
 
     const [isRatingOpen, setIsRatingOpen] = useState<boolean>(true);
     const [isDiscountOpen, setIsDiscountOpen] = useState<boolean>(true);
@@ -102,8 +112,26 @@ export default function Filter({isOpen = true, onClose, onApplyFilter}: FilterPr
         <div className={`filter-card ${isOpen ? 'mobile-open' : ''}`}>
             <div className="filter-header">
                 <h3>Filters</h3>
-                <button className="filter-toggle-btn" onClick={() => setIsFilterBodyOpen(!isFilterBodyOpen)}>
+                <button className="filter-toggle-btn pc-toggle-btn" onClick={() => setIsFilterBodyOpen(!isFilterBodyOpen)}>
                     <img src={filterMenu} alt="filter" className="filter-main-icon" />
+                </button>
+
+                <button 
+                    className="filter-toggle-btn mobile-close-btn" 
+                    onClick={onClose}
+                >
+                    <svg 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        className="icon-close-mobile"
+                    >
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
                 </button>
             </div>
 
@@ -133,8 +161,9 @@ export default function Filter({isOpen = true, onClose, onApplyFilter}: FilterPr
                                     <option value="All Ratings">All Ratings</option>
                                     <option value="5">5 Stars</option>
                                     <option value="4">4 Stars & above</option>
-                                    <option value="4">3 Stars & above</option>
-                                    <option value="4">2 Stars & above</option>
+                                    <option value="3">3 Stars & above</option>
+                                    <option value="2">2 Stars & above</option>
+                                    <option value="1">1 Stars & above</option>
                                 </select>
                             </div>
                         )}

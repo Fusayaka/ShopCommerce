@@ -32,6 +32,16 @@
   padding: 4px;
 }
 
+.mobile-close-btn {
+  display: none;
+}
+
+.icon-close-mobile {
+  width: 20px;
+  height: 20px;
+  color: #000000;
+}
+
 .filter-main-icon {
   width: 18px;
   height: 18px;
@@ -229,4 +239,22 @@
 
 .filter-apply-btn:hover {
   background-color: #333333;
+}
+
+@media (max-width: 768px) {
+  .pc-toggle-btn {
+    display: none;
+  }
+  
+  .mobile-close-btn {
+    display: flex;
+  }
+  
+  .filter-card {
+    width: 100%;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 24px 20px;
+  }
 }

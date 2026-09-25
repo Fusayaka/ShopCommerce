@@ -2,10 +2,24 @@ import { useState, useEffect } from 'react';
 import './productResultPage.css'
 import ProductCard from '@/components/ProductCard/ProductCard'
 import { mockProducts, type Product } from '@/mockdata/mockProduct';
+import filterMenu from '@/assets/filter.png'
+import { useSearchParams } from 'react-router-dom';
 
-export default function ProductResultPage() {
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(9); // Mặc định PC là 9 (3x3)
+interface ProductResultPageProps {
+    onOpenFilter?: () => void;
+}
+
+export default function ProductResultPage({ onOpenFilter }: ProductResultPageProps) {
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const currentPage = Number(searchParams.get('page')) || 1;
+    const [itemsPerPage, setItemsPerPage] = useState(9);
+
+    const handlePageChange = (newPage: number) => {
+        const params = new URLSearchParams(searchParams);
+        params.set('page', newPage.toString());
+        setSearchParams(params);
+    };
 
     useEffect(() => {
         const handleResize = () => {
@@ -23,7 +37,7 @@ export default function ProductResultPage() {
     }, []);
 
     const getResultProducts = (): Product[] => {
-        return mockProducts;
+        return mockProducts.concat(mockProducts, mockProducts);
     };
 
     const products = getResultProducts();
@@ -36,18 +50,61 @@ export default function ProductResultPage() {
     const currentProducts = products.slice(startIndex, startIndex + itemsPerPage);
 
     const handlePrev = () => {
-        if (safeCurrentPage > 1) setCurrentPage(safeCurrentPage - 1);
+        if (safeCurrentPage > 1) handlePageChange(safeCurrentPage - 1);
     };
 
     const handleNext = () => {
-        if (safeCurrentPage < totalPages) setCurrentPage(safeCurrentPage + 1);
+        if (safeCurrentPage < totalPages) handlePageChange(safeCurrentPage + 1);
     };
+
+    const getPaginationItems = (currentPage: number, totalPages: number) => {
+        const items: (number | string)[] = [];
+        if (totalPages <= 5){
+            for (let i = 1; i <= totalPages; i++){
+                items.push(i);
+            }
+        }
+        else {
+            items.push(1);
+
+            if (currentPage > 3){
+                items.push("...");
+            }
+
+            const start = Math.max(2, currentPage - 1);
+            const end = Math.min(totalPages - 1, currentPage + 1);
+
+            for (let i = start; i <= end; i++){
+                items.push(i);
+            }
+
+            if (totalPages - 2 > currentPage){
+                items.push("...");
+            }
+
+            items.push(totalPages);
+        }
+
+        return items;
+    };
+
+    const paginationItems= getPaginationItems(safeCurrentPage, totalPages);
 
     return (
         <div className="product-result-container">
             <div className="product-result-header">
                 <h2>Trending</h2>
-                <span className="total-products">Total: {products.length} Products</span>
+                
+                <div className="product-result-meta">
+                    <span className="total-products">Total: {products.length} Products</span>
+
+                    <button 
+                        className="mobile-filter-btn" 
+                        onClick={onOpenFilter}
+                    >
+                        <img src={filterMenu} alt="filter" />
+                    </button>
+                </div>
             </div>
             
             <div className="product-grid">
@@ -72,18 +129,24 @@ export default function ProductResultPage() {
                         onClick={handlePrev} 
                         disabled={safeCurrentPage === 1}
                     >
-                        &larr; Prev
+                        &larr; <span className="nav-text">Prev</span>
                     </button>
 
                     <div className="page-numbers">
-                        {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
-                            <button
-                                key={page}
-                                className={`page-number-btn ${safeCurrentPage === page ? 'active' : ''}`}
-                                onClick={() => setCurrentPage(page)}
-                            >
-                                {page}
-                            </button>
+                        {paginationItems.map((item, index) => (
+                            item === "..." ? (
+                                <span key={`ellipsis-${index}`} className='page-ellipsis'>
+                                    ...
+                                </span>
+                            ): (
+                                <button
+                                    key={item}
+                                    className={`page-number-btn ${safeCurrentPage === item ? 'active' : ''}`}
+                                    onClick={() => handlePageChange(item as number)}
+                                >
+                                    {item}
+                                </button>
+                            )
                         ))}
                     </div>
 
@@ -92,7 +155,7 @@ export default function ProductResultPage() {
                         onClick={handleNext} 
                         disabled={safeCurrentPage === totalPages}
                     >
-                        Next &rarr;
+                        <span className="nav-text">Next</span> &rarr;
                     </button>
                 </div>
             )}
