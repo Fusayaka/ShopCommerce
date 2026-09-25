@@ -63,7 +63,7 @@ export default function ProductList(){
             <nav className='detail-breadcrumb'>
                 <Link to='/'>Home</Link> 
                 {'  >  '}
-                <Link to='/products'>Product</Link>
+                <span>Product</span>
             </nav>
             
             <div className="product-list-container">
