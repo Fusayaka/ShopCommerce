@@ -12,6 +12,8 @@
 
 .product-card:hover {
   transform: translateY(-4px);
+  box-shadow: 0 0 0 2px cyan, 0 10px 20px rgba(0, 255, 255, .3);
+  border-radius: 16px;
 }
 
 .product-img-wrapper {
@@ -60,13 +62,14 @@
   justify-content: center;
   gap: 8px;
   width: 100%;
-  height: 24px;
+  height: 20px;
+  overflow: hidden;
 }
 
 .price-group {
   display: inline-flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 4px;
   flex-shrink: 0;
 }
 
@@ -79,7 +82,7 @@
 }
 
 .ori-price {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   color: #0000004d;
   text-decoration: line-through;
