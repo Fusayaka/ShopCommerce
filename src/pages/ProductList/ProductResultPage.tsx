@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import './productResultPage.css'
 import ProductCard from '@/components/ProductCard/ProductCard'
-import { mockProducts, type Product } from '@/mockdata/mockProduct';
+import { mockProducts } from '@/mockdata';
+import { type Product } from '@/types';
 import filterMenu from '@/assets/filter.png'
 import { useSearchParams } from 'react-router-dom';
 

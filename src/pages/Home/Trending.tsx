@@ -1,4 +1,5 @@
-import { mockProducts, type Product } from "@/mockdata/mockProduct";
+import { mockProducts } from "@/mockdata";
+import type { Product } from "@/types";
 import ProductCard from "@/components/ProductCard/ProductCard";
 import './trending.css'
 import { useEffect, useState } from "react";

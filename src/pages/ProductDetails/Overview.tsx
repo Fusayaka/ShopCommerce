@@ -3,7 +3,8 @@ import './overview.css'
 import { Link, useParams } from 'react-router-dom';
 import StarRating from '@/components/StarRating/StarRating';
 import plhImg from '/images/cloth-placeholder.jpeg'
-import { mockProducts, type Product } from '@/mockdata/mockProduct';
+import { mockProducts } from '@/mockdata';
+import type { Product } from '@/types';
 
 const DEFAULT_DESC = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam, ea saepe aliquam expedita cum a commodi, aliquid autem laborum recusandae nulla sequi culpa tempore repellendus qui ad ratione, ipsam iure.";
 
@@ -137,7 +138,7 @@ export default function Overview() {
                     </div>
 
                     <p className='detail-desc'>
-                        {product.desc || DEFAULT_DESC}
+                        {product.description || DEFAULT_DESC}
                     </p>
                     
                     <div className="detail-selector-group">

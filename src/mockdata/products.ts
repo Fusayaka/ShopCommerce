@@ -1,16 +1,7 @@
-export interface Product{
-    id: string;
-    title: string;
-    price: number;
-    originalPrice?: number;
-    discount?: number;
-    rating: number;
-    image?: string;
-    desc?: string
-}
+import { type Product } from "@/types";
 
 
-export const mockProducts: Product[] = [
+const mockProducts: Product[] = [
     {
         id: "t0001",
         title: "Owen Blue T-Shirt",
@@ -430,3 +421,6 @@ export const mockProducts: Product[] = [
         image: "/images/t-shirt-5.webp"
     }
 ];
+
+
+export default mockProducts;

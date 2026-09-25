@@ -1,24 +1,14 @@
 import { useState } from 'react';
 import './Comment.css';
 
-import { mockComments } from '@/mockdata/mockComment';
+import { mockComments } from '@/mockdata';
 import StarRating from '@/components/StarRating/StarRating';
 import { useParams } from 'react-router-dom';
-
-export interface Comment {
-  id: number;
-  productId: string;
-  name: string;
-  content: string;
-  rating: number;
-  created_at?: Date | string;
-  avatar?: string;
-}
+import { type Comment as CommentType } from '@/types';
 
 interface CommentCardProps {
-  comment: Comment;
+  comment: CommentType;
 }
-
 
 const CommentCard = ({ comment }: CommentCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -39,6 +29,8 @@ const CommentCard = ({ comment }: CommentCardProps) => {
       })
     : 'August 21, 2025';
 
+  const displayName = comment.name || 'Anonymous';
+
   return (
     <div className="comment-card">
       <div className="comment-stars">
@@ -48,13 +40,13 @@ const CommentCard = ({ comment }: CommentCardProps) => {
       <div className="comment-user-header">
         <div className="comment-avatar">
           {comment.avatar ? (
-            <img src={comment.avatar} alt={comment.name} />
+            <img src={comment.avatar} alt={displayName} />
           ) : (
-            comment.name.charAt(0).toUpperCase()
+            displayName.charAt(0).toUpperCase()
           )}
         </div>
 
-        <h4 className="comment-username">{comment.name}</h4>
+        <h4 className="comment-username">{displayName}</h4>
       </div>
 
       <p className="comment-content">{content}</p>
