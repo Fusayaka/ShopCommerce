@@ -2,7 +2,7 @@ import { useState } from 'react';
 import './Comment.css';
 
 import { mockComments } from '@/mockdata';
-import StarRating from '@/components/StarRating/StarRating';
+import { StarRating } from '@/components';
 import { useParams } from 'react-router-dom';
 import { type Comment as CommentType } from '@/types';
 

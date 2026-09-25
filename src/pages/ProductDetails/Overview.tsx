@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import './overview.css'
 import { Link, useParams } from 'react-router-dom';
-import StarRating from '@/components/StarRating/StarRating';
+import { StarRating } from '@/components';
 import plhImg from '/images/cloth-placeholder.jpeg'
 import { mockProducts } from '@/mockdata';
 import type { Product } from '@/types';

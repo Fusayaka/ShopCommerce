@@ -67,21 +67,21 @@ export default function ProductList(){
             </nav>
             
             <div className="product-list-container">
-            <div className={`filter-sidebar-wrapper ${!isDesktop && isMobileFilterOpen ? 'mobile-modal-open' : ''}`}>
-                {!isDesktop && isMobileFilterOpen && (
-                    <div className="mobile-overlay" onClick={() => setIsMobileFilterOpen(false)}></div>
-                )}
-                
-                <div className="filter-content">
-                    <Filter 
-                        onClose={() => setIsMobileFilterOpen(false)} 
-                        onApplyFilter={hanleApplyFilter}
-                    />
+                <div className={`filter-sidebar-wrapper ${!isDesktop && isMobileFilterOpen ? 'mobile-modal-open' : ''}`}>
+                    {!isDesktop && isMobileFilterOpen && (
+                        <div className="mobile-overlay" onClick={() => setIsMobileFilterOpen(false)}></div>
+                    )}
+                    
+                    <div className="filter-content">
+                        <Filter 
+                            onClose={() => setIsMobileFilterOpen(false)} 
+                            onApplyFilter={hanleApplyFilter}
+                        />
+                    </div>
                 </div>
-            </div>
 
-            <ProductResultPage onOpenFilter={() => setIsMobileFilterOpen(true)} />
-        </div>
+                <ProductResultPage onOpenFilter={() => setIsMobileFilterOpen(true)} />
+            </div>
         </section>
     );
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import './productResultPage.css'
-import ProductCard from '@/components/ProductCard/ProductCard'
+import { ProductCard } from "@/components";
 import { mockProducts } from '@/mockdata';
 import { type Product } from '@/types';
 import filterMenu from '@/assets/filter.png'

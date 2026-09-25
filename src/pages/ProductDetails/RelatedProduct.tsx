@@ -1,6 +1,6 @@
 import mockProducts from "@/mockdata/products";
 import type { Product } from "@/types";
-import ProductCard from "@/components/ProductCard/ProductCard";
+import { ProductCard } from "@/components";
 import { useParams } from "react-router-dom";
 import './relatedProduct.css'
 
