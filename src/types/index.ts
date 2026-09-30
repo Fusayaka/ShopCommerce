@@ -37,6 +37,7 @@ export interface Comment {
 }
 
 export interface OrderItem {
+    orderItemId: string;
     productId: string;
     
     title?: string;
@@ -46,7 +47,6 @@ export interface OrderItem {
     color: Color;
     quantity: number;
     unitPrice: number;
-    totalPrice: number;
     created_at?: string;
     updated_at?: string;
 }

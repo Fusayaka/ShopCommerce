@@ -207,7 +207,7 @@ INSERT INTO orders (id, user_id, status, subtotal, discount, delivery_fee, promo
 -- ==============================================================================
 -- 6. SEED ORDER ITEMS (21 Order Items)
 -- ==============================================================================
-INSERT INTO order_items (order_id, product_id, size, color, quantity, unit_price) VALUES 
+INSERT INTO order_items (order_id, product_id, size, color, quantity, unit_price) VALUES
 ('11111111-0000-0000-0000-000000000001', 't0001', 'L', 'Blue', 2, 120),
 ('11111111-0000-0000-0000-000000000002', 't0002', 'M', 'White', 1, 144),
 ('11111111-0000-0000-0000-000000000003', 't0005', 'L', 'White', 1, 200),

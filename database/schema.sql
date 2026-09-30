@@ -53,14 +53,15 @@ CREATE TABLE orders (
 
 -- 5. Order Items
 CREATE TABLE order_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
     product_id VARCHAR(50) REFERENCES products(id) ON DELETE CASCADE,
     size item_size NOT NULL,
     color color NOT NULL,
     quantity INT DEFAULT 1 NOT NULL, 
     unit_price DECIMAL(10, 2) NOT NULL,
-    total_price DECIMAL(10, 2) NOT NULL,
+    total_price DECIMAL(10, 2) GENERATED ALWAYS AS (unit_price * quantity) STORED,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (order_id, product_id, size, color) 
+    UNIQUE (order_id, product_id, size, color)
 );
