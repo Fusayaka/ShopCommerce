@@ -1,26 +1,27 @@
 import trashIcon from '@/assets/trash-icon.png'
 import plhImg from '/images/cloth-placeholder.jpeg'
 import type { OrderItem } from '@/types'
-import { useState } from 'react';
+
 import './cartItem.css'
 
 interface CartItemProps{
     item: OrderItem;
+    onUpdateQuantity: (orderItemId: string, newQuantity: number) => void;
+    onRemoveItem: (orderItemId: string) => void;
 }
 
-export default function CartItem({item}: CartItemProps){
-    const [quantity, setQuantity] = useState(item.quantity);
-    const increase = () => setQuantity(prev => prev + 1);
+export default function CartItem({item, onUpdateQuantity, onRemoveItem}: CartItemProps){
+    const increase = () => onUpdateQuantity(item.orderItemId, item.quantity + 1);
     const decrease = () => {
-        if (quantity <= 1){
-            // Delete
+        if (item.quantity <= 1){
+            onRemoveItem(item.orderItemId);
         }
         else {
-            setQuantity(prev => prev - 1);
+            onUpdateQuantity(item.orderItemId, item.quantity - 1);
         }
     };
 
-    const currentTotalPrice = item.unitPrice * quantity;
+    const currentTotalPrice = item.unitPrice * item.quantity;
 
     return (
         <div className="cart-item">
@@ -35,8 +36,10 @@ export default function CartItem({item}: CartItemProps){
             <div className="cart-item-info">
                 <div className="cart-item-header">
                     <h3 className="cart-item-title">{item.title}</h3>
-                    <button className="cart-item-delete">
-                        <img src={trashIcon}/>
+                    <button 
+                        className="cart-item-delete" 
+                        onClick={() => onRemoveItem(item.orderItemId)}>
+                        <img src={trashIcon} alt='Delete item'/>
                     </button>
                 </div>
                 
@@ -53,7 +56,7 @@ export default function CartItem({item}: CartItemProps){
                     
                     <div className="quantity-control">
                         <button onClick={decrease}>-</button>
-                        <span>{quantity}</span>
+                        <span>{item.quantity}</span>
                         <button onClick={increase}>+</button>
                     </div>
                 </div>
