@@ -54,9 +54,9 @@ export default function Trending(){
                         id={prod.id}
                         title={prod.title}
                         rating={prod.rating}
-                        price={prod.price}
                         originalPrice={prod.originalPrice}
-                        image={prod.image} 
+                        promotionPrice={prod.promotionPrice}
+                        image={prod.image}
                         discount={prod.discount}
                     />
                 ))}

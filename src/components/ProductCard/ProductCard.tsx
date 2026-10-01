@@ -8,20 +8,23 @@ interface ProductCardProps {
     image?: string;
     title: string;
     rating: number;
-    price: number;
-    originalPrice?: number;
+    originalPrice: number;
+    promotionPrice?: number;
     discount?: number;
 }
 
 export default function ProductCard({
     id,
-    image, 
-    title, 
+    image,
+    title,
     rating,
-    price, 
-    originalPrice, 
+    originalPrice,
+    promotionPrice,
     discount
 }: ProductCardProps){
+    const onSale = promotionPrice != null;
+    const price = promotionPrice ?? originalPrice;
+
     return (
         <Link to={`/product/${id}`}className="product-card">
             <div className="product-img-wrapper">
@@ -39,9 +42,9 @@ export default function ProductCard({
 
             <div className="product-price">
                 <span className="cur-price">${price}</span>
-                {(originalPrice || discount) && (
+                {onSale && (
                     <div className="price-group">
-                        {originalPrice && <span className="ori-price">${originalPrice}</span>}
+                        <span className="ori-price">${originalPrice}</span>
                         {discount && <span className="discount-badge">-{discount}%</span>}
                     </div>
                 )}

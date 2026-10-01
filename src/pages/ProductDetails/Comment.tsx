@@ -21,8 +21,8 @@ const CommentCard = ({ comment }: CommentCardProps) => {
       ? `${comment.content.slice(0, maxLength)}...`
       : comment.content;
 
-  const date = comment.created_at
-    ? new Date(comment.created_at).toLocaleDateString('en-US', {
+  const date = comment.updated_at
+    ? new Date(comment.updated_at).toLocaleDateString('en-US', {
         month: 'long',
         day: 'numeric',
         year: 'numeric',

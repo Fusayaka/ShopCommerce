@@ -115,9 +115,9 @@ export default function ProductResultPage({ onOpenFilter }: ProductResultPagePro
                         id={product.id}
                         title={product.title}
                         rating={product.rating}
-                        price={product.price}
                         originalPrice={product.originalPrice}
-                        image={product.image} 
+                        promotionPrice={product.promotionPrice}
+                        image={product.image}
                         discount={product.discount}
                     />
                 ))}

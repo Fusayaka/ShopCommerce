@@ -126,12 +126,12 @@ export default function Overview() {
                     </div>
 
                     <div className='detail-price-group'>
-                        <span className='detail-current-price'>${product.price}</span>
-                        
-                        {product.originalPrice && (
+                        <span className='detail-current-price'>${product.promotionPrice ?? product.originalPrice}</span>
+
+                        {product.promotionPrice && (
                             <span className='detail-original-price'>${product.originalPrice}</span>
                         )}
-                        
+
                         {product.discount && (
                             <span className='detail-discount-badge'>-{product.discount}%</span>
                         )}
