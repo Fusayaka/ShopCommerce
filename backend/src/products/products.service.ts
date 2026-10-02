@@ -78,14 +78,12 @@ export class ProductsService {
 
     const where: Prisma.ProductWhereInput = conditions.length > 0 ? {AND: conditions}: {}
     
-    const data = await Promise.all([
-      this.prisma.product.findMany({
-        where: where,
-        skip: skip,
-        take: limit,
-        orderBy: {rating: 'desc'}
-      })
-    ])
+    const data = await this.prisma.product.findMany({
+      where: where,
+      skip: skip,
+      take: limit,
+      orderBy: {rating: 'desc'}
+    })
 
     const total = await this.prisma.product.count({where});
     

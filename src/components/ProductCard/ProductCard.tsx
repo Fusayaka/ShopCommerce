@@ -45,7 +45,7 @@ export default function ProductCard({
                 {onSale && (
                     <div className="price-group">
                         <span className="ori-price">${originalPrice}</span>
-                        {discount && <span className="discount-badge">-{discount}%</span>}
+                        {discount && <span className="discount-badge">-{Math.floor(discount)}%</span>}
                     </div>
                 )}
             </div>

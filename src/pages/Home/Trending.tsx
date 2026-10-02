@@ -1,30 +1,31 @@
-import { mockProducts } from "@/mockdata";
 import type { Product } from "@/types";
 import { ProductCard } from "@/components";
 import './trending.css'
 import { useEffect, useState } from "react";
+import { CONFIG } from "@/config";
+
+const ROWS = 3;
 
 export default function Trending(){
     const getResponsiveItemCount = () => {
-        if (typeof window !== "undefined"){ 
+        if (typeof window !== "undefined"){
             return window.innerWidth <= 768 ? 2 : 4;
         }
         return 2;
     }
 
     const [products, setProducts] = useState<Product[]>([]);
-    
+
     const [visibleCount, setVisibleCount] = useState(getResponsiveItemCount());
     const [itemsPerLoad, setItemPerLoad] = useState(getResponsiveItemCount());
     
     const productsLength = products.length;
 
     useEffect(() => {
-        return setProducts(mockProducts);
-        // fetch("http://localhost:8000/api/products")
-        //     .then(res => res.json())
-        //     .then(data => setProducts(data))
-        //     .catch(err => console.error("Error when loading data:", err));
+        fetch(`${CONFIG.API_URL}/products?limit=${ROWS * getResponsiveItemCount()}`)
+            .then(res => res.json())
+            .then(json => setProducts(json.data ?? []))
+            .catch(err => console.error("Error when loading data:", err));
     }, []);
 
     const handleLoadMore = () => {
@@ -35,9 +36,12 @@ export default function Trending(){
 
     useEffect(() => {
         const handleResize = () => {
-            const curResponsiveCount = window.innerWidth <= 768 ? 2 : 4;
+            const curResponsiveCount = getResponsiveItemCount();
             setItemPerLoad(curResponsiveCount);
-            setVisibleCount((prev) => Math.max(prev, curResponsiveCount));
+            setVisibleCount((prev) => {
+                const rows = Math.max(ROWS, Math.ceil(prev / curResponsiveCount));
+                return rows * curResponsiveCount;
+            });
         }
 
         window.addEventListener("resize", handleResize);

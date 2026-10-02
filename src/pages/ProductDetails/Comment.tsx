@@ -1,7 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './Comment.css';
-
-import { mockComments } from '@/mockdata';
+import { CONFIG } from '@/config';
 import { StarRating } from '@/components';
 import { useParams } from 'react-router-dom';
 import { type Comment as CommentType } from '@/types';
@@ -21,15 +20,16 @@ const CommentCard = ({ comment }: CommentCardProps) => {
       ? `${comment.content.slice(0, maxLength)}...`
       : comment.content;
 
-  const date = comment.updated_at
-    ? new Date(comment.updated_at).toLocaleDateString('en-US', {
+  const date = comment.updatedAt
+    ? new Date(comment.updatedAt).toLocaleDateString('en-US', {
         month: 'long',
         day: 'numeric',
         year: 'numeric',
       })
     : 'August 21, 2025';
 
-  const displayName = comment.name || 'Anonymous';
+  const displayName = comment.user?.name || 'Anonymous';
+  const avatar = comment.user?.avatar;
 
   return (
     <div className="comment-card">
@@ -39,8 +39,8 @@ const CommentCard = ({ comment }: CommentCardProps) => {
 
       <div className="comment-user-header">
         <div className="comment-avatar">
-          {comment.avatar ? (
-            <img src={comment.avatar} alt={displayName} />
+          {avatar ? (
+            <img src={avatar} alt={displayName} />
           ) : (
             displayName.charAt(0).toUpperCase()
           )}
@@ -68,14 +68,58 @@ const CommentCard = ({ comment }: CommentCardProps) => {
 
 export default function Comment() {
   const { productId } = useParams<{ productId: string }>();
+  const [isLoading, setIsLoading] = useState(true);
+  const [comments, setComments] = useState<CommentType[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    if (!productId) return;
 
-  const productComments = mockComments.filter(
-    comment => comment.productId === Number(productId)
-  );
+    const controller = new AbortController();
+
+    const fetchComments = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const res = await fetch(`${CONFIG.API_URL}/comments?productId=${productId}`, {
+          signal: controller.signal,
+        })
+
+        if (!res.ok) throw new Error(`Connection error: ${res.status}`);
+
+        const json = await res.json();
+        // GET /comments returns a bare array of comments (each with a nested user)
+        setComments(Array.isArray(json) ? json : [])
+      } catch (err){
+        if (err instanceof Error && err.name === "AbortError") return;
+        setError("Could not load comments.");
+        setComments([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchComments();
+    return () => controller.abort();
+
+  }, [productId])
+
+  if (isLoading) {
+    return <div className="comment-status">Loading comments...</div>;
+  }
+
+  if (error) {
+    return <div className="comment-status">{error}</div>;
+  }
+
+  if (comments.length === 0) {
+    return <div className="comment-status">No comments yet.</div>;
+  }
 
   return (
     <div className="comment-list">
-      {productComments.map(comment => (
+      {comments.map(comment => (
         <CommentCard
           key={comment.id}
           comment={comment}

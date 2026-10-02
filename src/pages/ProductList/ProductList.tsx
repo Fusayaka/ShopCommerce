@@ -31,7 +31,7 @@ export default function ProductList(){
     }) => {
         const params = new URLSearchParams(searchParams);
 
-        if (filter.rating && filter.rating !== "0") {
+        if (filter.rating && filter.rating !== undefined) {
             params.set("rating", filter.rating);
         } else {
             params.delete("rating");

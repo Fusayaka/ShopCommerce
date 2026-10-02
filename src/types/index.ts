@@ -28,11 +28,14 @@ export interface Comment {
     id: number;
     productId: number;
     userId: number;
-    name?: string;
-    avatar?: string;
     content: string;
     rating: number;
-    updated_at?: string;
+    updatedAt?: string;
+    user?: {
+        id: number;
+        name: string;
+        avatar?: string;
+    };
 }
 
 export interface OrderItem {

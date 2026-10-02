@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import './productResultPage.css'
 import { ProductCard } from "@/components";
-import { mockProducts } from '@/mockdata';
 import { type Product } from '@/types';
 import filterMenu from '@/assets/filter.png'
 import { useSearchParams } from 'react-router-dom';
+import { CONFIG } from '@/config';
 
 interface ProductResultPageProps {
     onOpenFilter?: () => void;
@@ -15,6 +15,12 @@ export default function ProductResultPage({ onOpenFilter }: ProductResultPagePro
 
     const currentPage = Number(searchParams.get('page')) || 1;
     const [itemsPerPage, setItemsPerPage] = useState(9);
+
+    const [products, setProducts] = useState<Product[]>([]);
+    const [total, setTotal] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     const handlePageChange = (newPage: number) => {
         const params = new URLSearchParams(searchParams);
@@ -37,18 +43,48 @@ export default function ProductResultPage({ onOpenFilter }: ProductResultPagePro
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const getResultProducts = (): Product[] => {
-        return mockProducts.concat(mockProducts, mockProducts);
-    };
+    useEffect(() => {
+        const controller = new AbortController();
 
-    const products = getResultProducts();
+        const params = new URLSearchParams(searchParams);
+        params.set('page', currentPage.toString());
+        params.set('limit', itemsPerPage.toString());
 
-    const totalPages = Math.ceil(products.length / itemsPerPage);
-    
+        const fetchProducts = async () => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                const res = await fetch(`${CONFIG.API_URL}/products?${params.toString()}`, {
+                    signal: controller.signal,
+                });
+                if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+
+                const json = await res.json();
+                setProducts(json.data ?? []);
+                setTotal(json.meta?.total ?? 0);
+                setTotalPages(json.meta?.lastPage ?? 1);
+            }
+            catch (err) {
+                if (err instanceof Error && err.name === "AbortError") return;
+                setError("Could not load products.");
+                setProducts([]);
+            }
+            finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchProducts();
+        return () => controller.abort();
+    }, [searchParams, currentPage, itemsPerPage]);
+
     const safeCurrentPage = Math.min(currentPage, Math.max(1, totalPages));
-    
-    const startIndex = (safeCurrentPage - 1) * itemsPerPage;
-    const currentProducts = products.slice(startIndex, startIndex + itemsPerPage);
+
+    useEffect(() => {
+        if (!isLoading && currentPage > totalPages) {
+            handlePageChange(1);
+        }
+    }, [isLoading, currentPage, totalPages]);
 
     const handlePrev = () => {
         if (safeCurrentPage > 1) handlePageChange(safeCurrentPage - 1);
@@ -95,39 +131,47 @@ export default function ProductResultPage({ onOpenFilter }: ProductResultPagePro
         <div className="product-result-container">
             <div className="product-result-header">
                 <h2>Trending</h2>
-                
-                <div className="product-result-meta">
-                    <span className="total-products">Total: {products.length} Products</span>
 
-                    <button 
-                        className="mobile-filter-btn" 
+                <div className="product-result-meta">
+                    <span className="total-products">Total: {total} Products</span>
+
+                    <button
+                        className="mobile-filter-btn"
                         onClick={onOpenFilter}
                     >
                         <img src={filterMenu} alt="filter" />
                     </button>
                 </div>
             </div>
-            
-            <div className="product-grid">
-                {currentProducts.map((product) => (
-                    <ProductCard
-                        key={product.id}
-                        id={product.id}
-                        title={product.title}
-                        rating={product.rating}
-                        originalPrice={product.originalPrice}
-                        promotionPrice={product.promotionPrice}
-                        image={product.image}
-                        discount={product.discount}
-                    />
-                ))}
-            </div>
+
+            {isLoading ? (
+                <div className="product-result-status">Loading...</div>
+            ) : error ? (
+                <div className="product-result-status">{error}</div>
+            ) : products.length === 0 ? (
+                <div className="product-result-status">No products found.</div>
+            ) : (
+                <div className="product-grid">
+                    {products.map((product) => (
+                        <ProductCard
+                            key={product.id}
+                            id={product.id}
+                            title={product.title}
+                            rating={product.rating}
+                            originalPrice={product.originalPrice}
+                            promotionPrice={product.promotionPrice}
+                            image={product.image}
+                            discount={product.discount}
+                        />
+                    ))}
+                </div>
+            )}
 
             {totalPages > 1 && (
                 <div className="pagination-container">
-                    <button 
-                        className="page-nav-btn" 
-                        onClick={handlePrev} 
+                    <button
+                        className="page-nav-btn"
+                        onClick={handlePrev}
                         disabled={safeCurrentPage === 1}
                     >
                         &larr; <span className="nav-text">Prev</span>
@@ -151,9 +195,9 @@ export default function ProductResultPage({ onOpenFilter }: ProductResultPagePro
                         ))}
                     </div>
 
-                    <button 
-                        className="page-nav-btn" 
-                        onClick={handleNext} 
+                    <button
+                        className="page-nav-btn"
+                        onClick={handleNext}
                         disabled={safeCurrentPage === totalPages}
                     >
                         <span className="nav-text">Next</span> &rarr;

@@ -1,9 +1,8 @@
-import { Optional } from "@nestjs/common";
 import { IsBoolean, IsInt, IsNumber, IsOptional, IsString, Min, Max } from "class-validator";
 import { Transform, Type } from "class-transformer";
 
 export class GetProductsQueryDto{
-    @Optional()
+    @IsOptional()
     @IsString()
     search?: string;
     
