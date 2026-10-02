@@ -158,7 +158,7 @@ export default function Filter({isOpen = true, onClose, onApplyFilter}: FilterPr
                                     onChange={(e) => setRating(e.target.value)}
                                     className="filter-select"
                                 >
-                                    <option value="All Ratings">All Ratings</option>
+                                    <option value="0">All Ratings</option>
                                     <option value="5">5 Stars</option>
                                     <option value="4">4 Stars & above</option>
                                     <option value="3">3 Stars & above</option>

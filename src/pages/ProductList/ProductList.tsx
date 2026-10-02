@@ -23,7 +23,7 @@ export default function ProductList(){
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const hanleApplyFilter = (filter: {
+    const handleApplyFilter = (filter: {
         rating: string;
         minPrice: number;
         maxPrice: number;
@@ -31,7 +31,7 @@ export default function ProductList(){
     }) => {
         const params = new URLSearchParams(searchParams);
 
-        if (filter.rating && filter.rating !== "All Ratings") {
+        if (filter.rating && filter.rating !== "0") {
             params.set("rating", filter.rating);
         } else {
             params.delete("rating");
@@ -50,9 +50,9 @@ export default function ProductList(){
         }
 
         if (filter.isDiscountOnly) {
-            params.set("discount", "true");
+            params.set("hasDiscount", "true");
         } else {
-            params.delete("discount");
+            params.delete("hasDiscount");
         }
 
         setSearchParams(params);
@@ -75,7 +75,7 @@ export default function ProductList(){
                     <div className="filter-content">
                         <Filter 
                             onClose={() => setIsMobileFilterOpen(false)} 
-                            onApplyFilter={hanleApplyFilter}
+                            onApplyFilter={handleApplyFilter}
                         />
                     </div>
                 </div>

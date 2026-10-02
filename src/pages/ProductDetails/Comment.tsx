@@ -70,7 +70,7 @@ export default function Comment() {
   const { productId } = useParams<{ productId: string }>();
 
   const productComments = mockComments.filter(
-    comment => comment.productId === productId
+    comment => comment.productId === Number(productId)
   );
 
   return (

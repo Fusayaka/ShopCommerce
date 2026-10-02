@@ -3,7 +3,7 @@ import { type Product } from "@/types";
 
 const mockProducts: Product[] = [
     {
-        id: "t0001",
+        id: 1,
         title: "Owen Blue T-Shirt",
         originalPrice: 126,
         promotionPrice: 120,
@@ -13,7 +13,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80"
     },
     {
-        id: "t0002",
+        id: 2,
         title: "Lyn White T-Shirt",
         originalPrice: 169,
         promotionPrice: 144,
@@ -23,7 +23,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80"
     },
     {
-        id: "t0003",
+        id: 3,
         title: "AC White T-Shirt",
         originalPrice: 200,
         promotionPrice: 180,
@@ -33,7 +33,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=600&q=80"
     },
     {
-        id: "t0004",
+        id: 4,
         title: "SC Black T-Shirt",
         originalPrice: 148,
         promotionPrice: 136,
@@ -43,7 +43,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80"
     },
     {
-        id: "t0005",
+        id: 5,
         title: "Proclub White T-Shirt",
         originalPrice: 222,
         promotionPrice: 200,
@@ -53,7 +53,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=80"
     },
     {
-        id: "t0006",
+        id: 6,
         title: "Classic Black T-Shirt",
         originalPrice: 150,
         rating: 4.2,
@@ -61,7 +61,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&q=80"
     },
     {
-        id: "t0007",
+        id: 7,
         title: "Essential Gray T-Shirt",
         originalPrice: 135,
         rating: 4.0,
@@ -69,7 +69,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&q=80"
     },
     {
-        id: "t0008",
+        id: 8,
         title: "Urban Green T-Shirt",
         originalPrice: 183,
         promotionPrice: 165,
@@ -79,7 +79,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80"
     },
     {
-        id: "t0009",
+        id: 9,
         title: "Relaxed Beige T-Shirt",
         originalPrice: 206,
         promotionPrice: 175,
@@ -89,7 +89,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=600&q=80"
     },
     {
-        id: "t0010",
+        id: 10,
         title: "Minimal Gray T-Shirt",
         originalPrice: 190,
         rating: 4.1,
@@ -97,7 +97,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=600&q=80"
     },
     {
-        id: "t0011",
+        id: 11,
         title: "Classic Navy T-Shirt",
         originalPrice: 140,
         promotionPrice: 125,
@@ -107,7 +107,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&q=80"
     },
     {
-        id: "t0012",
+        id: 12,
         title: "Oversized White T-Shirt",
         originalPrice: 180,
         promotionPrice: 155,
@@ -117,7 +117,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80"
     },
     {
-        id: "t0013",
+        id: 13,
         title: "Essential Black T-Shirt",
         originalPrice: 130,
         rating: 3.8,
@@ -125,7 +125,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80"
     },
     {
-        id: "t0014",
+        id: 14,
         title: "Vintage Blue T-Shirt",
         originalPrice: 190,
         promotionPrice: 165,
@@ -135,7 +135,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=600&q=80"
     },
     {
-        id: "t0015",
+        id: 15,
         title: "Soft Cotton White T-Shirt",
         originalPrice: 145,
         rating: 4.1,
@@ -143,7 +143,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80"
     },
     {
-        id: "t0016",
+        id: 16,
         title: "Street Black T-Shirt",
         originalPrice: 200,
         promotionPrice: 175,
@@ -153,7 +153,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=80"
     },
     {
-        id: "t0017",
+        id: 17,
         title: "Relax Fit Gray T-Shirt",
         originalPrice: 160,
         rating: 4.0,
@@ -161,7 +161,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&q=80"
     },
     {
-        id: "t0018",
+        id: 18,
         title: "Premium Blue T-Shirt",
         originalPrice: 250,
         promotionPrice: 220,
@@ -171,7 +171,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&q=80"
     },
     {
-        id: "t0019",
+        id: 19,
         title: "Daily White T-Shirt",
         originalPrice: 110,
         rating: 3.9,
@@ -179,7 +179,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80"
     },
     {
-        id: "t0020",
+        id: 20,
         title: "Modern Green T-Shirt",
         originalPrice: 210,
         promotionPrice: 185,
@@ -189,7 +189,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=600&q=80"
     },
     {
-        id: "t0021",
+        id: 21,
         title: "Heavy Cotton Black T-Shirt",
         originalPrice: 220,
         promotionPrice: 195,
@@ -199,7 +199,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=600&q=80"
     },
     {
-        id: "t0022",
+        id: 22,
         title: "Basic Cream T-Shirt",
         originalPrice: 125,
         rating: 4.0,
@@ -207,7 +207,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&q=80"
     },
     {
-        id: "t0023",
+        id: 23,
         title: "Sporty Blue T-Shirt",
         originalPrice: 175,
         promotionPrice: 155,
@@ -217,7 +217,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80"
     },
     {
-        id: "t0024",
+        id: 24,
         title: "Loose Fit White T-Shirt",
         originalPrice: 195,
         promotionPrice: 170,
@@ -227,7 +227,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80"
     },
     {
-        id: "t0025",
+        id: 25,
         title: "Simple Black T-Shirt",
         originalPrice: 140,
         rating: 3.7,
@@ -235,7 +235,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=600&q=80"
     },
     {
-        id: "t0026",
+        id: 26,
         title: "Classic Olive T-Shirt",
         originalPrice: 205,
         promotionPrice: 180,
@@ -245,7 +245,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80"
     },
     {
-        id: "t0027",
+        id: 27,
         title: "Premium Gray T-Shirt",
         originalPrice: 240,
         promotionPrice: 210,
@@ -255,7 +255,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=80"
     },
     {
-        id: "t0028",
+        id: 28,
         title: "Everyday Beige T-Shirt",
         originalPrice: 135,
         rating: 4.1,
@@ -263,7 +263,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&q=80"
     },
     {
-        id: "t0029",
+        id: 29,
         title: "Urban Navy T-Shirt",
         originalPrice: 185,
         promotionPrice: 165,
@@ -273,7 +273,7 @@ const mockProducts: Product[] = [
         image: "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&q=80"
     },
     {
-        id: "t0030",
+        id: 30,
         title: "Comfort Fit White T-Shirt",
         originalPrice: 175,
         promotionPrice: 150,

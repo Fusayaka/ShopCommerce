@@ -22,7 +22,7 @@ export default function Overview() {
         setIsLoading(true);
 
         const timeout = setTimeout(() => {
-            const product = mockProducts.find(p => p.id === productId);
+            const product = mockProducts.find(p => p.id === Number(productId));
             setProduct(product || null);
             setIsLoading(false);
         }, 500);

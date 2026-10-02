@@ -4,7 +4,7 @@ import plhImg from '/images/cloth-placeholder.jpeg'
 import StarRating from "../StarRating/StarRating";
 
 interface ProductCardProps {
-    id: string | number;
+    id: number;
     image?: string;
     title: string;
     rating: number;

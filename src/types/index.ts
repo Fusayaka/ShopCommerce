@@ -12,7 +12,7 @@ export interface User {
 }
 
 export interface Product {
-    id: string;
+    id: number;
     title: string;
     description?: string;
     originalPrice: number;
@@ -26,7 +26,7 @@ export interface Product {
 
 export interface Comment {
     id: number;
-    productId: string;
+    productId: number;
     userId: number;
     name?: string;
     avatar?: string;
@@ -37,7 +37,7 @@ export interface Comment {
 
 export interface OrderItem {
     orderItemId: string;
-    productId: string;
+    productId: number;
 
     title?: string;
     image?: string;

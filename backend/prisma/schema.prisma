@@ -20,7 +20,7 @@ model User {
 }
 
 model Product {
-  id             String      @id @db.VarChar(50)
+  id             Int         @id @default(autoincrement())
   title          String      @db.VarChar(100)
   description    String?
   originalPrice  Decimal     @map("original_price") @db.Decimal(10, 2)
@@ -38,7 +38,7 @@ model Product {
 
 model Comment {
   id        Int       @id @default(autoincrement())
-  productId String    @map("product_id") @db.VarChar(50)
+  productId Int       @map("product_id")
   userId    Int       @map("user_id")
   content   String
   rating    Decimal   @db.Decimal(3, 2)
@@ -68,7 +68,7 @@ model Order {
 model OrderItem {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   orderId    String?   @map("order_id") @db.Uuid
-  productId  String?   @map("product_id") @db.VarChar(50)
+  productId  Int?      @map("product_id")
   size       ItemSize
   color      Color
   quantity   Int       @default(1)

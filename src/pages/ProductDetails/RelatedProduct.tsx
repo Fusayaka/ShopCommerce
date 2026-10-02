@@ -4,7 +4,7 @@ import { ProductCard } from "@/components";
 import { useParams } from "react-router-dom";
 import './relatedProduct.css'
 
-function getRelatedProducts(product_id: string){
+function getRelatedProducts(product_id: number){
     return mockProducts
         .filter(p => p.id != product_id)
         .sort(() => 0.5 - Math.random())
@@ -14,7 +14,7 @@ function getRelatedProducts(product_id: string){
 export default function RelatedProduct() {
     const { productId } = useParams<{ productId: string }>();
     
-    const relatedProducts: Product[] = getRelatedProducts(productId || "");
+    const relatedProducts: Product[] = getRelatedProducts(Number(productId));
     
     if (relatedProducts.length == 0) return (
         <h2>No recommendation for this product</h2>
