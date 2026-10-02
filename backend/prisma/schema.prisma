@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(50)
+  email       String    @unique @db.VarChar(50)
+  avatar      String?   @db.VarChar(255)
+  description String?
+  updatedAt   DateTime? @default(now()) @map("updated_at") @db.Timestamp(6)
+  comments    Comment[]
+  orders      Order[]
+
+  @@map("users")
+}
+
+model Product {
+  id             String      @id @db.VarChar(50)
+  title          String      @db.VarChar(100)
+  description    String?
+  originalPrice  Decimal     @map("original_price") @db.Decimal(10, 2)
+  promotionPrice Decimal?    @map("promotion_price") @db.Decimal(10, 2)
+  discount       Decimal?    @default(dbgenerated("\nCASE\n    WHEN (promotion_price IS NULL) THEN NULL::numeric\n    ELSE round((((original_price - promotion_price) / original_price) * (100)::numeric), 2)\nEND")) @db.Decimal(5, 2)
+  rating         Decimal?    @default(0) @db.Decimal(2, 1)
+  numReviews     Int         @default(0) @map("num_reviews")
+  image          String?     @db.VarChar(255)
+  updatedAt      DateTime?   @default(now()) @map("updated_at") @db.Timestamp(6)
+  comments       Comment[]
+  orderItems     OrderItem[]
+
+  @@map("products")
+}
+
+model Comment {
+  id        Int       @id @default(autoincrement())
+  productId String    @map("product_id") @db.VarChar(50)
+  userId    Int       @map("user_id")
+  content   String
+  rating    Decimal   @db.Decimal(3, 2)
+  updatedAt DateTime? @default(now()) @map("updated_at") @db.Timestamp(6)
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("comments")
+}
+
+model Order {
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      Int?         @map("user_id")
+  status      OrderStatus? @default(cart)
+  subtotal    Decimal      @default(0) @db.Decimal(10, 2)
+  discount    Decimal      @default(0) @db.Decimal(10, 2)
+  deliveryFee Decimal      @default(0) @map("delivery_fee") @db.Decimal(10, 2)
+  total       Decimal?     @default(dbgenerated("((subtotal - discount) + delivery_fee)")) @db.Decimal(10, 2)
+  promoCode   String?      @map("promo_code") @db.VarChar(20)
+  updatedAt   DateTime?    @default(now()) @map("updated_at") @db.Timestamp(6)
+  items       OrderItem[]
+  user        User?        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId    String?   @map("order_id") @db.Uuid
+  productId  String?   @map("product_id") @db.VarChar(50)
+  size       ItemSize
+  color      Color
+  quantity   Int       @default(1)
+  unitPrice  Decimal   @map("unit_price") @db.Decimal(10, 2)
+  totalPrice Decimal?  @default(dbgenerated("(unit_price * (quantity)::numeric)")) @map("total_price") @db.Decimal(10, 2)
+  updatedAt  DateTime? @default(now()) @map("updated_at") @db.Timestamp(6)
+  order      Order?    @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  product    Product?  @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([orderId, productId, size, color])
+  @@map("order_items")
+}
+
+enum ItemSize {
+  S
+  M
+  L
+  XL
+  XXL
+
+  @@map("item_size")
+}
+
+enum Color {
+  Red
+  Green
+  Blue
+  Rainbow
+  Black
+  White
+  Grey
+
+  @@map("color")
+}
+
+enum OrderStatus {
+  cart
+  completed
+  checkout
+
+  @@map("order_status")
+}

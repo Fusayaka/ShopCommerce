@@ -1,0 +1,270 @@
+.header-container {
+  --primary-color: #000000;
+  --bg-search: #f0f0f0;
+  --text-gray: #666666;
+  --transition-speed: 0.2s;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 5%;
+  background-color: #ffffff;
+  border-bottom: 1px solid #eaeaea;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+.header-logo a {
+  display: block;
+  height: 32px;
+  margin-right: 10px;
+}
+
+.header-logo img {
+  height: auto;
+  width: auto;
+  object-fit: contain;
+}
+
+.header-nav {
+  display: flex;
+  gap: 36px;
+}
+
+.header-nav a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  transition: opacity var(--transition-speed) ease;
+}
+
+.header-nav a:hover {
+  color: deepskyblue;
+}
+
+.header-search {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-search);
+  border-radius: 99px;
+  padding: 10px 16px;
+  width: 400px;
+  max-width: 25%;
+}
+
+.header-search input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 80%;
+  flex: 1;
+  font-size: 14px;
+  color: var(--primary-color);
+}
+
+.search-icon {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  object-fit: contain;
+}
+
+.header-search input::placeholder {
+  color: var(--text-gray);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.lang-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lang-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.lang-selector select {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--primary-color);
+  position: static;
+  opacity: 1;
+  appearance: auto;
+}
+
+.cart-btn img {
+  height: 24px;
+  width: 24px;
+  object-fit: contain;
+  transition: transform var(--transition-speed) ease;
+  transform: translateY(4px);
+}
+
+.cart-btn:hover img {
+  transform: scale(1.5);
+}
+
+.login-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--primary-color);
+  color: #ffffff;
+  padding: 7px 15px;
+  border-radius: 99px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
+}
+
+.login-btn:hover {
+  transform: translateY(-1px);
+  color: red;
+}
+
+.hamburger-btn,
+.mobile-search-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.hamburger-btn img{
+  height: 24px;
+  width: auto;
+}
+
+@media (max-width: 768px) {
+  .header-container {
+    padding: 12px 16px;
+  }
+
+  .header-logo {
+    display: flex;
+    justify-content: flex-start;
+    text-align: left;
+    flex: 1;
+    padding-left: 20px;
+  }
+
+  .header-nav,
+  .header-search,
+  .login-btn {
+    display: none;
+  }
+
+  .hamburger-btn,
+  .mobile-search-btn {
+    display: flex;
+    align-items: center;
+  }
+
+  .header-actions {
+    gap: 16px;
+  }
+  .lang-selector {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    display: block;
+  }
+  
+  .lang-icon {
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .lang-selector select {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0; 
+    appearance: none;
+    font-size: 16px;
+  }
+}
+
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.mobile-menu-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-menu-content {
+  position: absolute;
+  top: 0;
+  left: -250px;
+  width: 250px;
+  height: 100%;
+  background-color: #ffffff;
+  padding: 24px;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+}
+
+.mobile-menu-overlay.open .mobile-menu-content {
+  transform: translateX(250px);
+}
+
+.close-menu-btn {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 8px;
+  margin-bottom: 24px;
+}
+
+.mobile-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.mobile-nav a {
+  text-decoration: none;
+  color: var(--primary-color);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.mobile-nav hr {
+  border: 0;
+  border-top: 1px solid #eaeaea;
+  margin: 8px 0;
+}
