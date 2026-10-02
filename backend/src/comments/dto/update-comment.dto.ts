@@ -1,0 +1,4 @@
+import { PartialType, PickType } from '@nestjs/mapped-types';
+import { CreateCommentDto } from './create-comment.dto.js';
+
+export class UpdateCommentDto extends PartialType(PickType(CreateCommentDto, ['content'] as const)) {}
