@@ -1,0 +1,117 @@
+@startuml
+skinparam linetype ortho
+skinparam backgroundColor #FFFFFF
+skinparam classAttributeIconSize 0
+
+enum ItemSize {
+    S
+    M
+    L
+    XL
+    XXL
+}
+
+enum Color {
+    Red
+    Green
+    Blue
+    Rainbow
+    Black
+    White
+    Grey
+}
+
+enum OrderStatus {
+    pending
+    checkout
+    completed
+    cancelled
+}
+
+class User {
+    + id: int <<PK>>
+    + name: string
+    + email: string
+    + avatar: string
+    + description: string
+    + updatedAt: dateTime
+}
+
+class Product {
+    + id: int <<PK>>
+    + title: string
+    + description: string
+    + originalPrice: decimal
+    + promotionPrice: decimal
+    + discount: decimal
+    + rating: decimal
+    + numReviews: int
+    + image: string
+    + updatedAt: dateTime
+}
+
+class Comment {
+    + id: int <<PK>>
+    + userId: int <<FK>>
+    + productId: int <<FK>>
+    + content: string
+    + rating: int
+    + updatedAt: dateTime
+}
+
+class Cart {
+    + id: int <<PK>>
+    + userId: int <<FK>> <<unique>>
+    + updatedAt: dateTime
+}
+
+class CartItem {
+    + id: int <<PK>>
+    + cartId: int <<FK>>
+    + productId: int <<FK>>
+    + size: ItemSize
+    + color: Color
+    + quantity: int
+    + updatedAt: dateTime
+}
+
+class Order {
+    + id: int <<PK>>
+    + userId: int <<FK>>
+    + status: OrderStatus
+    + subtotal: decimal
+    + discount: decimal
+    + deliveryFee: decimal
+    + total: decimal
+    + promoCode: string
+    + createdAt: dateTime
+    + updatedAt: dateTime
+}
+
+class OrderItem {
+    + id: int <<PK>>
+    + orderId: int <<FK>>
+    + productId: int <<FK>>
+    + title: string
+    + image: string
+    + size: ItemSize
+    + color: Color
+    + quantity: int
+    + priceAtPurchase: decimal
+    + totalPrice: decimal
+    + updatedAt: dateTime
+}
+
+' Relationships
+User ||--o{ Comment : "writes"
+Product ||--o{ Comment : "has"
+
+User ||--|| Cart : "owns"
+Cart ||--|{ CartItem : "contains"
+Product ||--o{ CartItem : "is added in"
+
+User ||--o{ Order : "places"
+Order ||--|{ OrderItem : "includes"
+Product ||--o{ OrderItem : "is ordered as"
+
+@enduml

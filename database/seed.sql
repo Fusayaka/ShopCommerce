@@ -1,7 +1,7 @@
 -- ==============================================================================
 -- 1. CLEAR OLD DATA
 -- ==============================================================================
-TRUNCATE TABLE order_items, orders, comments, products, users RESTART IDENTITY CASCADE;
+TRUNCATE TABLE order_items, orders, cart_items, carts, comments, products, users RESTART IDENTITY CASCADE;
 
 -- ==============================================================================
 -- 2. SEED USERS (10 Users, ids 1000-1009)
@@ -120,52 +120,74 @@ INSERT INTO comments (product_id, user_id, content, rating) VALUES
 (30, 1000, 'Simple design and good quality.', 4);
 
 -- ==============================================================================
--- 5. SEED ORDERS (20 Orders)
+-- 5. SEED CARTS (one active cart per user)
 -- ==============================================================================
-INSERT INTO orders (id, user_id, status, subtotal, discount, delivery_fee, promo_code) VALUES
-('11111111-0000-0000-0000-000000000001', 1000, 'completed', 240, 20, 15, 'SALE20'),
-('11111111-0000-0000-0000-000000000002', 1000, 'completed', 144, 0, 15, NULL),
-('11111111-0000-0000-0000-000000000003', 1000, 'completed', 200, 0, 0, 'FREESHIP'),
-('11111111-0000-0000-0000-000000000004', 1000, 'checkout', 375, 30, 15, 'VIP30'),
-('11111111-0000-0000-0000-000000000005', 1000, 'cart', 140, 0, 15, NULL),
-('11111111-0000-0000-0000-000000000006', 1001, 'completed', 316, 50, 15, 'HALFOFF'),
-('11111111-0000-0000-0000-000000000007', 1001, 'completed', 270, 0, 15, NULL),
-('11111111-0000-0000-0000-000000000008', 1001, 'checkout', 175, 0, 15, NULL),
-('11111111-0000-0000-0000-000000000009', 1001, 'cart', 185, 10, 15, 'NEW10'),
-('11111111-0000-0000-0000-000000000010', 1002, 'completed', 300, 0, 0, NULL),
-('11111111-0000-0000-0000-000000000011', 1002, 'completed', 220, 0, 15, NULL),
-('11111111-0000-0000-0000-000000000012', 1002, 'cart', 180, 0, 15, NULL),
-('11111111-0000-0000-0000-000000000013', 1003, 'completed', 145, 0, 15, NULL),
-('11111111-0000-0000-0000-000000000014', 1003, 'completed', 310, 30, 0, 'SAVE30'),
-('11111111-0000-0000-0000-000000000015', 1003, 'cart', 200, 0, 15, NULL),
-('11111111-0000-0000-0000-000000000016', 1004, 'completed', 145, 0, 15, NULL),
-('11111111-0000-0000-0000-000000000017', 1004, 'cart', 220, 0, 15, NULL),
-('11111111-0000-0000-0000-000000000018', 1005, 'completed', 195, 0, 15, NULL),
-('11111111-0000-0000-0000-000000000019', 1006, 'cart', 330, 30, 0, 'BULK30'),
-('11111111-0000-0000-0000-000000000020', 1007, 'completed', 185, 0, 15, NULL);
+INSERT INTO carts (id, user_id) VALUES
+(1, 1000),
+(2, 1001),
+(3, 1002),
+(4, 1003),
+(5, 1004),
+(6, 1006);
+
+INSERT INTO cart_items (cart_id, product_id, size, color, quantity) VALUES
+(1, 25, 'M', 'Black', 1),
+(2, 20, 'L', 'Green', 1),
+(3, 26, 'XL', 'White', 1),
+(4, 5, 'M', 'Black', 1),
+(5, 18, 'M', 'Blue', 1),
+(6, 8, 'XXL', 'Blue', 2);
 
 -- ==============================================================================
--- 6. SEED ORDER ITEMS (21 Order Items)
+-- 6. SEED ORDERS (placed orders only: checkout / completed)
 -- ==============================================================================
-INSERT INTO order_items (order_id, product_id, size, color, quantity, unit_price) VALUES
-('11111111-0000-0000-0000-000000000001', 1, 'L', 'Blue', 2, 120),
-('11111111-0000-0000-0000-000000000002', 2, 'M', 'White', 1, 144),
-('11111111-0000-0000-0000-000000000003', 5, 'L', 'White', 1, 200),
-('11111111-0000-0000-0000-000000000004', 11, 'XL', 'Blue', 3, 125),
-('11111111-0000-0000-0000-000000000005', 25, 'M', 'Black', 1, 140),
-('11111111-0000-0000-0000-000000000006', 3, 'S', 'White', 1, 180),
-('11111111-0000-0000-0000-000000000006', 4, 'S', 'Black', 1, 136),
-('11111111-0000-0000-0000-000000000007', 7, 'M', 'Grey', 2, 135),
-('11111111-0000-0000-0000-000000000008', 16, 'M', 'Black', 1, 175),
-('11111111-0000-0000-0000-000000000009', 20, 'L', 'Green', 1, 185),
-('11111111-0000-0000-0000-000000000010', 30, 'XL', 'White', 2, 150),
-('11111111-0000-0000-0000-000000000011', 18, 'L', 'White', 1, 220),
-('11111111-0000-0000-0000-000000000012', 26, 'XL', 'White', 1, 180),
-('11111111-0000-0000-0000-000000000013', 15, 'S', 'White', 1, 145),
-('11111111-0000-0000-0000-000000000014', 23, 'S', 'Red', 2, 155),
-('11111111-0000-0000-0000-000000000015', 5, 'M', 'Black', 1, 200),
-('11111111-0000-0000-0000-000000000016', 15, 'L', 'White', 1, 145),
-('11111111-0000-0000-0000-000000000017', 18, 'M', 'Blue', 1, 220),
-('11111111-0000-0000-0000-000000000018', 21, 'S', 'Black', 1, 195),
-('11111111-0000-0000-0000-000000000019', 8, 'XXL', 'Blue', 2, 165),
-('11111111-0000-0000-0000-000000000020', 20, 'L', 'Grey', 1, 185);
+INSERT INTO orders (id, user_id, status, subtotal, discount, delivery_fee, promo_code) VALUES
+(1, 1000, 'completed', 240, 20, 15, 'SALE20'),
+(2, 1000, 'completed', 144, 0, 15, NULL),
+(3, 1000, 'completed', 200, 0, 0, 'FREESHIP'),
+(4, 1000, 'checkout', 375, 30, 15, 'VIP30'),
+(5, 1001, 'completed', 316, 50, 15, 'HALFOFF'),
+(6, 1001, 'completed', 270, 0, 15, NULL),
+(7, 1001, 'checkout', 175, 0, 15, NULL),
+(8, 1002, 'completed', 300, 0, 0, NULL),
+(9, 1002, 'completed', 220, 0, 15, NULL),
+(10, 1003, 'completed', 145, 0, 15, NULL),
+(11, 1003, 'completed', 310, 30, 0, 'SAVE30'),
+(12, 1004, 'completed', 145, 0, 15, NULL),
+(13, 1005, 'completed', 195, 0, 15, NULL),
+(14, 1007, 'completed', 185, 0, 15, NULL);
+
+-- ==============================================================================
+-- 7. SEED ORDER ITEMS (title/image snapshotted from products at purchase time)
+-- ==============================================================================
+INSERT INTO order_items (order_id, product_id, title, image, size, color, quantity, price_at_purchase)
+SELECT v.order_id, v.product_id, p.title, p.image,
+       v.size::item_size, v.color::color, v.quantity, v.price_at_purchase
+FROM (VALUES
+    (1, 1, 'L', 'Blue', 2, 120),
+    (2, 2, 'M', 'White', 1, 144),
+    (3, 5, 'L', 'White', 1, 200),
+    (4, 11, 'XL', 'Blue', 3, 125),
+    (5, 3, 'S', 'White', 1, 180),
+    (5, 4, 'S', 'Black', 1, 136),
+    (6, 7, 'M', 'Grey', 2, 135),
+    (7, 16, 'M', 'Black', 1, 175),
+    (8, 30, 'XL', 'White', 2, 150),
+    (9, 18, 'L', 'White', 1, 220),
+    (10, 15, 'S', 'White', 1, 145),
+    (11, 23, 'S', 'Red', 2, 155),
+    (12, 15, 'L', 'White', 1, 145),
+    (13, 21, 'S', 'Black', 1, 195),
+    (14, 20, 'L', 'Grey', 1, 185)
+) AS v(order_id, product_id, size, color, quantity, price_at_purchase)
+JOIN products p ON p.id = v.product_id;
+
+-- ==============================================================================
+-- 8. RESYNC IDENTITY SEQUENCES
+-- Explicit id inserts above do not advance GENERATED BY DEFAULT sequences,
+-- so bump each one past its max id to avoid duplicate-key errors on new rows.
+-- ==============================================================================
+SELECT setval(pg_get_serial_sequence('users', 'id'), (SELECT MAX(id) FROM users));
+SELECT setval(pg_get_serial_sequence('products', 'id'), (SELECT MAX(id) FROM products));
+SELECT setval(pg_get_serial_sequence('carts', 'id'), (SELECT MAX(id) FROM carts));
+SELECT setval(pg_get_serial_sequence('orders', 'id'), (SELECT MAX(id) FROM orders));
