@@ -89,8 +89,7 @@ export default function Comment() {
         if (!res.ok) throw new Error(`Connection error: ${res.status}`);
 
         const json = await res.json();
-        // GET /comments returns a bare array of comments (each with a nested user)
-        setComments(Array.isArray(json) ? json : [])
+        setComments(json ?? [])
       } catch (err){
         if (err instanceof Error && err.name === "AbortError") return;
         setError("Could not load comments.");

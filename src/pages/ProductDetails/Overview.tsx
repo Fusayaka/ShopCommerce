@@ -3,51 +3,52 @@ import './overview.css'
 import { Link, useParams } from 'react-router-dom';
 import { StarRating } from '@/components';
 import plhImg from '/images/cloth-placeholder.jpeg'
-import { mockProducts } from '@/mockdata';
+import { CONFIG } from '@/config';
 import type { Product } from '@/types';
-
-const DEFAULT_DESC = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam, ea saepe aliquam expedita cum a commodi, aliquid autem laborum recusandae nulla sequi culpa tempore repellendus qui ad ratione, ipsam iure.";
 
 export default function Overview() {
     const {productId} = useParams<{ productId: string }>();
 
     const [product, setProduct] = useState<Product | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [loadError, setLoadError] = useState<string | null>(null);
+    const [feedback, setFeedback] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
     const [size, setSize] = useState<string | null>(null);
     const [color, setColor] = useState<string | null>(null);
     const [quantity, setQuantity] = useState<number | string>(1);
 
+    // TODO: implement userId
+    const userId = 1001;
+
     useEffect(() => {
+        const controller = new AbortController();
+
         setIsLoading(true);
+        setLoadError(null);
+        setFeedback(null);
 
-        const timeout = setTimeout(() => {
-            const product = mockProducts.find(p => p.id === Number(productId));
-            setProduct(product || null);
-            setIsLoading(false);
-        }, 500);
-        
-        return () => clearTimeout(timeout);
+        const fetchProduct = async () => {
+            if (!productId) return;
 
-        // const fetchProductAPI = async () => {
-        //     if (!productId) return;
-
-        //     try {
-        //         const response = await fetch(PRODUCT_API);
-        //         if (!response.ok) throw new Error('Not Found');
-        //         const data = await response.json();
-        //         setProduct(data);
-        //     }
-        //     catch (error) {
-        //         console.log(error);
-        //     }
-        //     finally{
-        //         setIsLoading(false);
-        //     }
-        // }
-        // fetchProductAPI();
-
-
+            try {
+                const res = await fetch(`${CONFIG.API_URL}/products/${productId}`, {
+                    signal: controller.signal
+                });
+                if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+                const data = await res.json();
+                setProduct(data);
+            }
+            catch (error) {
+                if (error instanceof Error && error.name === "AbortError") return;
+                setLoadError("Could not load product.");
+            }
+            finally{
+                setIsLoading(false);
+            }
+        }
+        fetchProduct();
+        return () => controller.abort();
     }, [productId])
 
     const handleQuantityChange = (type: 'increase' | 'decrease' | 'input', value? : string) => {
@@ -84,24 +85,57 @@ export default function Overview() {
         }
     };
 
-    const handleAddtoCart =() => {
+    useEffect(() => {
+        if (!feedback) return;
+        const timer = setTimeout(() => setFeedback(null), 3000);
+        return () => clearTimeout(timer);
+    }, [feedback]);
+
+    const handleAddtoCart = async () => {
         if (!color || !size){
-            alert("Please choose size and color!");
+            setFeedback({ text: "Please choose size and color!", type: "error" });
+            return;
         }
 
-        if (Number(quantity) < 1){
-            alert("Number of product must not be less than 1!");
+        try {
+            const res = await fetch(`${CONFIG.API_URL}/carts/items?userId=${userId}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    productId: Number(productId),
+                    size: size,
+                    color: color,
+                    quantity: Number(quantity),
+                }),
+            })
+            if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+            setFeedback({ text: "Added to cart!", type: "success" });
         }
-
-        // TO BE IMPLEMENTED
+        catch {
+            setFeedback({ text: "Could not add to your cart!", type: "error" });
+        }
     };
 
-    if (isLoading || !product){
-        return <div className="overview-container">Loading</div>
+    if (isLoading){
+        return <div className="detail-status">Loading...</div>
+    }
+
+    if (loadError || !product){
+        return (
+            <div className="detail-status detail-status-error">
+                {loadError ?? "Product not found."}
+            </div>
+        );
     }
 
     return (
         <section className='detail-container'>
+            {feedback && (
+                <div className={`detail-toast detail-toast-${feedback.type}`} role="status">
+                    {feedback.text}
+                </div>
+            )}
+
             <nav className='detail-breadcrumb'>
                 <Link to='/'>Home</Link> {' > '}
                 <Link to='/products'>Product</Link> {' > '}
@@ -138,16 +172,16 @@ export default function Overview() {
                     </div>
 
                     <p className='detail-desc'>
-                        {product.description || DEFAULT_DESC}
+                        {product.description}
                     </p>
                     
                     <div className="detail-selector-group">
                         <span className="detail-selector-label">Select colors</span>
                         <div className="detail-color-options">
-                            {['red', 'blue', 'green'].map(c => (
-                                <button 
+                            {['Red', 'Blue', 'Green'].map(c => (
+                                <button
                                     key={c}
-                                    className={`detail-color-btn ${c} ${color === c ? 'active' : ''}`} 
+                                    className={`detail-color-btn ${c.toLowerCase()} ${color === c ? 'active' : ''}`}
                                     onClick={() => setColor(c)}
                                 ></button>
                             ))}

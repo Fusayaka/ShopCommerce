@@ -1,23 +1,24 @@
 import trashIcon from '@/assets/trash-icon.png'
 import plhImg from '/images/cloth-placeholder.jpeg'
 import type { CartItem } from '@/types'
+import { Link } from 'react-router-dom'
 
 import './cartItemCard.css'
 
 interface CartItemCardProps{
     item: CartItem;
-    onUpdateQuantity: (id: number, newQuantity: number) => void;
-    onRemoveItem: (id: number) => void;
+    onUpdateQuantity: (item: CartItem, newQuantity: number) => void;
+    onRemoveItem: (item: CartItem) => void;
 }
 
 export default function CartItemCard({item, onUpdateQuantity, onRemoveItem}: CartItemCardProps){
-    const increase = () => onUpdateQuantity(item.id, item.quantity + 1);
+    const increase = () => onUpdateQuantity(item, item.quantity + 1);
     const decrease = () => {
         if (item.quantity <= 1){
-            onRemoveItem(item.id);
+            onRemoveItem(item);
         }
         else {
-            onUpdateQuantity(item.id, item.quantity - 1);
+            onUpdateQuantity(item, item.quantity - 1);
         }
     };
 
@@ -25,20 +26,22 @@ export default function CartItemCard({item, onUpdateQuantity, onRemoveItem}: Car
 
     return (
         <div className="cart-item">
-            <div className="cart-item-image">
+            <Link to={`/product/${item.productId}`} className="cart-item-image">
                 <img
-                    src={item.image || plhImg}
+                    src={item.image}
                     alt={item.title}
                     onError={(e) => e.currentTarget.src = plhImg}
                 />
-            </div>
+            </Link>
 
             <div className="cart-item-info">
                 <div className="cart-item-header">
-                    <h3 className="cart-item-title">{item.title}</h3>
+                    <Link to={`/product/${item.productId}`} className="cart-item-title">
+                        {item.title}
+                    </Link>
                     <button
                         className="cart-item-delete"
-                        onClick={() => onRemoveItem(item.id)}>
+                        onClick={() => onRemoveItem(item)}>
                         <img src={trashIcon} alt='Delete item'/>
                     </button>
                 </div>

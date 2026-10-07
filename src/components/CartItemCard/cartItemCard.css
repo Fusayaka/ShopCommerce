@@ -15,6 +15,7 @@
 }
 
 .cart-item-image {
+    display: block;
     width: 120px;
     height: 130px;
     flex-shrink: 0;
@@ -43,13 +44,19 @@
 }
 
 .cart-item-title {
+    display: block;
     font-size: 20px;
     font-weight: 700;
     margin: 0;
     color: #000;
+    text-decoration: none;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.cart-item-title:hover {
+    color: #d31b1b;
 }
 
 .cart-item-delete {
