@@ -1,6 +1,6 @@
 export type Size = 'S' | 'M' | 'L' | 'XL' | 'XXL';
 export type Color = 'Red' | 'Green' | 'Blue' | 'Rainbow' | 'Black' | 'White' | 'Grey';
-export type OrderStatus = 'cart' | 'completed' | 'checkout';
+export type OrderStatus = 'pending' | 'checkout' | 'completed' | 'cancelled';
 
 export interface User {
     id: number;
@@ -38,6 +38,26 @@ export interface Comment {
     };
 }
 
+export interface CartItem {
+    id: number;
+    productId: number;
+
+    title: string;
+    image?: string;
+
+    size: Size;
+    color: Color;
+    quantity: number;
+    unitPrice: number;
+}
+
+export interface Cart {
+    id: number;
+    userId: number;
+    items: CartItem[];
+    updated_at?: string;
+}
+
 export interface OrderItem {
     orderItemId: string;
     productId: number;
@@ -52,7 +72,7 @@ export interface OrderItem {
     updated_at?: string;
 }
 
-export interface OrderSummary {
+export interface Order {
     id: string;
     userId: number;
     items: OrderItem[];
