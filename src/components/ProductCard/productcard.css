@@ -13,7 +13,7 @@
 .product-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 0 0 2px cyan, 0 10px 20px rgba(0, 255, 255, .3);
-  border-radius: 16px;
+  border-radius: 20px;
 }
 
 .product-img-wrapper {

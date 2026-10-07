@@ -31,7 +31,7 @@ export default function ProductList(){
     }) => {
         const params = new URLSearchParams(searchParams);
 
-        if (filter.rating && filter.rating !== undefined) {
+        if (filter.rating && filter.rating !== "0") {
             params.set("rating", filter.rating);
         } else {
             params.delete("rating");
@@ -54,6 +54,8 @@ export default function ProductList(){
         } else {
             params.delete("hasDiscount");
         }
+
+        params.delete("page");
 
         setSearchParams(params);
     };

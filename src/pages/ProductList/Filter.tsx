@@ -81,7 +81,7 @@ export default function Filter({isOpen = true, onClose, onApplyFilter}: FilterPr
         searchParams.get("discount") === "true"
     );
     const [rating, setRating] = useState(
-        searchParams.get("rating") || "All Ratings"
+        searchParams.get("rating") || "0"
     );
     const [minPrice, setMinPrice] = useState<number>(
         Number(searchParams.get("minPrice")) || 0
