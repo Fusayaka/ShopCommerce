@@ -5,6 +5,7 @@ import { StarRating } from '@/components';
 import plhImg from '/images/cloth-placeholder.jpeg'
 import { CONFIG } from '@/config';
 import type { Product } from '@/types';
+import { getCardPrice } from '@/utils/pricing';
 
 export default function Overview() {
     const {productId} = useParams<{ productId: string }>();
@@ -48,6 +49,7 @@ export default function Overview() {
             }
         }
         fetchProduct();
+        setQuantity(1);
         return () => controller.abort();
     }, [productId])
 
@@ -55,15 +57,19 @@ export default function Overview() {
         const curQuantity = Number(quantity) || 0;
         
         if (type === 'decrease'){
-            if (curQuantity >= 1){
+            if (curQuantity > 1){
                 setQuantity(curQuantity - 1);
             }
             else {
-                alert('Quantity must not be less than 0!');
+                setFeedback({ text: 'Quantity must not be less than 1!', type: "error" });
                 setQuantity(1);
             }
         }
         else if (type === 'increase'){
+            if (selectedStock != undefined && curQuantity >= selectedStock.stock){
+                setFeedback({ text: "Can not buy more than stock inventory!", type: "error" });
+                return;
+            }
             setQuantity(curQuantity + 1);
         }
         else if (type === 'input' && value !== undefined) {
@@ -97,14 +103,24 @@ export default function Overview() {
             return;
         }
 
+        const selectedStock = product?.stocks?.find(
+            (s) => s.size === size && s.color === color,
+        );
+        if (!selectedStock){
+            setFeedback({ text: "This option is not available!", type: "error" });
+            return;
+        }
+        if (selectedStock.stock <= 0){
+            setFeedback({ text: "This option is out of stock!", type: "error" });
+            return;
+        }
+
         try {
             const res = await fetch(`${CONFIG.API_URL}/carts/items?userId=${userId}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    productId: Number(productId),
-                    size: size,
-                    color: color,
+                    stockId: selectedStock.id,
                     quantity: Number(quantity),
                 }),
             })
@@ -127,6 +143,32 @@ export default function Overview() {
             </div>
         );
     }
+
+    const rating = Number(product.rating);
+    const selectedStock = product.stocks?.find(
+        (s) => s.size === size && s.color === color,
+    );
+    const { originalPrice, promotionPrice, discount } = getCardPrice(
+        product.stocks,
+        size,
+        color,
+    );
+
+    const stocks = product.stocks ?? [];
+    const COLORS = ['Red', 'Blue', 'Green'];
+    const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
+
+    const colorExists = (c: string) =>
+        stocks.some((v) => v.color === c);
+    const variantExists = (c: string, s: string) =>
+        stocks.some((v) => v.color === c && v.size === s);
+
+    const outOfStock = !!selectedStock && selectedStock.stock <= 0;
+
+    const handleSelectColor = (c: string) => {
+        setColor(c);
+        if (size && !variantExists(c, size)) setSize(null);
+    };
 
     return (
         <section className='detail-container'>
@@ -152,39 +194,45 @@ export default function Overview() {
                         {product.title}
                     </h1>
                     
-                    <div className='detail-rating-group'>
-                        <span className="detail-stars">
-                            <StarRating rating={product.rating}/>  
-                        </span>
-                        <span className="detail-score">{product.rating}/5</span>
-                    </div>
+                    {rating > 0 && (
+                        <div className='detail-rating-group'>
+                            <span className="detail-stars">
+                                <StarRating rating={rating}/>
+                            </span>
+                            <span className="detail-score">{rating}/5</span>
+                        </div>
+                    )}
 
                     <div className='detail-price-group'>
-                        <span className='detail-current-price'>${product.promotionPrice ?? product.originalPrice}</span>
+                        <span className='detail-current-price'>${promotionPrice ?? originalPrice}</span>
 
-                        {product.promotionPrice && (
-                            <span className='detail-original-price'>${product.originalPrice}</span>
+                        {promotionPrice != null && (
+                            <span className='detail-original-price'>${originalPrice}</span>
                         )}
 
-                        {product.discount && (
-                            <span className='detail-discount-badge'>-{product.discount}%</span>
-                        )}
+                        {discount ? (
+                            <span className='detail-discount-badge'>-{discount}%</span>
+                        ) : null}
                     </div>
 
                     <p className='detail-desc'>
                         {product.description}
                     </p>
-                    
+
                     <div className="detail-selector-group">
                         <span className="detail-selector-label">Select colors</span>
                         <div className="detail-color-options">
-                            {['Red', 'Blue', 'Green'].map(c => (
-                                <button
-                                    key={c}
-                                    className={`detail-color-btn ${c.toLowerCase()} ${color === c ? 'active' : ''}`}
-                                    onClick={() => setColor(c)}
-                                ></button>
-                            ))}
+                            {COLORS.map(c => {
+                                const disabled = !colorExists(c);
+                                return (
+                                    <button
+                                        key={c}
+                                        disabled={disabled}
+                                        className={`detail-color-btn ${c.toLowerCase()} ${color === c ? 'active' : ''} ${disabled ? 'disabled' : ''}`}
+                                        onClick={() => {handleSelectColor(c), setQuantity(1)}}
+                                    ></button>
+                                );
+                            })}
                         </div>
                     </div>
 
@@ -193,33 +241,45 @@ export default function Overview() {
                     <div className="detail-selector-group">
                         <span className="detail-selector-label">Choose Size</span>
                         <div className="detail-size-options">
-                            {['S', 'M', 'L', 'XL', 'XXL'].map(s => (
-                                <button 
-                                    key={s} 
-                                    className={`detail-size-btn ${size === s ? 'active' : ''}`}
-                                    onClick={() => setSize(s)}
-                                >
-                                    {s}
-                                </button>
-                            ))}
+                            {SIZES.map(s => {
+                                const disabled = !color || !variantExists(color, s);
+                                return (
+                                    <button
+                                        key={s}
+                                        disabled={disabled}
+                                        className={`detail-size-btn ${size === s ? 'active' : ''} ${disabled ? 'disabled' : ''}`}
+                                        onClick={() => {setSize(s), setQuantity(1)}}
+                                    >
+                                        {s}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
+
+                    {selectedStock && (
+                        outOfStock ? (
+                            <p className="detail-stock-info detail-stock-out">Out of stock</p>
+                        ) : (
+                            <p className="detail-stock-info">In stock: {selectedStock.stock}</p>
+                        )
+                    )}
 
                     <hr className="detail-divider" />
 
                     <div className="detail-action-group">
                         <div className="detail-quantity-selector">
                             <button onClick={() => handleQuantityChange('decrease')}>-</button>
-                            <input 
-                                type="text" 
-                                className="detail-quantity-input" 
-                                value={quantity} 
+                            <input
+                                type="text"
+                                className="detail-quantity-input"
+                                value={quantity}
                                 onChange={(e) => handleQuantityChange('input', e.target.value)}
                                 onBlur={handleQuantityEmpty}
                             />
                             <button onClick={() => handleQuantityChange('increase')}>+</button>
                         </div>
-                        <button className="detail-add-to-cart-btn" onClick={handleAddtoCart}>Add to Cart</button>
+                        <button className="detail-add-to-cart-btn" onClick={handleAddtoCart} disabled={!selectedStock || outOfStock}>Add to Cart</button>
                     </div>
                 </div>
             </div>

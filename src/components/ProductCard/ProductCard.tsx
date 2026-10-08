@@ -2,50 +2,37 @@ import { Link } from "react-router-dom";
 import './productcard.css'
 import plhImg from '/images/cloth-placeholder.jpeg'
 import StarRating from "../StarRating/StarRating";
+import { getCardPrice } from "@/utils/pricing";
+import type { Product } from "@/types";
 
-interface ProductCardProps {
-    id: number;
-    image?: string;
-    title: string;
-    rating: number;
-    originalPrice: number;
-    promotionPrice?: number;
-    discount?: number;
-}
-
-export default function ProductCard({
-    id,
-    image,
-    title,
-    rating,
-    originalPrice,
-    promotionPrice,
-    discount
-}: ProductCardProps){
-    const onSale = promotionPrice != null;
+export default function ProductCard(product: Product){
+    const {originalPrice, promotionPrice, discount} = getCardPrice(product.stocks);
+    const rating = Number(product.rating);
     const price = promotionPrice ?? originalPrice;
 
     return (
-        <Link to={`/product/${id}`}className="product-card">
+        <Link to={`/product/${product.id}`}className="product-card">
             <div className="product-img-wrapper">
-                <img src={image || plhImg} alt={title} loading="lazy"/>
+                <img src={product.image || plhImg} alt={product.title} loading="lazy"/>
             </div>
 
-            <h4 className="product-title">{title}</h4>
+            <h4 className="product-title">{product.title}</h4>
 
-            <div className="product-rating">
-                <span className="stars">
-                    <StarRating rating={rating}/>   
-                </span> 
-                <span className="score">{rating}/5</span>
-            </div>
+            {rating > 0 && (
+                <div className="product-rating">
+                    <span className="stars">
+                        <StarRating rating={rating}/>
+                    </span>
+                    <span className="score">{rating}/5</span>
+                </div>
+            )}
 
             <div className="product-price">
                 <span className="cur-price">${price}</span>
-                {onSale && (
+                {promotionPrice != null && (
                     <div className="price-group">
                         <span className="ori-price">${originalPrice}</span>
-                        {discount && <span className="discount-badge">-{Math.floor(discount)}%</span>}
+                        {discount ? <span className="discount-badge">-{discount}%</span> : null}
                     </div>
                 )}
             </div>

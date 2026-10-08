@@ -53,16 +53,7 @@ export default function Trending(){
             <h2 className="trending-title">TRENDING</h2>
             <div className="trending-grid">
                 {products.slice(0, visibleCount).map((prod: Product) => (
-                    <ProductCard
-                        key={prod.id}
-                        id={prod.id}
-                        title={prod.title}
-                        rating={prod.rating}
-                        originalPrice={prod.originalPrice}
-                        promotionPrice={prod.promotionPrice}
-                        image={prod.image}
-                        discount={prod.discount}
-                    />
+                    <ProductCard key={prod.id} {...prod} />
                 ))}
             </div>
             {

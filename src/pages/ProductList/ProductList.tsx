@@ -27,6 +27,8 @@ export default function ProductList(){
         rating: string;
         minPrice: number;
         maxPrice: number;
+        minLimit: number;
+        maxLimit: number;
         isDiscountOnly: boolean;
     }) => {
         const params = new URLSearchParams(searchParams);
@@ -37,13 +39,13 @@ export default function ProductList(){
             params.delete("rating");
         }
 
-        if (filter.minPrice > 0) {
+        if (filter.minPrice > filter.minLimit) {
             params.set("minPrice", filter.minPrice.toString());
         } else {
             params.delete("minPrice");
         }
 
-        if (filter.maxPrice < 500) {
+        if (filter.maxPrice < filter.maxLimit) {
             params.set("maxPrice", filter.maxPrice.toString());
         } else {
             params.delete("maxPrice");

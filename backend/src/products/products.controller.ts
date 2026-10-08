@@ -15,6 +15,11 @@ export class ProductsController {
     return this.productsService.findAll(query);
   }
 
+  @Get('price')
+  getRoundedRange(){
+    return this.productsService.getRoundedPriceRange();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(+id);
@@ -23,6 +28,11 @@ export class ProductsController {
   @Get(':id/stock')
   getStock(@Param('id') id: string, @Query() query: GetStockDto) {
     return this.productsService.getStock(+id, query);
+  }
+
+  @Get(':id/related')
+  getRelated(@Param('id') id: string) {
+    return this.productsService.getRelated(+id);
   }
 
   @Post()

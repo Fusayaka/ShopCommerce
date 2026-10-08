@@ -1,18 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './filter.css'
 import upArrow from '@/assets/up-arrow.png'
 import downArrow from '@/assets/down-arrow.png'
 import filterMenu from '@/assets/filter.png'
 import { useSearchParams } from 'react-router-dom';
+import { fetchPriceRange } from '@/utils/products';
 
 interface FilterProps{
     isOpen?: boolean;
     onClose?: () => void;
-    onApplyFilter?: (filters: { 
-        rating: string, 
-        minPrice: number, 
-        maxPrice: number, 
-        isDiscountOnly: boolean 
+    onApplyFilter?: (filters: {
+        rating: string,
+        minPrice: number,
+        maxPrice: number,
+        minLimit: number,
+        maxLimit: number,
+        isDiscountOnly: boolean
     }) => void;
 }
 
@@ -83,27 +86,38 @@ export default function Filter({isOpen = true, onClose, onApplyFilter}: FilterPr
     const [rating, setRating] = useState(
         searchParams.get("rating") || "0"
     );
+    const [minLimit, setMinLimit] = useState<number>(0);
+    const [maxLimit, setMaxLimit] = useState<number>(500);
+
     const [minPrice, setMinPrice] = useState<number>(
         Number(searchParams.get("minPrice")) || 0
     );
     const [maxPrice, setMaxPrice] = useState<number>(
-        Number(searchParams.get("maxPrice")) || 400
+        Number(searchParams.get("maxPrice")) || 500
     );
+
+    useEffect(() => {
+        fetchPriceRange()
+            .then(({ min, max }) => {
+                setMinLimit(min);
+                setMaxLimit(max);
+                if (!searchParams.get("minPrice")) setMinPrice(min);
+                if (!searchParams.get("maxPrice")) setMaxPrice(max);
+            })
+            .catch((err) => console.error("Error loading price range:", err));
+    }, []);
 
     const [isRatingOpen, setIsRatingOpen] = useState<boolean>(true);
     const [isDiscountOpen, setIsDiscountOpen] = useState<boolean>(true);
     const [isPriceOpen, setIsPriceOpen] = useState<boolean>(true);
     const [isFilterBodyOpen, setIsFilterBodyOpen] = useState<boolean>(true);
 
-    const minLimit = 0;
-    const maxLimit = 500;
-
     const minPercent = ((minPrice - minLimit) / (maxLimit - minLimit)) * 100;
     const maxPercent = ((maxPrice - minLimit) / (maxLimit - minLimit)) * 100;
 
     const handleApply = () => {
         if (onApplyFilter){
-            onApplyFilter({rating, minPrice, maxPrice, isDiscountOnly});
+            onApplyFilter({rating, minPrice, maxPrice, minLimit, maxLimit, isDiscountOnly});
         }
         if (onClose) onClose();
     };

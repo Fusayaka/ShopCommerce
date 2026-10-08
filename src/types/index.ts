@@ -1,5 +1,14 @@
+export interface Paginated<T> {
+    data: T[];
+    meta: {
+        total: number;
+        page: number;
+        lastPage: number;
+    };
+}
+
 export type Size = 'S' | 'M' | 'L' | 'XL' | 'XXL';
-export type Color = 'Red' | 'Green' | 'Blue' | 'Rainbow' | 'Black' | 'White' | 'Grey';
+export type Color = 'Red' | 'Green' | 'Blue';
 export type OrderStatus = 'pending' | 'checkout' | 'completed' | 'cancelled';
 
 export interface User {
@@ -7,21 +16,38 @@ export interface User {
     name: string;
     email: string;
     avatar?: string;
+    contact?: string;
+    address?: string;
     description?: string;
-    updated_at?: string;
+    updatedAt?: string;
+}
+
+export interface Authen {
+    id: number;
+    userId: number;
+    username?: string;
+    email: string;
 }
 
 export interface Product {
     id: number;
     title: string;
     description?: string;
-    originalPrice: number;
-    promotionPrice?: number;
-    discount?: number;
     rating: number;
     numReviews: number;
     image?: string;
-    updated_at?: string;
+    updatedAt?: string;
+    stocks?: ProductStock[];
+}
+export interface ProductStock {
+    id: number;
+    productId: number;
+    size: Size;
+    color: Color;
+    originalPrice: number;
+    promotionPrice?: number;
+    stock: number;
+    product?: Product;
 }
 
 export interface Comment {
@@ -40,40 +66,48 @@ export interface Comment {
 
 export interface CartItem {
     id: number;
-    productId: number;
-
-    title: string;
-    image?: string;
-
-    size: Size;
-    color: Color;
+    cartId: number;
+    stockId: number;
     quantity: number;
-    unitPrice: number;
+    updatedAt?: string;
+    stock?: ProductStock;
 }
 
 export interface Cart {
     id: number;
     userId: number;
     items: CartItem[];
-    updated_at?: string;
+    updatedAt?: string;
+}
+
+// Flattened cart line for display, derived from the API's nested cart item
+// (item -> stock -> product).
+export interface CartLineItem {
+    id: number;        // cart item id
+    stockId: number;   // variant id, used for update / remove
+    productId: number; // for linking to the product page
+    title: string;
+    image?: string;
+    size: Size;
+    color: Color;
+    unitPrice: number;
+    quantity: number;
 }
 
 export interface OrderItem {
-    orderItemId: string;
-    productId: number;
-
-    title?: string;
+    id: number;
+    orderId: number;
+    stockId?: number;
+    title: string;
     image?: string;
-
-    size: Size;
-    color: Color;
     quantity: number;
-    unitPrice: number;
-    updated_at?: string;
+    priceAtPurchase: number;
+    totalPrice: number;
+    updatedAt?: string;
 }
 
 export interface Order {
-    id: string;
+    id: number;
     userId: number;
     items: OrderItem[];
     status: OrderStatus;
@@ -84,5 +118,6 @@ export interface Order {
     total: number;
 
     promoCode?: string;
-    updated_at?: string;
+    createdAt?: string;
+    updatedAt?: string;
 }

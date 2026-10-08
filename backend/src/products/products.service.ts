@@ -115,6 +115,7 @@ export class ProductsService {
       skip: skip,
       take: limit,
       orderBy: {rating: 'desc'},
+      include: { stocks: true },
     })
 
     const total = await this.prisma.product.count({where});
@@ -195,6 +196,67 @@ export class ProductsService {
         productId_size_color: { productId, size, color },
       },
     });
+  }
+
+  async getRelated(productId: number) {
+    const ids = (
+      await this.prisma.product.findMany({
+        select: { id: true },
+        orderBy: { id: 'asc' },
+      })
+    ).map((p) => p.id);
+
+    const n = ids.length;
+    const idx = ids.indexOf(productId);
+    if (n <= 1 || idx === -1) return [];
+
+    const relatedIds: number[] = [];
+    for (let i = 1; i <= Math.min(4, n - 1); i++) {
+      relatedIds.push(ids[(idx + i) % n]);
+    }
+
+    return this.prisma.product.findMany({
+      where: { id: { in: relatedIds } },
+      include: { stocks: true },
+    });
+  }
+
+  async getRoundedPriceRange(){
+    const result = await this.prisma.productStock.aggregate({
+      _min: {
+        originalPrice: true,
+        promotionPrice: true,
+      },
+      _max: {
+        originalPrice: true,
+        promotionPrice: true,
+      },
+    });
+
+    const minValues = [result._min.originalPrice, result._min.promotionPrice]
+      .filter((v) => v != null)
+      .map((v) => Number(v));
+    const maxValues = [result._max.originalPrice, result._max.promotionPrice]
+      .filter((v) => v != null)
+      .map((v) => Number(v));
+
+    const currentMin = minValues.length > 0 ? Math.min(...minValues) : 0;
+    const currentMax = maxValues.length > 0 ? Math.max(...maxValues) : 0;
+
+    return {
+      min: this.floorToPow10(currentMin),
+      max: this.ceilToPow10(currentMax),
+    };
+  }
+
+  private floorToPow10(value: number): number {
+    if (value <= 0) return 0;
+    return Math.pow(10, Math.floor(Math.log10(value) + 1e-9));
+  }
+
+  private ceilToPow10(value: number): number {
+    if (value <= 0) return 0;
+    return Math.pow(10, Math.ceil(Math.log10(value) - 1e-9));
   }
 
   remove(id: number) {

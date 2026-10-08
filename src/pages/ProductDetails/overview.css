@@ -248,6 +248,56 @@
   color: #ffffff;
 }
 
+.detail-color-btn:disabled,
+.detail-color-btn.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.detail-color-btn:disabled:hover,
+.detail-color-btn.disabled:hover {
+  transform: none;
+}
+
+.detail-size-btn:disabled,
+.detail-size-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.detail-size-btn:disabled:hover,
+.detail-size-btn.disabled:hover {
+  background-color: #f0f0f0;
+}
+
+.detail-out-of-stock {
+  color: #ff3333;
+  font-weight: 700;
+  font-size: 16px;
+  margin: 16px 0;
+}
+
+.detail-stock-info {
+  color: #666666;
+  font-size: 18px;
+  font-weight: 600;
+  padding-top: 20px;
+  margin: 0 0 16px;
+}
+
+.detail-stock-info.detail-stock-out {
+  color: #ff3333;
+}
+
+.detail-add-to-cart-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.detail-add-to-cart-btn:disabled:hover {
+  opacity: 0.4;
+}
+
 .detail-action-group {
   display: flex;
   flex-direction: row;

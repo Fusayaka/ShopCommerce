@@ -1,40 +1,32 @@
-import mockProducts from "@/mockdata/products";
+import { useEffect, useState } from "react";
 import type { Product } from "@/types";
 import { ProductCard } from "@/components";
 import { useParams } from "react-router-dom";
+import { fetchRelatedProducts } from "@/utils/products";
 import './relatedProduct.css'
-
-function getRelatedProducts(product_id: number){
-    return mockProducts
-        .filter(p => p.id != product_id)
-        .sort(() => 0.5 - Math.random())
-        .slice(0, 4);
-}
 
 export default function RelatedProduct() {
     const { productId } = useParams<{ productId: string }>();
-    
-    const relatedProducts: Product[] = getRelatedProducts(Number(productId));
-    
-    if (relatedProducts.length == 0) return (
+    const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+
+    useEffect(() => {
+        if (!productId) return;
+        fetchRelatedProducts(Number(productId))
+            .then(setRelatedProducts)
+            .catch((err) => console.error("Error loading related products:", err));
+    }, [productId]);
+
+    if (relatedProducts.length === 0) return (
         <h2>No recommendation for this product</h2>
     );
+
     return (
         <div className="related-products-section">
             <h2 className="related-title">YOU MIGHT ALSO LIKE</h2>
-            
+
             <div className="related-grid">
                 {relatedProducts.map((product) => (
-                    <ProductCard
-                        key={product.id}
-                        id={product.id}
-                        title={product.title}
-                        rating={product.rating}
-                        originalPrice={product.originalPrice}
-                        promotionPrice={product.promotionPrice}
-                        image={product.image}
-                        discount={product.discount}
-                    />
+                    <ProductCard key={product.id} {...product} />
                 ))}
             </div>
         </div>

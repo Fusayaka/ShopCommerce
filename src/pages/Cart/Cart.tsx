@@ -3,20 +3,23 @@ import OrderBill from "./OrderBill";
 import OrderList from "./OrderList";
 import './cart.css';
 import { useEffect, useState } from 'react';
-import type { Cart, CartItem } from "@/types";
+import type { CartLineItem, Size, Color } from "@/types";
 import { CONFIG } from "@/config";
 
 interface CartApiItem {
     id: number;
-    productId: number;
-    size: CartItem["size"];
-    color: CartItem["color"];
+    stockId: number;
     quantity: number;
-    product: {
-        title: string;
-        image?: string | null;
+    stock: {
+        productId: number;
+        size: Size;
+        color: Color;
         originalPrice: string | number;
         promotionPrice?: string | number | null;
+        product: {
+            title: string;
+            image?: string | null;
+        };
     };
 }
 
@@ -27,7 +30,7 @@ interface CartApiResponse {
 }
 
 export default function Cart() {
-    const [items, setItems] = useState<CartItem[]>([]);
+    const [items, setItems] = useState<CartLineItem[]>([]);
     const [loading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     
@@ -46,15 +49,16 @@ export default function Cart() {
                 if (!res.ok) throw new Error(`Request failed: ${res.status}`);
     
                 const json: CartApiResponse = await res.json();
-                const mapped: CartItem[] = (json.items ?? []).map((item) => ({
+                const mapped: CartLineItem[] = (json.items ?? []).map((item) => ({
                     id: item.id,
-                    productId: item.productId,
-                    title: item.product.title,
-                    image: item.product.image ?? undefined,
-                    size: item.size,
-                    color: item.color,
+                    stockId: item.stockId,
+                    productId: item.stock.productId,
+                    title: item.stock.product.title,
+                    image: item.stock.product.image ?? undefined,
+                    size: item.stock.size,
+                    color: item.stock.color,
                     quantity: item.quantity,
-                    unitPrice: Number(item.product.promotionPrice ?? item.product.originalPrice),
+                    unitPrice: Number(item.stock.promotionPrice ?? item.stock.originalPrice),
                 }));
                 setItems(mapped);
             }
@@ -72,7 +76,7 @@ export default function Cart() {
         return () => controller.abort();
     }, [userId])
 
-    const handleUpdateQuantity = async (productItem: CartItem, newQuantity: number) => {
+    const handleUpdateQuantity = async (productItem: CartLineItem, newQuantity: number) => {
         const prevItems = items;
         setError(null);
         setItems(prev =>
@@ -86,7 +90,7 @@ export default function Cart() {
             const res = await fetch(`${CONFIG.API_URL}/carts/items?userId=${userId}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...productItem, quantity: newQuantity }),
+                body: JSON.stringify({ stockId: productItem.stockId, quantity: newQuantity }),
             });
             if (!res.ok) throw new Error(`Request failed: ${res.status}`);
         }
@@ -96,7 +100,7 @@ export default function Cart() {
         }
     };
 
-    const handleRemoveItem = async (productItem: CartItem) => {
+    const handleRemoveItem = async (productItem: CartLineItem) => {
         const prevItems = items;
         setError(null);
         setItems(prev => prev.filter(item => item.id !== productItem.id));
@@ -104,7 +108,7 @@ export default function Cart() {
             const res = await fetch(`${CONFIG.API_URL}/carts/items?userId=${userId}`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...productItem})
+                body: JSON.stringify({ stockId: productItem.stockId })
             });
             if (!res.ok) throw new Error(`Request failed: ${res.status}`);
         }

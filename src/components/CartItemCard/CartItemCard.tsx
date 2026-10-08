@@ -1,14 +1,14 @@
 import trashIcon from '@/assets/trash-icon.png'
 import plhImg from '/images/cloth-placeholder.jpeg'
-import type { CartItem } from '@/types'
+import type { CartLineItem } from '@/types'
 import { Link } from 'react-router-dom'
 
 import './cartItemCard.css'
 
 interface CartItemCardProps{
-    item: CartItem;
-    onUpdateQuantity: (item: CartItem, newQuantity: number) => void;
-    onRemoveItem: (item: CartItem) => void;
+    item: CartLineItem;
+    onUpdateQuantity: (item: CartLineItem, newQuantity: number) => void;
+    onRemoveItem: (item: CartLineItem) => void;
 }
 
 export default function CartItemCard({item, onUpdateQuantity, onRemoveItem}: CartItemCardProps){

@@ -1,5 +1,5 @@
 import promo from '@/assets/promo-code.png';
-import type { CartItem } from '@/types';
+import type { CartLineItem } from '@/types';
 import './orderBill.css';
 import { useState } from 'react';
 
@@ -12,7 +12,7 @@ const PROMO_CODE: Record<string, number> = {
 }
 
 interface OrderBillProps{
-    items: CartItem[];
+    items: CartLineItem[];
 }
 
 function getDeliveryFee() {

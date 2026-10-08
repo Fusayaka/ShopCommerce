@@ -153,16 +153,7 @@ export default function ProductResultPage({ onOpenFilter }: ProductResultPagePro
             ) : (
                 <div className="product-grid">
                     {products.map((product) => (
-                        <ProductCard
-                            key={product.id}
-                            id={product.id}
-                            title={product.title}
-                            rating={product.rating}
-                            originalPrice={product.originalPrice}
-                            promotionPrice={product.promotionPrice}
-                            image={product.image}
-                            discount={product.discount}
-                        />
+                        <ProductCard key={product.id} {...product} />
                     ))}
                 </div>
             )}
