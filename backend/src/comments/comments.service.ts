@@ -13,11 +13,6 @@ export class CommentsService {
     return this.prisma.comment.create({
       data: createCommentDto,
     });
-
-    // TO BE IMPLEMENTED
-
-
-
   }
 
   async findAll(query: GetCommentQueryDto) {
@@ -58,10 +53,5 @@ export class CommentsService {
 
   async remove(id: number) {
     return this.prisma.comment.delete({where: {id}})
-
-    // TO BE IMPLEMENTED
-    // return this.prisma.$transaction(async (tx) => {
-    //   const comment = await tx.comment.findUnique({where: {id}})
-    // });
   }
 }

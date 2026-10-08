@@ -1,17 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, Query, Patch } from '@nestjs/common';
 import { ProductsService } from './products.service.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
+import { UpsertStockDto } from './dto/upsert-stock.dto.js';
+import { GetStockDto } from './dto/get-stock.dto.js';
 import { GetProductsQueryDto } from './dto/get-product.dto.js';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
-
-  @Post()
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.create(createProductDto);
-  }
 
   @Get()
   findAll(@Query() query: GetProductsQueryDto) {
@@ -19,20 +16,35 @@ export class ProductsController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.productsService.findOne(id);
+  findOne(@Param('id') id: string) {
+    return this.productsService.findOne(+id);
+  }
+
+  @Get(':id/stock')
+  getStock(@Param('id') id: string, @Query() query: GetStockDto) {
+    return this.productsService.getStock(+id, query);
+  }
+
+  @Post()
+  create(@Body() dto: CreateProductDto) {
+    return this.productsService.create(dto);
+  }
+
+  @Post(':id/stocks')
+  upsertStock(
+    @Param('id') id: string,
+    @Body() dto: UpsertStockDto,
+  ) {
+    return this.productsService.upsertStock(+id, dto);
   }
 
   @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateProductDto: UpdateProductDto
-  ) {
-    return this.productsService.update(id, updateProductDto);
+  update(@Param('id') id: string, @Body() dto: UpdateProductDto) {
+    return this.productsService.update(+id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.productsService.remove(id);
+  remove(@Param('id') id: string) {
+    return this.productsService.remove(+id);
   }
 }

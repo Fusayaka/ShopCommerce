@@ -33,21 +33,38 @@ class User {
     + name: string
     + email: string
     + avatar: string
+    + contact: string
+    + address: string
     + description: string
     + updatedAt: dateTime
+}
+
+class Authen {
+    + id: int <<PK>>
+    + userId: int <<FK>> <<unique>>
+    + username: string
+    + email: string
+    + password: string
 }
 
 class Product {
     + id: int <<PK>>
     + title: string
     + description: string
-    + originalPrice: decimal
-    + promotionPrice: decimal
-    + discount: decimal
     + rating: decimal
     + numReviews: int
     + image: string
     + updatedAt: dateTime
+}
+
+class ProductStock {
+    + id: int <<PK>>
+    + productId: int <<FK>>
+    + size: ItemSize
+    + color: Color
+    + originalPrice: decimal
+    + promotionPrice: decimal
+    + stock: int
 }
 
 class Comment {
@@ -68,9 +85,7 @@ class Cart {
 class CartItem {
     + id: int <<PK>>
     + cartId: int <<FK>>
-    + productId: int <<FK>>
-    + size: ItemSize
-    + color: Color
+    + stockId: int <<FK>>
     + quantity: int
     + updatedAt: dateTime
 }
@@ -91,11 +106,9 @@ class Order {
 class OrderItem {
     + id: int <<PK>>
     + orderId: int <<FK>>
-    + productId: int <<FK>>
+    + stockId: int <<FK>>
     + title: string
     + image: string
-    + size: ItemSize
-    + color: Color
     + quantity: int
     + priceAtPurchase: decimal
     + totalPrice: decimal
@@ -106,12 +119,15 @@ class OrderItem {
 User ||--o{ Comment : "writes"
 Product ||--o{ Comment : "has"
 
+User ||--|| Authen : "authenticates"
 User ||--|| Cart : "owns"
 Cart ||--|{ CartItem : "contains"
-Product ||--o{ CartItem : "is added in"
+
+Product ||--|{ ProductStock : "has variants"
+ProductStock ||--o{ CartItem : "selected in"
 
 User ||--o{ Order : "places"
 Order ||--|{ OrderItem : "includes"
-Product ||--o{ OrderItem : "is ordered as"
+ProductStock ||--o{ OrderItem : "ordered as"
 
 @enduml

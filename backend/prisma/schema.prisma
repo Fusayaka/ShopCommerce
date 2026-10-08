@@ -11,8 +11,11 @@ model User {
   name        String    @db.VarChar(50)
   email       String    @unique @db.VarChar(50)
   avatar      String?   @db.VarChar(255)
+  contact     String?   @db.VarChar(20)
+  address     String?   @db.VarChar(255)
   description String?
   updatedAt   DateTime? @default(now()) @map("updated_at") @db.Timestamp(6)
+  authen      Authen?
   cart        Cart?
   comments    Comment[]
   orders      Order[]
@@ -20,22 +23,45 @@ model User {
   @@map("users")
 }
 
+model Authen {
+  id       Int     @id @default(autoincrement())
+  userId   Int     @unique @map("user_id")
+  username String? @unique @db.VarChar(50)
+  email    String  @unique @db.VarChar(50)
+  password String  @db.VarChar(255)
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("authen")
+}
+
 model Product {
-  id             Int         @id @default(autoincrement())
-  title          String      @db.VarChar(100)
-  description    String?
-  originalPrice  Decimal     @map("original_price") @db.Decimal(10, 2)
-  promotionPrice Decimal?    @map("promotion_price") @db.Decimal(10, 2)
-  discount       Decimal?    @default(dbgenerated("\nCASE\n    WHEN (promotion_price IS NULL) THEN NULL::numeric\n    ELSE round((((original_price - promotion_price) / original_price) * (100)::numeric), 2)\nEND")) @db.Decimal(5, 2)
-  rating         Decimal?    @default(0) @db.Decimal(2, 1)
-  numReviews     Int         @default(0) @map("num_reviews")
-  image          String?     @db.VarChar(255)
-  updatedAt      DateTime?   @default(now()) @map("updated_at") @db.Timestamp(6)
-  cartItems      CartItem[]
-  comments       Comment[]
-  orderItems     OrderItem[]
+  id          Int            @id @default(autoincrement())
+  title       String         @db.VarChar(100)
+  description String?
+  rating      Decimal?       @default(0) @db.Decimal(2, 1)
+  numReviews  Int            @default(0) @map("num_reviews")
+  image       String?        @db.VarChar(255)
+  updatedAt   DateTime?      @default(now()) @map("updated_at") @db.Timestamp(6)
+  comments    Comment[]
+  stocks      ProductStock[]
 
   @@map("products")
+}
+
+model ProductStock {
+  id             Int         @id @default(autoincrement())
+  productId      Int         @map("product_id")
+  size           ItemSize
+  color          Color
+  originalPrice  Decimal     @map("original_price") @db.Decimal(10, 2)
+  promotionPrice Decimal?    @map("promotion_price") @db.Decimal(10, 2)
+  stock          Int         @default(0)
+  cartItems      CartItem[]
+  orderItems     OrderItem[]
+  product        Product     @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([productId, size, color])
+  @@map("product_stocks")
 }
 
 model Comment {
@@ -62,17 +88,15 @@ model Cart {
 }
 
 model CartItem {
-  id        Int       @id @default(autoincrement())
-  cartId    Int       @map("cart_id")
-  productId Int       @map("product_id")
-  size      ItemSize
-  color     Color
-  quantity  Int       @default(1)
-  updatedAt DateTime? @default(now()) @map("updated_at") @db.Timestamp(6)
-  cart      Cart      @relation(fields: [cartId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id        Int          @id @default(autoincrement())
+  cartId    Int          @map("cart_id")
+  stockId   Int          @map("stock_id")
+  quantity  Int          @default(1)
+  updatedAt DateTime?    @default(now()) @map("updated_at") @db.Timestamp(6)
+  cart      Cart         @relation(fields: [cartId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  stock     ProductStock @relation(fields: [stockId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@unique([cartId, productId, size, color])
+  @@unique([cartId, stockId])
   @@map("cart_items")
 }
 
@@ -94,19 +118,17 @@ model Order {
 }
 
 model OrderItem {
-  id              Int       @id @default(autoincrement())
-  orderId         Int       @map("order_id")
-  productId       Int?      @map("product_id")
-  title           String    @db.VarChar(100)
-  image           String?   @db.VarChar(255)
-  size            ItemSize
-  color           Color
-  quantity        Int       @default(1)
-  priceAtPurchase Decimal   @map("price_at_purchase") @db.Decimal(10, 2)
-  totalPrice      Decimal?  @default(dbgenerated("(price_at_purchase * (quantity)::numeric)")) @map("total_price") @db.Decimal(10, 2)
-  updatedAt       DateTime? @default(now()) @map("updated_at") @db.Timestamp(6)
-  order           Order     @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  product         Product?  @relation(fields: [productId], references: [id], onUpdate: NoAction)
+  id              Int           @id @default(autoincrement())
+  orderId         Int           @map("order_id")
+  stockId         Int?          @map("stock_id")
+  title           String        @db.VarChar(100)
+  image           String?       @db.VarChar(255)
+  quantity        Int           @default(1)
+  priceAtPurchase Decimal       @map("price_at_purchase") @db.Decimal(10, 2)
+  totalPrice      Decimal?      @default(dbgenerated("(price_at_purchase * (quantity)::numeric)")) @map("total_price") @db.Decimal(10, 2)
+  updatedAt       DateTime?     @default(now()) @map("updated_at") @db.Timestamp(6)
+  order           Order         @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  stock           ProductStock? @relation(fields: [stockId], references: [id], onUpdate: NoAction)
 
   @@map("order_items")
 }
@@ -125,10 +147,6 @@ enum Color {
   Red
   Green
   Blue
-  Rainbow
-  Black
-  White
-  Grey
 
   @@map("color")
 }

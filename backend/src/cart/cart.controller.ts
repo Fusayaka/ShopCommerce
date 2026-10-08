@@ -40,7 +40,7 @@ export class CartController {
     return this.cartService.removeItem(+userId, deleteCartItemDto);
   }
 
-  // Empty the user's cart.
+  // Clear the user's cart.
   @Delete('items/all')
   clearCart(@Query('userId') userId: string) {
     return this.cartService.clearCart(+userId);

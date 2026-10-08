@@ -1,61 +1,113 @@
 -- ==============================================================================
 -- 1. CLEAR OLD DATA
 -- ==============================================================================
-TRUNCATE TABLE order_items, orders, cart_items, carts, comments, products, users RESTART IDENTITY CASCADE;
+TRUNCATE TABLE order_items, orders, cart_items, carts, comments, product_stocks, products, authen, users RESTART IDENTITY CASCADE;
 
 -- ==============================================================================
 -- 2. SEED USERS (10 Users, ids 1000-1009)
 -- ==============================================================================
-INSERT INTO users (id, name, email, avatar, description) VALUES
-(1000, 'Minh Nguyen', 'minh@example.com', 'https://i.pravatar.cc/150?img=11', 'Streetwear enthusiast and weekend sneakerhead.'),
-(1001, 'Lan Pham', 'lan@example.com', 'https://i.pravatar.cc/150?img=5', 'Loves minimal basics and soft cotton tees.'),
-(1002, 'Hoang Tran', 'hoang@example.com', 'https://i.pravatar.cc/150?img=15', 'Shops for comfy everyday fits.'),
-(1003, 'Trang Le', 'trang@example.com', 'https://i.pravatar.cc/150?img=20', 'Into oversized styles and neutral tones.'),
-(1004, 'Khoa Vu', 'khoa@example.com', 'https://i.pravatar.cc/150?img=33', 'Casual dresser who values good fabric.'),
-(1005, 'Linh Bui', 'linh@example.com', 'https://i.pravatar.cc/150?img=44', 'Fan of bold colors and premium cotton.'),
-(1006, 'Tuan Do', 'tuan@example.com', 'https://i.pravatar.cc/150?img=55', 'Collects classic tees in every color.'),
-(1007, 'Ngoc Dang', 'ngoc@example.com', 'https://i.pravatar.cc/150?img=66', 'Prefers relaxed fits for daily wear.'),
-(1008, 'Dat Ngo', 'dat@example.com', 'https://i.pravatar.cc/150?img=36', 'Always hunting for a good promo.'),
-(1009, 'Huyen Ly', 'huyen@example.com', 'https://i.pravatar.cc/150?img=38', 'Likes clean, simple designs.');
+INSERT INTO users (id, name, email, avatar, contact, address, description) VALUES
+(1000, 'Minh Nguyen', 'minh@example.com', 'https://i.pravatar.cc/150?img=11', '+84 901 000 001', '12 Le Loi, District 1, Ho Chi Minh City', 'Streetwear enthusiast and weekend sneakerhead.'),
+(1001, 'Lan Pham', 'lan@example.com', 'https://i.pravatar.cc/150?img=5', '+84 901 000 002', '45 Nguyen Hue, District 1, Ho Chi Minh City', 'Loves minimal basics and soft cotton tees.'),
+(1002, 'Hoang Tran', 'hoang@example.com', 'https://i.pravatar.cc/150?img=15', '+84 901 000 003', '78 Tran Hung Dao, District 5, Ho Chi Minh City', 'Shops for comfy everyday fits.'),
+(1003, 'Trang Le', 'trang@example.com', 'https://i.pravatar.cc/150?img=20', '+84 901 000 004', '23 Hai Ba Trung, District 3, Ho Chi Minh City', 'Into oversized styles and neutral tones.'),
+(1004, 'Khoa Vu', 'khoa@example.com', 'https://i.pravatar.cc/150?img=33', '+84 901 000 005', '9 Pham Ngu Lao, District 1, Ho Chi Minh City', 'Casual dresser who values good fabric.'),
+(1005, 'Linh Bui', 'linh@example.com', 'https://i.pravatar.cc/150?img=44', '+84 901 000 006', '67 Vo Van Tan, District 3, Ho Chi Minh City', 'Fan of bold colors and premium cotton.'),
+(1006, 'Tuan Do', 'tuan@example.com', 'https://i.pravatar.cc/150?img=55', '+84 901 000 007', '34 Dien Bien Phu, Binh Thanh, Ho Chi Minh City', 'Collects classic tees in every color.'),
+(1007, 'Ngoc Dang', 'ngoc@example.com', 'https://i.pravatar.cc/150?img=66', '+84 901 000 008', '101 Cach Mang Thang 8, District 10, Ho Chi Minh City', 'Prefers relaxed fits for daily wear.'),
+(1008, 'Dat Ngo', 'dat@example.com', 'https://i.pravatar.cc/150?img=36', '+84 901 000 009', '56 Ly Thuong Kiet, District 11, Ho Chi Minh City', 'Always hunting for a good promo.'),
+(1009, 'Huyen Ly', 'huyen@example.com', 'https://i.pravatar.cc/150?img=38', '+84 901 000 010', '88 Nguyen Trai, District 5, Ho Chi Minh City', 'Likes clean, simple designs.');
 
 -- ==============================================================================
--- 3. SEED PRODUCTS (30 Products)
+-- 3. SEED AUTHEN (one credential row per user, password is a bcrypt placeholder)
 -- ==============================================================================
-INSERT INTO products (id, title, original_price, promotion_price, rating, num_reviews, image) VALUES
-(1, 'Owen Blue T-Shirt', 126, 120, 4.5, 214, 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80'),
-(2, 'Lyn White T-Shirt', 169, 144, 3.5, 98, 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80'),
-(3, 'AC White T-Shirt', 200, 180, 4.3, 176, 'https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=600&q=80'),
-(4, 'SC Black T-Shirt', 148, 136, 3.0, 54, 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80'),
-(5, 'Proclub White T-Shirt', 222, 200, 4.0, 132, 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=80'),
-(6, 'Classic Black T-Shirt', 150, NULL, 4.2, 143, 'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&q=80'),
-(7, 'Essential Gray T-Shirt', 135, NULL, 4.0, 87, 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&q=80'),
-(8, 'Urban Green T-Shirt', 183, 165, 4.4, 165, 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80'),
-(9, 'Relaxed Beige T-Shirt', 206, 175, 4.6, 231, 'https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=600&q=80'),
-(10, 'Minimal Gray T-Shirt', 190, NULL, 4.1, 76, 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=600&q=80'),
-(11, 'Classic Navy T-Shirt', 140, 125, 4.2, 119, 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&q=80'),
-(12, 'Oversized White T-Shirt', 180, 155, 4.5, 188, 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80'),
-(13, 'Essential Black T-Shirt', 130, NULL, 3.8, 63, 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80'),
-(14, 'Vintage Blue T-Shirt', 190, 165, 4.3, 147, 'https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=600&q=80'),
-(15, 'Soft Cotton White T-Shirt', 145, NULL, 4.1, 102, 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80'),
-(16, 'Street Black T-Shirt', 200, 175, 4.4, 159, 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=80'),
-(17, 'Relax Fit Gray T-Shirt', 160, NULL, 4.0, 91, 'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&q=80'),
-(18, 'Premium Blue T-Shirt', 250, 220, 4.7, 276, 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&q=80'),
-(19, 'Daily White T-Shirt', 110, NULL, 3.9, 48, 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80'),
-(20, 'Modern Green T-Shirt', 210, 185, 4.5, 203, 'https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=600&q=80'),
-(21, 'Heavy Cotton Black T-Shirt', 220, 195, 4.6, 221, 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=600&q=80'),
-(22, 'Basic Cream T-Shirt', 125, NULL, 4.0, 72, 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&q=80'),
-(23, 'Sporty Blue T-Shirt', 175, 155, 4.2, 134, 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80'),
-(24, 'Loose Fit White T-Shirt', 195, 170, 4.3, 151, 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80'),
-(25, 'Simple Black T-Shirt', 140, NULL, 3.7, 39, 'https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=600&q=80'),
-(26, 'Classic Olive T-Shirt', 205, 180, 4.4, 168, 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80'),
-(27, 'Premium Gray T-Shirt', 240, 210, 4.8, 312, 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=80'),
-(28, 'Everyday Beige T-Shirt', 135, NULL, 4.1, 84, 'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&q=80'),
-(29, 'Urban Navy T-Shirt', 185, 165, 4.5, 192, 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&q=80'),
-(30, 'Comfort Fit White T-Shirt', 175, 150, 4.2, 127, 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80');
-
+INSERT INTO authen (user_id, username, email, password)
+SELECT id, split_part(email, '@', 1), email,
+       '$2b$10$abcdefghijklmnopqrstuvQ8Z0m9rN0m9rN0m9rN0m9rN0m9rN0m9'
+FROM users;
 
 -- ==============================================================================
--- 4. SEED COMMENTS (60 Comments)
+-- 4. SEED PRODUCTS (30 Products)
+-- ==============================================================================
+INSERT INTO products (id, title, rating, num_reviews, image) VALUES
+(1, 'Owen Blue T-Shirt', 4.0, 214, 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80'),
+(2, 'Lyn White T-Shirt', 4.7, 98, 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80'),
+(3, 'AC White T-Shirt', 2.8, 176, 'https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=600&q=80'),
+(4, 'SC Black T-Shirt', 5.0, 54, 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80'),
+(5, 'Proclub White T-Shirt', 3.8, 132, 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=80'),
+(6, 'Classic Black T-Shirt', 4.4, 143, 'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&q=80'),
+(7, 'Essential Gray T-Shirt', 4.8, 87, 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&q=80'),
+(8, 'Urban Green T-Shirt', 3.4, 165, 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80'),
+(9, 'Relaxed Beige T-Shirt', 1.6, 231, 'https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=600&q=80'),
+(10, 'Minimal Gray T-Shirt', 4.5, 76, 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=600&q=80'),
+(11, 'Classic Navy T-Shirt', 4.1, 119, 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&q=80'),
+(12, 'Oversized White T-Shirt', 3.1, 188, 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80'),
+(13, 'Essential Black T-Shirt', 4.9, 63, 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80'),
+(14, 'Vintage Blue T-Shirt', 3.6, 147, 'https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=600&q=80'),
+(15, 'Soft Cotton White T-Shirt', 4.3, 102, 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80'),
+(16, 'Street Black T-Shirt', 2.4, 159, 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=80'),
+(17, 'Relax Fit Gray T-Shirt', 4.6, 91, 'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&q=80'),
+(18, 'Premium Blue T-Shirt', 1.0, 276, 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&q=80'),
+(19, 'Daily White T-Shirt', 4.5, 48, 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80'),
+(20, 'Modern Green T-Shirt', 2.1, 203, 'https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=600&q=80'),
+(21, 'Heavy Cotton Black T-Shirt', 1.9, 221, 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=600&q=80'),
+(22, 'Basic Cream T-Shirt', 4.2, 72, 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&q=80'),
+(23, 'Sporty Blue T-Shirt', 3.7, 134, 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80'),
+(24, 'Loose Fit White T-Shirt', 3.3, 151, 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80'),
+(25, 'Simple Black T-Shirt', 4.0, 39, 'https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=600&q=80'),
+(26, 'Classic Olive T-Shirt', 2.6, 168, 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80'),
+(27, 'Premium Gray T-Shirt', 1.3, 312, 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=80'),
+(28, 'Everyday Beige T-Shirt', 3.9, 84, 'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&q=80'),
+(29, 'Urban Navy T-Shirt', 3.0, 192, 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&q=80'),
+(30, 'Comfort Fit White T-Shirt', 3.5, 127, 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80');
+
+-- ==============================================================================
+-- 5. SEED PRODUCT STOCKS (variants)
+-- ==============================================================================
+INSERT INTO product_stocks (product_id, size, color, original_price, promotion_price, stock)
+SELECT pp.product_id,
+       s.size::item_size,
+       c.color::color,
+       pp.original_price,
+       pp.promotion_price,
+       (10 + (pp.product_id * 7 + length(s.size) + length(c.color)) % 40) AS stock
+FROM (VALUES
+    (1, 126, 120),
+    (2, 169, 144),
+    (3, 200, 180),
+    (4, 148, 136),
+    (5, 222, 200),
+    (6, 150, NULL),
+    (7, 135, NULL),
+    (8, 183, 165),
+    (9, 206, 175),
+    (10, 190, NULL),
+    (11, 140, 125),
+    (12, 180, 155),
+    (13, 130, NULL),
+    (14, 190, 165),
+    (15, 145, NULL),
+    (16, 200, 175),
+    (17, 160, NULL),
+    (18, 250, 220),
+    (19, 110, NULL),
+    (20, 210, 185),
+    (21, 220, 195),
+    (22, 125, NULL),
+    (23, 175, 155),
+    (24, 195, 170),
+    (25, 140, NULL),
+    (26, 205, 180),
+    (27, 240, 210),
+    (28, 135, NULL),
+    (29, 185, 165),
+    (30, 175, 150)
+) AS pp(product_id, original_price, promotion_price)
+CROSS JOIN (VALUES ('S'), ('M'), ('L'), ('XL'), ('XXL')) AS s(size)
+CROSS JOIN (VALUES ('Red'), ('Green'), ('Blue')) AS c(color);
+
+-- ==============================================================================
+-- 6. SEED COMMENTS (60 Comments)
 -- ==============================================================================
 INSERT INTO comments (product_id, user_id, content, rating) VALUES
 (1, 1001, 'The shirt is comfortable and the fabric feels good', 5),
@@ -120,7 +172,7 @@ INSERT INTO comments (product_id, user_id, content, rating) VALUES
 (30, 1000, 'Simple design and good quality.', 4);
 
 -- ==============================================================================
--- 5. SEED CARTS (one active cart per user)
+-- 7. SEED CARTS
 -- ==============================================================================
 INSERT INTO carts (id, user_id) VALUES
 (1, 1000),
@@ -130,16 +182,23 @@ INSERT INTO carts (id, user_id) VALUES
 (5, 1004),
 (6, 1006);
 
-INSERT INTO cart_items (cart_id, product_id, size, color, quantity) VALUES
-(1, 25, 'M', 'Black', 1),
-(2, 20, 'L', 'Green', 1),
-(3, 26, 'XL', 'White', 1),
-(4, 5, 'M', 'Black', 1),
-(5, 18, 'M', 'Blue', 1),
-(6, 8, 'XXL', 'Blue', 2);
+INSERT INTO cart_items (cart_id, stock_id, quantity)
+SELECT v.cart_id, ps.id, v.quantity
+FROM (VALUES
+    (1, 25, 'M', 'Blue', 1),
+    (2, 20, 'L', 'Green', 1),
+    (3, 26, 'XL', 'Red', 1),
+    (4, 5, 'M', 'Blue', 1),
+    (5, 18, 'M', 'Blue', 1),
+    (6, 8, 'XXL', 'Blue', 2)
+) AS v(cart_id, product_id, size, color, quantity)
+JOIN product_stocks ps
+  ON ps.product_id = v.product_id
+ AND ps.size = v.size::item_size
+ AND ps.color = v.color::color;
 
 -- ==============================================================================
--- 6. SEED ORDERS (placed orders only: checkout / completed)
+-- 8. SEED ORDERS (placed orders only: checkout / completed)
 -- ==============================================================================
 INSERT INTO orders (id, user_id, status, subtotal, discount, delivery_fee, promo_code) VALUES
 (1, 1000, 'completed', 240, 20, 15, 'SALE20'),
@@ -158,34 +217,35 @@ INSERT INTO orders (id, user_id, status, subtotal, discount, delivery_fee, promo
 (14, 1007, 'completed', 185, 0, 15, NULL);
 
 -- ==============================================================================
--- 7. SEED ORDER ITEMS (title/image snapshotted from products at purchase time)
+-- 9. SEED ORDER ITEMS
 -- ==============================================================================
-INSERT INTO order_items (order_id, product_id, title, image, size, color, quantity, price_at_purchase)
-SELECT v.order_id, v.product_id, p.title, p.image,
-       v.size::item_size, v.color::color, v.quantity, v.price_at_purchase
+INSERT INTO order_items (order_id, stock_id, title, image, quantity, price_at_purchase)
+SELECT v.order_id, ps.id, p.title, p.image, v.quantity, v.price_at_purchase
 FROM (VALUES
     (1, 1, 'L', 'Blue', 2, 120),
-    (2, 2, 'M', 'White', 1, 144),
-    (3, 5, 'L', 'White', 1, 200),
+    (2, 2, 'M', 'Green', 1, 144),
+    (3, 5, 'L', 'Green', 1, 200),
     (4, 11, 'XL', 'Blue', 3, 125),
-    (5, 3, 'S', 'White', 1, 180),
-    (5, 4, 'S', 'Black', 1, 136),
-    (6, 7, 'M', 'Grey', 2, 135),
-    (7, 16, 'M', 'Black', 1, 175),
-    (8, 30, 'XL', 'White', 2, 150),
-    (9, 18, 'L', 'White', 1, 220),
-    (10, 15, 'S', 'White', 1, 145),
+    (5, 3, 'S', 'Green', 1, 180),
+    (5, 4, 'S', 'Blue', 1, 136),
+    (6, 7, 'M', 'Red', 2, 135),
+    (7, 16, 'M', 'Blue', 1, 175),
+    (8, 30, 'XL', 'Green', 2, 150),
+    (9, 18, 'L', 'Green', 1, 220),
+    (10, 15, 'S', 'Green', 1, 145),
     (11, 23, 'S', 'Red', 2, 155),
-    (12, 15, 'L', 'White', 1, 145),
-    (13, 21, 'S', 'Black', 1, 195),
-    (14, 20, 'L', 'Grey', 1, 185)
+    (12, 15, 'L', 'Green', 1, 145),
+    (13, 21, 'S', 'Blue', 1, 195),
+    (14, 20, 'L', 'Red', 1, 185)
 ) AS v(order_id, product_id, size, color, quantity, price_at_purchase)
+JOIN product_stocks ps
+  ON ps.product_id = v.product_id
+ AND ps.size = v.size::item_size
+ AND ps.color = v.color::color
 JOIN products p ON p.id = v.product_id;
 
 -- ==============================================================================
--- 8. RESYNC IDENTITY SEQUENCES
--- Explicit id inserts above do not advance GENERATED BY DEFAULT sequences,
--- so bump each one past its max id to avoid duplicate-key errors on new rows.
+-- 10. RESYNC IDENTITY SEQUENCES
 -- ==============================================================================
 SELECT setval(pg_get_serial_sequence('users', 'id'), (SELECT MAX(id) FROM users));
 SELECT setval(pg_get_serial_sequence('products', 'id'), (SELECT MAX(id) FROM products));

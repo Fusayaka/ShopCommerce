@@ -13,7 +13,7 @@ export class UsersService {
 
     findOne(id: number){
         return this.prisma.user.findUnique({
-            where: {id: id}
+            where: {id}
         });
     }
 
@@ -25,14 +25,14 @@ export class UsersService {
 
     update(id: number, updateUsersDto: UpdateUsersDto){
         return this.prisma.user.update({
-            where: {id: id},
+            where: {id},
             data: updateUsersDto,
         });
     }
 
     delete(id: number){
         return this.prisma.user.delete({
-            where: {id: id}
+            where: {id}
         })
     }
 }
