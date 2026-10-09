@@ -28,6 +28,7 @@ CREATE TABLE users (
     contact VARCHAR(20),
     address VARCHAR(255),
     description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -48,6 +49,7 @@ CREATE TABLE products (
     rating DECIMAL(2, 1) DEFAULT 0,
     num_reviews INT NOT NULL DEFAULT 0,
     image VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -60,6 +62,7 @@ CREATE TABLE product_stocks (
     original_price DECIMAL(10, 2) NOT NULL,
     promotion_price DECIMAL(10, 2),
     stock INT NOT NULL DEFAULT 0,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (product_id, size, color)
 );
 
@@ -113,6 +116,5 @@ CREATE TABLE order_items (
     image VARCHAR(255),
     quantity INT NOT NULL DEFAULT 1,
     price_at_purchase DECIMAL(10, 2) NOT NULL,
-    total_price DECIMAL(10, 2) GENERATED ALWAYS AS (price_at_purchase * quantity) STORED,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    total_price DECIMAL(10, 2) GENERATED ALWAYS AS (price_at_purchase * quantity) STORED
 );
