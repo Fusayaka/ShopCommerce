@@ -1,0 +1,49 @@
+.related-products-section {
+  padding: 60px 5%;
+  box-sizing: border-box;
+  width: 100%; 
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background-color: #ffffff;
+  color: #000000;
+  border-bottom: 1px solid #0000001a;
+}
+
+.related-title {
+  text-align: center;
+  font-size: 48px;
+  font-weight: 900;
+  margin: 0 0 50px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.related-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .related-products-section {
+    padding: 40px 5%;
+  }
+  
+  .related-title {
+    font-size: 32px;
+    margin-bottom: 30px;
+  }
+  
+  .related-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  
+}
