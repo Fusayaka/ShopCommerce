@@ -29,49 +29,54 @@ FROM users;
 -- ==============================================================================
 -- 4. SEED PRODUCTS (30 Products)
 -- ==============================================================================
-INSERT INTO products (id, title, rating, num_reviews, image) VALUES
-(1, 'Owen Blue T-Shirt', 4.0, 214, 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80'),
-(2, 'Lyn White T-Shirt', 4.7, 98, 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80'),
-(3, 'AC White T-Shirt', 2.8, 176, 'https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=600&q=80'),
-(4, 'SC Black T-Shirt', 5.0, 54, 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80'),
-(5, 'Proclub White T-Shirt', 3.8, 132, 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=80'),
-(6, 'Classic Black T-Shirt', 4.4, 143, 'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&q=80'),
-(7, 'Essential Gray T-Shirt', 4.8, 87, 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&q=80'),
-(8, 'Urban Green T-Shirt', 3.4, 165, 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80'),
-(9, 'Relaxed Beige T-Shirt', 1.6, 231, 'https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=600&q=80'),
-(10, 'Minimal Gray T-Shirt', 4.5, 76, 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=600&q=80'),
-(11, 'Classic Navy T-Shirt', 4.1, 119, 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&q=80'),
-(12, 'Oversized White T-Shirt', 3.1, 188, 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80'),
-(13, 'Essential Black T-Shirt', 4.9, 63, 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80'),
-(14, 'Vintage Blue T-Shirt', 3.6, 147, 'https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=600&q=80'),
-(15, 'Soft Cotton White T-Shirt', 4.3, 102, 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80'),
-(16, 'Street Black T-Shirt', 2.4, 159, 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=80'),
-(17, 'Relax Fit Gray T-Shirt', 4.6, 91, 'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&q=80'),
-(18, 'Premium Blue T-Shirt', 1.0, 276, 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&q=80'),
-(19, 'Daily White T-Shirt', 4.5, 48, 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80'),
-(20, 'Modern Green T-Shirt', 2.1, 203, 'https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=600&q=80'),
-(21, 'Heavy Cotton Black T-Shirt', 1.9, 221, 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=600&q=80'),
-(22, 'Basic Cream T-Shirt', 4.2, 72, 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&q=80'),
-(23, 'Sporty Blue T-Shirt', 3.7, 134, 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80'),
-(24, 'Loose Fit White T-Shirt', 3.3, 151, 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80'),
-(25, 'Simple Black T-Shirt', 4.0, 39, 'https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=600&q=80'),
-(26, 'Classic Olive T-Shirt', 2.6, 168, 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80'),
-(27, 'Premium Gray T-Shirt', 1.3, 312, 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=80'),
-(28, 'Everyday Beige T-Shirt', 3.9, 84, 'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&q=80'),
-(29, 'Urban Navy T-Shirt', 3.0, 192, 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&q=80'),
-(30, 'Comfort Fit White T-Shirt', 3.5, 127, 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80');
+INSERT INTO products (id, title, image) VALUES
+(1, 'Owen Blue T-Shirt', 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80'),
+(2, 'Lyn White T-Shirt', 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80'),
+(3, 'AC White T-Shirt', 'https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=600&q=80'),
+(4, 'SC Black T-Shirt', 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80'),
+(5, 'Proclub White T-Shirt', 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=80'),
+(6, 'Classic Black T-Shirt', 'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&q=80'),
+(7, 'Essential Gray T-Shirt', 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&q=80'),
+(8, 'Urban Green T-Shirt', 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80'),
+(9, 'Relaxed Beige T-Shirt', 'https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=600&q=80'),
+(10, 'Minimal Gray T-Shirt', 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=600&q=80'),
+(11, 'Classic Navy T-Shirt', 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&q=80'),
+(12, 'Oversized White T-Shirt', 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80'),
+(13, 'Essential Black T-Shirt', 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80'),
+(14, 'Vintage Blue T-Shirt', 'https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=600&q=80'),
+(15, 'Soft Cotton White T-Shirt', 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80'),
+(16, 'Street Black T-Shirt', 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=80'),
+(17, 'Relax Fit Gray T-Shirt', 'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&q=80'),
+(18, 'Premium Blue T-Shirt', 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&q=80'),
+(19, 'Daily White T-Shirt', 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80'),
+(20, 'Modern Green T-Shirt', 'https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=600&q=80'),
+(21, 'Heavy Cotton Black T-Shirt', 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=600&q=80'),
+(22, 'Basic Cream T-Shirt', 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&q=80'),
+(23, 'Sporty Blue T-Shirt', 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80'),
+(24, 'Loose Fit White T-Shirt', 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80'),
+(25, 'Simple Black T-Shirt', 'https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=600&q=80'),
+(26, 'Classic Olive T-Shirt', 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80'),
+(27, 'Premium Gray T-Shirt', 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=80'),
+(28, 'Everyday Beige T-Shirt', 'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&q=80'),
+(29, 'Urban Navy T-Shirt', 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&q=80'),
+(30, 'Comfort Fit White T-Shirt', 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80');
 
 -- ==============================================================================
 -- 5. SEED PRODUCT STOCKS (variants)
 -- ==============================================================================
-INSERT INTO product_stocks (product_id, size, color, original_price, promotion_price, stock)
-SELECT pp.product_id,
-       s.size::item_size,
-       c.color::color,
-       pp.original_price,
-       pp.promotion_price,
-       (10 + (pp.product_id * 7 + length(s.size) + length(c.color)) % 40) AS stock
-FROM (VALUES
+WITH protected(product_id, size, color) AS (
+    VALUES
+        -- cart items
+        (25, 'M', 'Blue'), (20, 'L', 'Green'), (26, 'XL', 'Red'),
+        (5, 'M', 'Blue'), (18, 'M', 'Blue'), (8, 'XXL', 'Blue'),
+        -- order items
+        (1, 'L', 'Blue'), (2, 'M', 'Green'), (5, 'L', 'Green'), (11, 'XL', 'Blue'),
+        (3, 'S', 'Green'), (4, 'S', 'Blue'), (7, 'M', 'Red'), (16, 'M', 'Blue'),
+        (30, 'XL', 'Green'), (18, 'L', 'Green'), (15, 'S', 'Green'), (23, 'S', 'Red'),
+        (15, 'L', 'Green'), (21, 'S', 'Blue'), (20, 'L', 'Red')
+),
+base(product_id, original_price, promotion_price) AS (
+    VALUES
     (1, 126, 120),
     (2, 169, 144),
     (3, 200, 180),
@@ -102,74 +107,177 @@ FROM (VALUES
     (28, 135, NULL),
     (29, 185, 165),
     (30, 175, 150)
-) AS pp(product_id, original_price, promotion_price)
-CROSS JOIN (VALUES ('S'), ('M'), ('L'), ('XL'), ('XXL')) AS s(size)
-CROSS JOIN (VALUES ('Red'), ('Green'), ('Blue')) AS c(color);
+),
+variants AS (
+    SELECT b.product_id,
+           s.size,
+           c.color,
+           b.original_price,
+           b.promotion_price,
+           CASE s.size WHEN 'S' THEN 1 WHEN 'M' THEN 2 WHEN 'L' THEN 3 WHEN 'XL' THEN 4 ELSE 5 END AS size_rank,
+           CASE c.color WHEN 'Red' THEN 1 WHEN 'Green' THEN 2 ELSE 3 END AS color_rank,
+           CASE s.size WHEN 'XL' THEN 15 WHEN 'XXL' THEN 30 ELSE 0 END AS surcharge
+    FROM base b
+    CROSS JOIN (VALUES ('S'), ('M'), ('L'), ('XL'), ('XXL')) AS s(size)
+    CROSS JOIN (VALUES ('Red'), ('Green'), ('Blue')) AS c(color)
+)
+INSERT INTO product_stocks (product_id, size, color, original_price, promotion_price, stock)
+SELECT v.product_id,
+       v.size::item_size,
+       v.color::color,
+       v.original_price + v.surcharge,
+       CASE WHEN v.promotion_price IS NULL THEN NULL ELSE v.promotion_price + v.surcharge END,
+       CASE WHEN (v.product_id * 5 + v.size_rank + v.color_rank) % 9 = 0
+            THEN 0
+            ELSE 10 + (v.product_id * 7 + v.size_rank + v.color_rank) % 40
+       END AS stock
+FROM variants v
+WHERE EXISTS (
+          SELECT 1 FROM protected pr
+          WHERE pr.product_id = v.product_id AND pr.size = v.size AND pr.color = v.color
+      )
+   OR (
+          NOT (v.size = 'XXL' AND v.product_id % 3 = 0)
+      AND NOT (v.size = 'XL'  AND v.product_id % 5 = 0)
+      AND NOT (v.color = 'Red'  AND v.product_id % 4 = 0)
+      AND NOT (v.color = 'Blue' AND v.product_id % 7 = 0)
+      );
 
 -- ==============================================================================
--- 6. SEED COMMENTS (60 Comments)
+-- 6. SEED COMMENTS (varied so ratings differ widely)
+--    Distribution (products.rating / num_reviews are derived from this below):
+--      * no reviews  : 4, 17, 22, 30                       -> rating 0 ("New")
+--      * many + high : 1, 2, 7, 13                         -> ~4.6-4.7
+--      * many + low  : 18, 21, 27                          -> ~1.3-1.8
+--      * mixed/medium: 3, 5, 8, 16, 20, 28, 29             -> ~2.3-3.5
+--      * few / single: 6, 9, 10, 11, 12, 14, 15, 19, 23, 24, 25, 26
 -- ==============================================================================
 INSERT INTO comments (product_id, user_id, content, rating) VALUES
-(1, 1001, 'The shirt is comfortable and the fabric feels good', 5),
-(1, 1002, 'Simple design but looks really nice.', 4),
-(2, 1003, 'Good quality for the price.', 5),
-(2, 1004, 'The color looks exactly like the picture.', 4),
-(3, 1005, 'Very comfortable for everyday wear.', 5),
-(3, 1006, 'The material feels soft and lightweight.', 4),
-(4, 1007, 'I really like the simple black design.', 5),
-(4, 1008, 'Fits well and is easy to match with other clothes.', 4),
-(5, 1009, 'Nice shirt with a comfortable fit.', 5),
-(5, 1000, 'The fabric is quite soft.', 4),
-(6, 1001, 'Classic design and good quality.', 4),
-(6, 1002, 'I would buy this shirt again.', 5),
-(7, 1003, 'The gray color looks great.', 5),
-(7, 1004, 'Comfortable and suitable for daily wear.', 4),
-(8, 1005, 'The green color is very nice.', 5),
-(8, 1006, 'Good fit and comfortable material.', 4),
+-- Product 1: many reviews, high rating
+(1, 1001, 'Super comfortable and the fabric feels premium.', 5),
+(1, 1002, 'Fits true to size and the color is great.', 5),
+(1, 1003, 'Really nice shirt, would buy again.', 4),
+(1, 1004, 'Best basic tee I own right now.', 5),
+(1, 1005, 'Soft, breathable and well made.', 4),
+(1, 1006, 'Love it, washes well with no shrinking.', 5),
+(1, 1007, 'Great value, looks more expensive than it is.', 5),
+-- Product 2: many reviews, high rating
+(2, 1008, 'Excellent quality cotton, very soft.', 5),
+(2, 1009, 'Clean white, exactly like the photo.', 4),
+(2, 1000, 'Fits perfectly and feels durable.', 5),
+(2, 1001, 'Comfortable for all-day wear.', 4),
+(2, 1002, 'Great shirt, highly recommend.', 5),
+-- Product 3: low-medium
+(3, 1003, 'Thinner than expected for the price.', 2),
+(3, 1004, 'It is okay, nothing special.', 3),
+(3, 1005, 'Fabric felt a bit rough after washing.', 2),
+-- Product 5: medium
+(5, 1006, 'Decent shirt but the fit is a little boxy.', 3),
+(5, 1007, 'Comfortable enough for everyday use.', 4),
+(5, 1008, 'Average quality, does the job.', 3),
+(5, 1009, 'Nice and soft, happy with it.', 4),
+-- Product 6: single review
+(6, 1000, 'Classic fit and good quality.', 4),
+-- Product 7: many reviews, high rating
+(7, 1001, 'The gray is a perfect neutral, love it.', 5),
+(7, 1002, 'Top notch fabric and stitching.', 5),
+(7, 1003, 'Very comfortable, slightly long but fine.', 4),
+(7, 1004, 'My new favorite everyday tee.', 5),
+(7, 1005, 'Great quality for the price.', 5),
+(7, 1006, 'Good shirt, fits as expected.', 4),
+-- Product 8: medium
+(8, 1007, 'The green is nice but the fabric is thin.', 3),
+(8, 1008, 'Comfortable and good color.', 4),
+(8, 1009, 'Fits well, decent material.', 4),
+(8, 1000, 'Okay for the price, nothing amazing.', 3),
+-- Product 9: two reviews
 (9, 1007, 'The beige color is easy to match.', 4),
-(9, 1008, 'Very comfortable for casual outfits.', 5),
-(10, 1009, 'Clean and simple design.', 4),
-(10, 1000, 'The shirt feels comfortable all day.', 5),
-(11, 1001, 'Nice navy color and good quality.', 5),
+(9, 1008, 'Comfortable for casual outfits.', 4),
+-- Product 10: two reviews
+(10, 1001, 'Clean, minimal and very comfortable.', 5),
+(10, 1002, 'Good gray tee, soft fabric.', 4),
+-- Product 11: three reviews, high rating
+(11, 1001, 'Nice navy color and great quality.', 5),
 (11, 1002, 'Fits nicely and looks clean.', 4),
-(12, 1003, 'The oversized fit is really comfortable.', 5),
-(12, 1004, 'Great for a casual outfit.', 4),
-(13, 1005, 'Simple black shirt that goes with everything.', 5),
-(13, 1006, 'Good quality and comfortable fabric.', 4),
-(14, 1007, 'The blue color looks really good.', 5),
-(14, 1008, 'Nice casual style.', 4),
-(15, 1009, 'Very light and comfortable.', 5),
-(15, 1000, 'Good cotton material.', 4),
-(16, 1001, 'Looks great with jeans.', 5),
-(16, 1002, 'Comfortable oversized style.', 4),
-(17, 1003, 'The gray color is nice and neutral.', 4),
-(17, 1004, 'Very comfortable for everyday use.', 5),
-(18, 1005, 'The quality feels better than expected.', 5),
-(18, 1006, 'Premium looking shirt.', 4),
-(19, 1007, 'Simple and comfortable.', 4),
-(19, 1008, 'Good basic shirt for everyday wear.', 5),
-(20, 1009, 'The green color is beautiful.', 5),
-(20, 1000, 'Comfortable and stylish.', 4),
-(21, 1001, 'The fabric feels thick and durable.', 5),
-(21, 1002, 'Good heavyweight shirt.', 4),
-(22, 1003, 'The cream color looks great.', 5),
-(22, 1004, 'Very easy to match with other clothes.', 4),
-(23, 1005, 'Nice shirt for casual activities.', 4),
-(23, 1006, 'Comfortable and lightweight.', 5),
-(24, 1007, 'The loose fit is very comfortable.', 5),
-(24, 1008, 'Great casual shirt.', 4),
-(25, 1009, 'Simple black design that I really like.', 5),
-(25, 1000, 'Good fit and comfortable.', 4),
-(26, 1001, 'The olive color looks unique.', 5),
-(26, 1002, 'Nice everyday shirt.', 4),
-(27, 1003, 'The material feels premium.', 5),
-(27, 1004, 'Very comfortable and well made.', 4),
-(28, 1005, 'Nice beige color.', 4),
-(28, 1006, 'Simple and comfortable.', 5),
-(29, 1007, 'The navy color looks modern.', 5),
-(29, 1008, 'Good shirt for casual outfits.', 4),
-(30, 1009, 'Very comfortable white shirt.', 5),
-(30, 1000, 'Simple design and good quality.', 4);
+(11, 1003, 'Really solid everyday shirt.', 5),
+-- Product 12: single review
+(12, 1003, 'Oversized fit is fine but runs very large.', 3),
+-- Product 13: many reviews, high rating
+(13, 1004, 'Perfect black tee, goes with everything.', 5),
+(13, 1005, 'Great fabric, holds its shape well.', 4),
+(13, 1006, 'Excellent quality, very comfortable.', 5),
+(13, 1007, 'Love the fit and the material.', 5),
+(13, 1008, 'Solid basic, would rebuy.', 4),
+(13, 1009, 'Best black shirt I have bought.', 5),
+-- Product 14: two reviews
+(14, 1007, 'The blue is nice but a bit thin.', 3),
+(14, 1008, 'Decent casual style.', 4),
+-- Product 15: two reviews
+(15, 1000, 'Soft cotton and light, very nice.', 4),
+(15, 1001, 'Super comfortable, great for summer.', 5),
+-- Product 16: medium-low
+(16, 1002, 'Color faded a bit after one wash.', 2),
+(16, 1003, 'It is alright, the fit is a bit off.', 3),
+(16, 1004, 'Not as thick as I hoped.', 2),
+-- Product 18: many reviews, low rating
+(18, 1005, 'Overpriced for the quality.', 1),
+(18, 1006, 'Fabric feels cheap, disappointed.', 2),
+(18, 1007, 'Shrunk after the first wash.', 1),
+(18, 1008, 'Not worth the premium price.', 2),
+(18, 1009, 'Would not buy again.', 1),
+-- Product 19: single review
+(19, 1007, 'Simple, clean and comfortable.', 4),
+-- Product 20: medium
+(20, 1000, 'The green is duller than the photo.', 2),
+(20, 1001, 'Okay shirt, average fit.', 3),
+(20, 1002, 'Comfortable but a bit thin.', 3),
+-- Product 21: low rating
+(21, 1003, 'Heavy fabric but the stitching came loose.', 2),
+(21, 1004, 'Fell apart too quickly.', 1),
+(21, 1005, 'Not as durable as advertised.', 2),
+(21, 1006, 'Disappointed with the quality.', 2),
+-- Product 23: two reviews
+(23, 1007, 'Nice sporty fit, good for workouts.', 4),
+(23, 1008, 'Decent but a little stiff at first.', 3),
+-- Product 24: two reviews
+(24, 1009, 'Relaxed fit is really comfortable.', 4),
+(24, 1000, 'Good casual shirt, fits well.', 4),
+-- Product 25: single review
+(25, 1001, 'Simple and perfect, exactly what I wanted.', 5),
+-- Product 26: low rating
+(26, 1002, 'The olive looks washed out.', 2),
+(26, 1003, 'Material is thinner than expected.', 2),
+-- Product 27: many reviews, low rating
+(27, 1004, 'Way overpriced for what you get.', 1),
+(27, 1005, 'Poor quality, felt cheap.', 1),
+(27, 1006, 'Not premium at all.', 2),
+(27, 1007, 'Disappointed, returned it.', 1),
+(27, 1008, 'Fabric pilled after one wear.', 2),
+(27, 1009, 'Would not recommend.', 1),
+-- Product 28: mixed, low-medium
+(28, 1005, 'The beige looks a little dull.', 2),
+(28, 1006, 'Okay shirt, average quality.', 3),
+-- Product 29: two reviews
+(29, 1000, 'The navy is nice but the fit is average.', 3),
+(29, 1001, 'Okay shirt for the price.', 3);
+
+-- ==============================================================================
+-- 6b. DERIVE products.rating / num_reviews from the seeded comments.
+--     Same logic as the update_product_rating trigger, so the aggregates are
+--     correct whether or not that trigger is installed at seed time.
+--     Products with no comments stay at 0 / 0.
+-- ==============================================================================
+UPDATE products p
+SET rating = COALESCE((
+        SELECT ROUND(AVG(c.rating)::numeric, 1)
+        FROM comments c
+        WHERE c.product_id = p.id
+    ), 0),
+    num_reviews = (
+        SELECT COUNT(*)
+        FROM comments c
+        WHERE c.product_id = p.id
+    );
 
 -- ==============================================================================
 -- 7. SEED CARTS

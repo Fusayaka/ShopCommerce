@@ -36,6 +36,7 @@ export interface Product {
     rating: number;
     numReviews: number;
     image?: string;
+    createdAt?: string;
     updatedAt?: string;
     stocks?: ProductStock[];
 }

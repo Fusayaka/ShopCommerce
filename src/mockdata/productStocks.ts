@@ -1,7 +1,8 @@
 // src/mockdata/productStocks.ts
-// Per-variant stock + price, mirroring the `product_stocks` seed:
-// each product gets one row per size x color (5 sizes x 3 colors = 15 variants),
-// priced from the product base-price list and with a deterministic stock count.
+// Per-variant stock + price, mirroring the `product_stocks` seed. Not every
+// product has all 15 variants: some are missing sizes/colors, some variants are
+// out of stock (stock = 0), and XL/XXL cost more than S/M/L. Combos referenced
+// by the cart/order mocks are always kept (see PROTECTED).
 
 export type Size = "S" | "M" | "L" | "XL" | "XXL";
 export type Color = "Red" | "Green" | "Blue";
@@ -53,6 +54,36 @@ const PRICES: Record<number, [number, number | null]> = {
     30: [175, 150],
 };
 
+const SIZE_RANK: Record<Size, number> = { S: 1, M: 2, L: 3, XL: 4, XXL: 5 };
+const COLOR_RANK: Record<Color, number> = { Red: 1, Green: 2, Blue: 3 };
+
+// Variants referenced by the cart/order mocks must always exist, otherwise
+// getStockId() throws when those modules load.
+const PROTECTED = new Set<string>([
+    // cart items
+    "25:M:Blue", "20:L:Green", "26:XL:Red", "5:M:Blue", "18:M:Blue", "8:XXL:Blue",
+    // order items
+    "1:L:Blue", "2:M:Green", "5:L:Green", "11:XL:Blue", "3:S:Green", "4:S:Blue",
+    "7:M:Red", "16:M:Blue", "30:XL:Green", "18:L:Green", "15:S:Green", "23:S:Red",
+    "15:L:Green", "21:S:Blue", "20:L:Red",
+]);
+
+const variantKey = (productId: number, size: Size, color: Color) =>
+    `${productId}:${size}:${color}`;
+
+// Some products intentionally drop a size and/or a color, for variety.
+function isMissing(productId: number, size: Size, color: Color): boolean {
+    if (size === "XXL" && productId % 3 === 0) return true;
+    if (size === "XL" && productId % 5 === 0) return true;
+    if (color === "Red" && productId % 4 === 0) return true;
+    if (color === "Blue" && productId % 7 === 0) return true;
+    return false;
+}
+
+// S/M/L share the base price; XL and XXL cost more.
+const sizeSurcharge = (size: Size): number =>
+    size === "XL" ? 15 : size === "XXL" ? 30 : 0;
+
 const mockProductStocks: ProductStock[] = [];
 let stockId = 1;
 
@@ -60,14 +91,30 @@ for (let productId = 1; productId <= 30; productId++) {
     const [originalPrice, promotionPrice] = PRICES[productId];
     for (const size of SIZES) {
         for (const color of COLORS) {
+            if (
+                isMissing(productId, size, color) &&
+                !PROTECTED.has(variantKey(productId, size, color))
+            ) {
+                continue;
+            }
+
+            const surcharge = sizeSurcharge(size);
+            const rankSum = SIZE_RANK[size] + COLOR_RANK[color];
+            const stock =
+                (productId * 5 + rankSum) % 9 === 0
+                    ? 0
+                    : 10 + ((productId * 7 + rankSum) % 40);
+
             mockProductStocks.push({
                 id: stockId++,
                 productId,
                 size,
                 color,
-                originalPrice,
-                ...(promotionPrice !== null ? { promotionPrice } : {}),
-                stock: 10 + ((productId * 7 + size.length + color.length) % 40),
+                originalPrice: originalPrice + surcharge,
+                ...(promotionPrice !== null
+                    ? { promotionPrice: promotionPrice + surcharge }
+                    : {}),
+                stock,
             });
         }
     }
