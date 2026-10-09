@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { Product } from "@/types";
 import { ProductCard } from "@/components";
 import { useParams } from "react-router-dom";
-import { fetchRelatedProducts } from "@/utils/products";
+import { productApi } from "@/api/productApi";
 import './relatedProduct.css'
 
 export default function RelatedProduct() {
@@ -11,7 +11,7 @@ export default function RelatedProduct() {
 
     useEffect(() => {
         if (!productId) return;
-        fetchRelatedProducts(Number(productId))
+        productApi.getRelatedProducts(Number(productId))
             .then(setRelatedProducts)
             .catch((err) => console.error("Error loading related products:", err));
     }, [productId]);

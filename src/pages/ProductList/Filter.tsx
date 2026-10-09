@@ -4,7 +4,7 @@ import upArrow from '@/assets/up-arrow.png'
 import downArrow from '@/assets/down-arrow.png'
 import filterMenu from '@/assets/filter.png'
 import { useSearchParams } from 'react-router-dom';
-import { fetchPriceRange } from '@/utils/products';
+import { productApi } from '@/api/productApi';
 
 interface FilterProps{
     isOpen?: boolean;
@@ -97,7 +97,7 @@ export default function Filter({isOpen = true, onClose, onApplyFilter}: FilterPr
     );
 
     useEffect(() => {
-        fetchPriceRange()
+        productApi.getRoundRange()
             .then(({ min, max }) => {
                 setMinLimit(min);
                 setMaxLimit(max);

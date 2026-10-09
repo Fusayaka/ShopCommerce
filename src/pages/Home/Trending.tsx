@@ -2,7 +2,7 @@ import type { Product } from "@/types";
 import { ProductCard } from "@/components";
 import './trending.css'
 import { useEffect, useState } from "react";
-import { CONFIG } from "@/config";
+import { productApi } from "@/api/productApi";
 
 const ROWS = 3;
 
@@ -22,8 +22,7 @@ export default function Trending(){
     const productsLength = products.length;
 
     useEffect(() => {
-        fetch(`${CONFIG.API_URL}/products?limit=${ROWS * getResponsiveItemCount()}`)
-            .then(res => res.json())
+        productApi.getProducts({ limit: ROWS * getResponsiveItemCount() })
             .then(json => setProducts(json.data ?? []))
             .catch(err => console.error("Error when loading data:", err));
     }, []);

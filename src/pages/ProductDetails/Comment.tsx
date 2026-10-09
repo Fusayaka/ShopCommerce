@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import './Comment.css';
-import { CONFIG } from '@/config';
 import { StarRating } from '@/components';
 import { useParams } from 'react-router-dom';
 import { type Comment as CommentType } from '@/types';
+import { commentApi } from '@/api/commentApi';
 
 interface CommentCardProps {
   comment: CommentType;
@@ -75,32 +75,27 @@ export default function Comment() {
   useEffect(() => {
     if (!productId) return;
 
-    const controller = new AbortController();
+    let active = true;
 
     const fetchComments = async () => {
       setIsLoading(true);
       setError(null);
 
       try {
-        const res = await fetch(`${CONFIG.API_URL}/comments?productId=${productId}`, {
-          signal: controller.signal,
-        })
-
-        if (!res.ok) throw new Error(`Connection error: ${res.status}`);
-
-        const json = await res.json();
-        setComments(json ?? [])
-      } catch (err){
-        if (err instanceof Error && err.name === "AbortError") return;
+        const data = await commentApi.getProductComment(Number(productId));
+        if (!active) return;
+        setComments(data ?? [])
+      } catch {
+        if (!active) return;
         setError("Could not load comments.");
         setComments([]);
       } finally {
-        setIsLoading(false);
+        if (active) setIsLoading(false);
       }
     };
 
     fetchComments();
-    return () => controller.abort();
+    return () => { active = false; };
 
   }, [productId])
 

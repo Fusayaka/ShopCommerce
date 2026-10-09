@@ -3,31 +3,9 @@ import OrderBill from "./OrderBill";
 import OrderList from "./OrderList";
 import './cart.css';
 import { useEffect, useState } from 'react';
-import type { CartLineItem, Size, Color } from "@/types";
-import { CONFIG } from "@/config";
-
-interface CartApiItem {
-    id: number;
-    stockId: number;
-    quantity: number;
-    stock: {
-        productId: number;
-        size: Size;
-        color: Color;
-        originalPrice: string | number;
-        promotionPrice?: string | number | null;
-        product: {
-            title: string;
-            image?: string | null;
-        };
-    };
-}
-
-interface CartApiResponse {
-    id: number;
-    userId: number;
-    items: CartApiItem[];
-}
+import type { CartLineItem } from "@/types";
+import { cartApi } from "@/api/cartApi";
+import { toast } from "react-toastify";
 
 export default function Cart() {
     const [items, setItems] = useState<CartLineItem[]>([]);
@@ -38,18 +16,15 @@ export default function Cart() {
     const userId = 1001;
 
     useEffect(() => {
-        const controller = new AbortController();
+        let active = true;
         const fetchItems = async () => {
             setIsLoading(true);
             setError(null);
             try {
-                const res = await fetch(`${CONFIG.API_URL}/carts?userId=${userId}`, {
-                    signal: controller.signal
-                });
-                if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-    
-                const json: CartApiResponse = await res.json();
-                const mapped: CartLineItem[] = (json.items ?? []).map((item) => ({
+                const cart = await cartApi.getCart(userId);
+                if (!active) return;
+
+                const mapped: CartLineItem[] = (cart.items ?? []).map((item) => ({
                     id: item.id,
                     stockId: item.stockId,
                     productId: item.stock.productId,
@@ -62,18 +37,18 @@ export default function Cart() {
                 }));
                 setItems(mapped);
             }
-            catch (err){
-                if (err instanceof Error && err.name === "AbortError") return;
+            catch {
+                if (!active) return;
                 setItems([]);
                 setError("Could not load cart");
             }
             finally {
-                setIsLoading(false);
+                if (active) setIsLoading(false);
             }
         }
 
         fetchItems();
-        return () => controller.abort();
+        return () => { active = false; };
     }, [userId])
 
     const handleUpdateQuantity = async (productItem: CartLineItem, newQuantity: number) => {
@@ -87,12 +62,10 @@ export default function Cart() {
                 )
         );
         try {
-            const res = await fetch(`${CONFIG.API_URL}/carts/items?userId=${userId}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ stockId: productItem.stockId, quantity: newQuantity }),
+            await cartApi.updateQuantity(userId, {
+                stockId: productItem.stockId,
+                quantity: newQuantity,
             });
-            if (!res.ok) throw new Error(`Request failed: ${res.status}`);
         }
         catch {
             setItems(prevItems);
@@ -105,16 +78,11 @@ export default function Cart() {
         setError(null);
         setItems(prev => prev.filter(item => item.id !== productItem.id));
         try {
-            const res = await fetch(`${CONFIG.API_URL}/carts/items?userId=${userId}`, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ stockId: productItem.stockId })
-            });
-            if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+            await cartApi.removeItem(userId, productItem.stockId);
+            toast.success("Remove item successfully!");
         }
         catch {
             setItems(prevItems);
-            setError("Could not remove item");
         }
     };
 

@@ -3,9 +3,11 @@ import './overview.css'
 import { Link, useParams } from 'react-router-dom';
 import { StarRating } from '@/components';
 import plhImg from '/images/cloth-placeholder.jpeg'
-import { CONFIG } from '@/config';
 import type { Product } from '@/types';
 import { getCardPrice } from '@/utils/pricing';
+import { cartApi } from '@/api/cartApi';
+import { productApi } from '@/api/productApi';
+import { toast } from 'react-toastify';
 
 export default function Overview() {
     const {productId} = useParams<{ productId: string }>();
@@ -13,7 +15,6 @@ export default function Overview() {
     const [product, setProduct] = useState<Product | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [loadError, setLoadError] = useState<string | null>(null);
-    const [feedback, setFeedback] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
     const [size, setSize] = useState<string | null>(null);
     const [color, setColor] = useState<string | null>(null);
@@ -23,34 +24,30 @@ export default function Overview() {
     const userId = 1001;
 
     useEffect(() => {
-        const controller = new AbortController();
+        let active = true;
 
         setIsLoading(true);
         setLoadError(null);
-        setFeedback(null);
 
         const fetchProduct = async () => {
             if (!productId) return;
 
             try {
-                const res = await fetch(`${CONFIG.API_URL}/products/${productId}`, {
-                    signal: controller.signal
-                });
-                if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-                const data = await res.json();
+                const data = await productApi.getProduct(Number(productId));
+                if (!active) return;
                 setProduct(data);
             }
-            catch (error) {
-                if (error instanceof Error && error.name === "AbortError") return;
+            catch {
+                if (!active) return;
                 setLoadError("Could not load product.");
             }
             finally{
-                setIsLoading(false);
+                if (active) setIsLoading(false);
             }
         }
         fetchProduct();
         setQuantity(1);
-        return () => controller.abort();
+        return () => { active = false; };
     }, [productId])
 
     const handleQuantityChange = (type: 'increase' | 'decrease' | 'input', value? : string) => {
@@ -61,13 +58,13 @@ export default function Overview() {
                 setQuantity(curQuantity - 1);
             }
             else {
-                setFeedback({ text: 'Quantity must not be less than 1!', type: "error" });
+                toast.error("Quantity must not be less than 1!");
                 setQuantity(1);
             }
         }
         else if (type === 'increase'){
             if (selectedStock != undefined && curQuantity >= selectedStock.stock){
-                setFeedback({ text: "Can not buy more than stock inventory!", type: "error" });
+                toast.error("Can not buy more than stock inventory!");
                 return;
             }
             setQuantity(curQuantity + 1);
@@ -91,15 +88,9 @@ export default function Overview() {
         }
     };
 
-    useEffect(() => {
-        if (!feedback) return;
-        const timer = setTimeout(() => setFeedback(null), 3000);
-        return () => clearTimeout(timer);
-    }, [feedback]);
-
     const handleAddtoCart = async () => {
         if (!color || !size){
-            setFeedback({ text: "Please choose size and color!", type: "error" });
+            toast.error("Please choose size and color!");
             return;
         }
 
@@ -107,28 +98,23 @@ export default function Overview() {
             (s) => s.size === size && s.color === color,
         );
         if (!selectedStock){
-            setFeedback({ text: "This option is not available!", type: "error" });
+            toast.error("This option is not available!");
             return;
         }
         if (selectedStock.stock <= 0){
-            setFeedback({ text: "This option is out of stock!", type: "error" });
+            toast.error("This option is out of stock!");
             return;
         }
 
         try {
-            const res = await fetch(`${CONFIG.API_URL}/carts/items?userId=${userId}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    stockId: selectedStock.id,
-                    quantity: Number(quantity),
-                }),
-            })
-            if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-            setFeedback({ text: "Added to cart!", type: "success" });
+            await cartApi.addToCart(userId, {
+                stockId: selectedStock.id,
+                quantity: Number(quantity),
+            });
+            toast.success("Added to cart!");
         }
         catch {
-            setFeedback({ text: "Could not add to your cart!", type: "error" });
+            toast.error("Could not add to your cart!");
         }
     };
 
@@ -172,12 +158,6 @@ export default function Overview() {
 
     return (
         <section className='detail-container'>
-            {feedback && (
-                <div className={`detail-toast detail-toast-${feedback.type}`} role="status">
-                    {feedback.text}
-                </div>
-            )}
-
             <nav className='detail-breadcrumb'>
                 <Link to='/'>Home</Link> {' > '}
                 <Link to='/products'>Product</Link> {' > '}

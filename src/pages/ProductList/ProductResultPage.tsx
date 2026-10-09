@@ -4,7 +4,7 @@ import { ProductCard } from "@/components";
 import { type Product } from '@/types';
 import filterMenu from '@/assets/filter.png'
 import { useSearchParams } from 'react-router-dom';
-import { CONFIG } from '@/config';
+import { productApi, type GetProductsQuery } from '@/api/productApi';
 
 interface ProductResultPageProps {
     onOpenFilter?: () => void;
@@ -44,38 +44,45 @@ export default function ProductResultPage({ onOpenFilter }: ProductResultPagePro
     }, []);
 
     useEffect(() => {
-        const controller = new AbortController();
+        let active = true;
 
-        const params = new URLSearchParams(searchParams);
-        params.set('page', currentPage.toString());
-        params.set('limit', itemsPerPage.toString());
+        const ratingParam = searchParams.get('rating');
+        const minPriceParam = searchParams.get('minPrice');
+        const maxPriceParam = searchParams.get('maxPrice');
+        const searchParam = searchParams.get('search');
+
+        const query: GetProductsQuery = {
+            page: currentPage,
+            limit: itemsPerPage,
+            search: searchParam ?? undefined,
+            rating: ratingParam ? Number(ratingParam) : undefined,
+            minPrice: minPriceParam ? Number(minPriceParam) : undefined,
+            maxPrice: maxPriceParam ? Number(maxPriceParam) : undefined,
+            hasDiscount: searchParams.get('hasDiscount') === 'true' || undefined,
+        };
 
         const fetchProducts = async () => {
             setIsLoading(true);
             setError(null);
             try {
-                const res = await fetch(`${CONFIG.API_URL}/products?${params.toString()}`, {
-                    signal: controller.signal,
-                });
-                if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-
-                const json = await res.json();
-                setProducts(json.data ?? []);
-                setTotal(json.meta?.total ?? 0);
-                setTotalPages(json.meta?.lastPage ?? 1);
+                const { data, meta } = await productApi.getProducts(query);
+                if (!active) return;
+                setProducts(data ?? []);
+                setTotal(meta?.total ?? 0);
+                setTotalPages(meta?.lastPage ?? 1);
             }
-            catch (err) {
-                if (err instanceof Error && err.name === "AbortError") return;
+            catch {
+                if (!active) return;
                 setError("Could not load products.");
                 setProducts([]);
             }
             finally {
-                setIsLoading(false);
+                if (active) setIsLoading(false);
             }
         };
 
         fetchProducts();
-        return () => controller.abort();
+        return () => { active = false; };
     }, [searchParams, currentPage, itemsPerPage]);
 
     const safeCurrentPage = Math.min(currentPage, Math.max(1, totalPages));
