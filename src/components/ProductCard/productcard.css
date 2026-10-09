@@ -91,6 +91,28 @@
   height: 20px;
 }
 
+.new-badge {
+  background-color: #00bcd41a;
+  color: #0097a7;
+  padding: 3px 10px;
+  border-radius: 62px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.3px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.no-review {
+  color: #999999;
+  font-size: 13px;
+  font-weight: 400;
+  font-style: italic;
+}
+
 .discount-badge {
   background-color: #ff33331a;
   color: #ff3333;

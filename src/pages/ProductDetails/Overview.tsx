@@ -46,7 +46,11 @@ export default function Overview() {
             }
         }
         fetchProduct();
+
         setQuantity(1);
+        setColor(null);
+        setSize(null);
+        
         return () => { active = false; };
     }, [productId])
 
@@ -149,6 +153,8 @@ export default function Overview() {
     const variantExists = (c: string, s: string) =>
         stocks.some((v) => v.color === c && v.size === s);
 
+    const availableColors = COLORS.filter(colorExists);
+
     const outOfStock = !!selectedStock && selectedStock.stock <= 0;
 
     const handleSelectColor = (c: string) => {
@@ -202,17 +208,17 @@ export default function Overview() {
                     <div className="detail-selector-group">
                         <span className="detail-selector-label">Select colors</span>
                         <div className="detail-color-options">
-                            {COLORS.map(c => {
-                                const disabled = !colorExists(c);
-                                return (
+                            {availableColors.length === 0 ? (
+                                <span className="detail-selector-hint">Currently unavailable</span>
+                            ) : (
+                                availableColors.map(c => (
                                     <button
                                         key={c}
-                                        disabled={disabled}
-                                        className={`detail-color-btn ${c.toLowerCase()} ${color === c ? 'active' : ''} ${disabled ? 'disabled' : ''}`}
-                                        onClick={() => {handleSelectColor(c), setQuantity(1)}}
+                                        className={`detail-color-btn ${c.toLowerCase()} ${color === c ? 'active' : ''}`}
+                                        onClick={() => { handleSelectColor(c); setQuantity(1); }}
                                     ></button>
-                                );
-                            })}
+                                ))
+                            )}
                         </div>
                     </div>
 
