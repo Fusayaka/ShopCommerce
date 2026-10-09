@@ -9,16 +9,12 @@ export class UsersController {
 
     @Get()
     findAll(){
-        const users = this.usersService.findAll();
-        if (!users) throw new NotFoundException("No users found");
-        return users;
+        return this.usersService.findAll();
     }
 
     @Get(":id")
     findOne(@Param("id") id: number){
-        const user = this.usersService.findOne(+id);
-        if(!user) throw new NotFoundException("User not found");
-        return user;
+        return this.usersService.findOne(+id);
     }
 
     @Post()

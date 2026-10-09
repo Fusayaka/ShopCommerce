@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
 import { UpsertStockDto } from './dto/upsert-stock.dto.js';
@@ -18,7 +18,7 @@ export class ProductsService {
     const stockData = stocks?.map((s) => {
       if (s.originalPrice === undefined || s.stock === undefined) {
         throw new BadRequestException(
-          'Each stock needs originalPrice and stock',
+          'Each stock requires originalPrice and stock',
         );
       }
       return {
@@ -130,14 +130,19 @@ export class ProductsService {
     };
   }
 
-  findOne(id: number) {
-    return this.prisma.product.findUnique({
+  async findOne(id: number) {
+    const product = await this.prisma.product.findUnique({
       where: {id},
       include: { stocks: true },
     });
+    if (!product) throw new NotFoundException('Product not found');
+    return product;
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
+  async update(id: number, updateProductDto: UpdateProductDto) {
+    const existing = await this.prisma.product.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException('Can not update: Product not found');
+
     const { stocks, ...productData } = updateProductDto;
     return this.prisma.product.update({
       where: {id},
@@ -152,6 +157,9 @@ export class ProductsService {
   async upsertStock(productId: number, dto: UpsertStockDto) {
     const { size, color, originalPrice, promotionPrice, stock } = dto;
 
+    const product = await this.prisma.product.findUnique({ where: { id: productId } });
+    if (!product) throw new NotFoundException('Can not upsert: Product not found');
+
     const existing = await this.prisma.productStock.findUnique({
       where: { productId_size_color: { productId, size, color } },
     });
@@ -162,6 +170,7 @@ export class ProductsService {
           'originalPrice and stock are required to create a new variant',
         );
       }
+      this.assertValidPromotion(originalPrice, promotionPrice);
       return this.prisma.productStock.create({
         data: { productId, size, color, originalPrice, promotionPrice, stock },
       });
@@ -171,7 +180,11 @@ export class ProductsService {
       originalPrice !== undefined || promotionPrice !== undefined;
 
     if (priceProvided) {
-      // Reprice, keep current stock.
+      // Reprice, keep current stock. Validate against the new or kept prices.
+      this.assertValidPromotion(
+        originalPrice ?? Number(existing.originalPrice),
+        promotionPrice ?? existing.promotionPrice?.toNumber(),
+      );
       return this.prisma.productStock.update({
         where: { id: existing.id },
         data: { originalPrice, promotionPrice },
@@ -187,6 +200,14 @@ export class ProductsService {
     }
 
     throw new BadRequestException('Provide price fields or stock to update');
+  }
+
+  private assertValidPromotion(originalPrice: number, promotionPrice?: number) {
+    if (promotionPrice !== undefined && promotionPrice > originalPrice) {
+      throw new BadRequestException(
+        'promotionPrice cannot be greater than originalPrice',
+      );
+    }
   }
 
   getStock(productId: number, query: GetStockDto) {
@@ -259,7 +280,10 @@ export class ProductsService {
     return Math.pow(10, Math.ceil(Math.log10(value) - 1e-9));
   }
 
-  remove(id: number) {
+  async remove(id: number) {
+    const existing = await this.prisma.product.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException('Can not remove: Product not found');
+
     return this.prisma.product.delete({
       where: {id}
     });
