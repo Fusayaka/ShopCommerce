@@ -10,8 +10,33 @@ import paypal from '@/assets/paypal-logo.png'
 import visa from '@/assets/visa-logo.png'
 
 export default function Footer(){
+    const isGuest = !localStorage.getItem("token");
+
     return (
-        <footer className="footer-container">
+        <footer className={`footer-container${isGuest ? " has-subscribe" : ""}`}>
+            {isGuest && (
+                <div className="subscribe-wrapper">
+                    <section className="subscribe-container">
+                        <div className="subscribe-text">
+                            <h2>STAY UP-TO-DATE ABOUT <br/> OUR LATEST OFFERS</h2>
+                        </div>
+
+                        <form className="subscribe-form" onSubmit={(e) => e.preventDefault()}>
+                            <div className="input-group">
+                                <input
+                                    type="email"
+                                    placeholder="Enter your email address"
+                                    required
+                                />
+                            </div>
+                            <button type="submit" className="subscribe-btn">
+                                Subscribe to Newsletter
+                            </button>
+                        </form>
+                    </section>
+                </div>
+            )}
+
             <div className="footer-top">
                 <div className="footer-brand">
                     <h2>Demo Shop</h2>
@@ -45,7 +70,7 @@ export default function Footer(){
                         <ul>
                             <li><Link to="/support">Support</Link></li>
                             <li><Link to="/delivery">Delivery</Link></li>
-                            <li><Link to="/terms">Terms and Conditions</Link></li>
+                            <li><Link to="/terms">Terms & Conditions</Link></li>
                             <li><Link to="/privacy">Privacy</Link></li>
                         </ul>
                     </div>

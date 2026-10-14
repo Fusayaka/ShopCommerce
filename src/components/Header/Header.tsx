@@ -5,13 +5,30 @@ import cart from '@/assets/icon-cart.jpg'
 import lang from '@/assets/language.png'
 import search from '@/assets/search.png'
 import hamburgerbtn from '@/assets/hamburger.png'
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+type CurrentUser = { name?: string; avatar?: string };
+
+function getCurrentUser(): CurrentUser | null {
+    try {
+        const raw = localStorage.getItem('user');
+        return raw ? (JSON.parse(raw) as CurrentUser) : null;
+    } catch {
+        return null;
+    }
+}
 
 export default function Header() {
+    const isGuest = !localStorage.getItem('token');
+    const currentUser = getCurrentUser();
+    const userInitial = (currentUser?.name ?? 'U').charAt(0).toUpperCase();
+
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [currentLang, setCurrentLang] = useState('vi');
     const [searchTerm, setSearchTerm] = useState("");
     const navigate = useNavigate();
+    const searchInputRef = useRef<HTMLInputElement>(null);
     
     const handleLangChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setCurrentLang(event.target.value);
@@ -23,8 +40,9 @@ export default function Header() {
 
     const handleSearchProducts = () => {
         if (searchTerm.trim() !== ""){
-            navigate(`/products?name=${encodeURIComponent(searchTerm.trim())}`)
+            navigate(`/products?search=${encodeURIComponent(searchTerm.trim())}`)
         }
+        setIsSearchOpen(false);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -32,6 +50,10 @@ export default function Header() {
             handleSearchProducts();
         }
     }
+
+    useEffect(() => {
+        if (isSearchOpen) searchInputRef.current?.focus();
+    }, [isSearchOpen]);
 
     return (
         <header className='header-container'>
@@ -59,11 +81,15 @@ export default function Header() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onKeyDown={handleKeyDown}
                 />
-                <img src={search} alt='search' className='search-icon' />
+                <img src={search} alt='search' className='search-icon' onClick={handleSearchProducts} />
             </div>
 
             <div className='header-actions'>
-                <button className='mobile-search-btn'>
+                <button
+                    className='mobile-search-btn'
+                    onClick={() => setIsSearchOpen((open) => !open)}
+                    aria-label='Search'
+                >
                     <img src={search} alt='search' className='search-icon' />
                 </button>
 
@@ -80,9 +106,30 @@ export default function Header() {
                     <img src={cart} alt='Cart'></img>
                 </Link>
 
-                <Link to="login" className='login-btn'>
-                    Login
-                </Link>
+                {isGuest
+                    ?
+                    <Link to="login" className='login-btn'>
+                        Login
+                    </Link>
+                    :
+                    <Link to="/profile" className='avatar-btn' aria-label='Account'>
+                        {currentUser?.avatar
+                            ? <img src={currentUser.avatar} alt={currentUser?.name ?? 'User'} />
+                            : <span className='avatar-fallback'>{userInitial}</span>}
+                    </Link>
+                }
+            </div>
+
+            <div className={`mobile-search-bar ${isSearchOpen ? 'open' : ''}`}>
+                <input
+                    ref={searchInputRef}
+                    type='text'
+                    placeholder='Search for products'
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                />
+                <img src={search} alt='search' className='search-icon' onClick={handleSearchProducts} />
             </div>
 
             <div className={`mobile-menu-overlay ${isMenuOpen ? 'open' : ''}`} onClick={toggleMenu}>
@@ -96,7 +143,7 @@ export default function Header() {
                         <Link to={'/products'} onClick={toggleMenu}>Products</Link>
                         <Link to={'/download'} onClick={toggleMenu}>Download</Link>
                         <Link to={'/dashboard'} onClick={toggleMenu}>Dashboard</Link>
-                        <Link to={'/login'} onClick={toggleMenu}>Login</Link>
+                        {isGuest && <Link to={'/login'} onClick={toggleMenu}>Login</Link>}
                     </nav>
                 </div>
             </div>

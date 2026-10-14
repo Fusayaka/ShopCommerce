@@ -5,6 +5,105 @@
   margin-top: auto;
 }
 
+.footer-container.has-subscribe {
+  --subscribe-top-gap: 48px;
+  padding-top: var(--subscribe-top-gap);
+  overflow: hidden;
+}
+
+.footer-container:not(.has-subscribe) {
+  padding-top: 24px;
+}
+
+.subscribe-wrapper {
+  margin-bottom: 64px;
+  position: relative;
+  z-index: 10;
+}
+
+.subscribe-container {
+  position: relative;
+  background-color: #000000;
+  border-radius: 20px;
+  padding: 36px 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.subscribe-container::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  top: calc(-1 * var(--subscribe-top-gap));
+  height: calc(var(--subscribe-top-gap) + 50%);
+  background-color: #ffffff;
+  z-index: -1;
+}
+
+.subscribe-text {
+  flex: 1;
+}
+
+.subscribe-text h2 {
+  color: #ffffff;
+  font-size: 27px;
+  font-weight: 900;
+  line-height: 1.1;
+  max-width: 550px;
+  margin: 0;
+}
+
+.subscribe-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 350px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border-radius: 99px;
+  padding: 12px 20px;
+  gap: 12px;
+}
+
+.input-group input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+  font-family: inherit;
+  background-color: transparent;
+}
+
+.input-group input::placeholder {
+  color: #888888;
+}
+
+.subscribe-btn {
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 99px;
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.subscribe-btn:hover {
+  opacity: 0.8;
+  transform: translateY(-2px);
+}
+
 .footer-top {
   display: flex;
   /* justify-content: space-between; */
@@ -152,6 +251,24 @@
 }
 
 @media (max-width: 768px){
+  .footer-container{
+    padding: 0 30px;
+  }
+
+  .subscribe-container {
+    flex-direction: column;
+    padding: 32px 24px;
+    text-align: center;
+  }
+
+  .subscribe-text h2 {
+    font-size: 20px;
+  }
+
+  .subscribe-form {
+    max-width: 100%;
+  }
+
   .footer-bottom{
     display: flex;
     flex-direction: column;

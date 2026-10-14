@@ -5,21 +5,20 @@ import StarRating from "../StarRating/StarRating";
 import { getCardPrice } from "@/utils/pricing";
 import type { Product } from "@/types";
 
-const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
-
-function isNewProduct(createdAt?: string, updatedAt?: string): boolean {
+function isNewProduct(createdAt?: string): boolean {
     if (!createdAt) return true;
-    const created = new Date(createdAt).getTime();
+    const created = new Date(createdAt);
     if (Number.isNaN(created)) return true;
-    const updated = updatedAt ? new Date(updatedAt).getTime() : created;
-    return updated - created < THIRTY_DAYS;
+    const previousThirtyDays = new Date();
+    previousThirtyDays.setDate(previousThirtyDays.getDate() - 30);
+    return previousThirtyDays < created;
 }
 
 export default function ProductCard(product: Product){
     const {originalPrice, promotionPrice, discount} = getCardPrice(product.stocks);
     const rating = Number(product.rating);
     const price = promotionPrice ?? originalPrice;
-    const isNew = isNewProduct(product.createdAt, product.updatedAt);
+    const isNew = isNewProduct(product.createdAt);
 
     return (
         <Link to={`/product/${product.id}`}className="product-card">
