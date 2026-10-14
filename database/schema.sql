@@ -48,6 +48,7 @@ CREATE TABLE products (
     description TEXT,
     rating DECIMAL(2, 1) DEFAULT 0,
     num_reviews INT NOT NULL DEFAULT 0,
+    price DECIMAL(10, 2) NOT NULL DEFAULT 0,
     image VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

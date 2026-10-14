@@ -22,10 +22,7 @@ export class GetProductsQueryDto{
     hasDiscount?: boolean
     
     @IsOptional()
-    @Type(() => Number)
-    @Min(0)
-    @Max(5)
-    rating?: number;
+    rating?: string;
 
     @IsOptional()
     @Type(() => Number)
@@ -38,4 +35,8 @@ export class GetProductsQueryDto{
     @IsInt()
     @Min(1)
     limit?: number = 6;
+
+    @IsOptional()
+    @IsString()
+    sortBy: string;
 }

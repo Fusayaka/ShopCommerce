@@ -144,6 +144,18 @@ WHERE EXISTS (
       );
 
 -- ==============================================================================
+-- 5b. DERIVE products.price (lowest display price) from the seeded variants.
+--     Same logic as the update_product_price trigger, so it is correct whether
+--     or not that trigger is installed at seed time.
+-- ==============================================================================
+UPDATE products p
+SET price = COALESCE(
+    (SELECT MIN(promotion_price) FROM product_stocks s WHERE s.product_id = p.id),
+    (SELECT MIN(original_price)  FROM product_stocks s WHERE s.product_id = p.id),
+    0
+);
+
+-- ==============================================================================
 -- 6. SEED COMMENTS (varied so ratings differ widely)
 --    Distribution (products.rating / num_reviews are derived from this below):
 --      * no reviews  : 4, 17, 22, 30                       -> rating 0 ("New")

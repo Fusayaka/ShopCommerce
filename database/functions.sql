@@ -91,3 +91,23 @@ BEGIN
     RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION update_product_price()
+RETURNS trigger AS $$
+DECLARE
+    v_product_id INT;
+BEGIN
+    v_product_id := COALESCE(NEW.product_id, OLD.product_id);
+
+    UPDATE products
+    SET price = COALESCE(
+        (SELECT MIN(promotion_price) FROM product_stocks WHERE product_id = v_product_id),
+        (SELECT MIN(original_price)  FROM product_stocks WHERE product_id = v_product_id),
+        0
+    )
+    WHERE id = v_product_id;
+
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;

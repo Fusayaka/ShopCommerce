@@ -34,3 +34,10 @@ CREATE TRIGGER trigger_clamp_cart_items
 AFTER UPDATE OF stock ON product_stocks
 FOR EACH ROW
 EXECUTE FUNCTION clamp_cart_items_to_stock();
+
+
+DROP TRIGGER IF EXISTS trigger_update_product_price ON product_stocks;
+CREATE TRIGGER trigger_update_product_price
+AFTER INSERT OR UPDATE OF original_price, promotion_price OR DELETE ON product_stocks
+FOR EACH ROW
+EXECUTE FUNCTION update_product_price();

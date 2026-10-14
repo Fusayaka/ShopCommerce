@@ -100,12 +100,26 @@ export class ProductsService {
       })
     }
 
-    if (rating){
-      conditions.push({
-        rating:{
-          gte: rating
-        }
-      })
+    if (rating) {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      conditions.push(
+        rating === "new"
+          ? { createdAt: { gte: thirtyDaysAgo }, rating: 0 }
+          : rating === "no-review"
+          ? { createdAt: { lt: thirtyDaysAgo }, rating: 0 }
+          : { rating: { gte: Number(rating) } }
+      );
+    }
+
+    const sortBy = query.sortBy || 'rating-desc';
+    let orderBy = {};
+    if (sortBy === "latest"){
+      orderBy = {createdAt: "desc"};
+    }
+    else {
+      const [field, direction] = sortBy.split("-");
+      orderBy = { [field] : direction};
     }
 
     const where: Prisma.ProductWhereInput = conditions.length > 0 ? {AND: conditions}: {}
@@ -114,7 +128,7 @@ export class ProductsService {
       where: where,
       skip: skip,
       take: limit,
-      orderBy: {rating: 'desc'},
+      orderBy: orderBy,
       include: { stocks: true },
     })
 
