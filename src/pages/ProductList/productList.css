@@ -1,16 +1,17 @@
 .product-list-section {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 24px 60px;
+  padding: 24px 5%;
   font-family: 'Helvetica Neue', Arial, sans-serif;
   box-sizing: border-box;
 }
 
 .detail-breadcrumb {
-  font-size: 14px;
+  font-size: 16px;
   color: #666666;
   margin-bottom: 24px;
   text-align: left;
+  padding: 0;
 }
 
 .detail-breadcrumb a {
@@ -40,6 +41,10 @@
 }
 
 @media (max-width: 768px) {
+  .product-list-section{
+    padding: 20px 30px;
+  }
+
   .product-list-container {
     flex-direction: column;
   }

@@ -55,10 +55,22 @@ html {
 }
 
 #root {
+  /* The shop is a fixed light design. Pin the palette tokens to their light
+     values here so every surface, heading and border stays readable even when
+     the OS (and the :root dark overrides above) switch to dark mode. Setting
+     them on #root beats the :root dark values for everything inside the app. */
+  --bg: #ffffff;
+  --text: #333333;
+  --text-h: #000000;
+  --border: #e5e4e7;
+  color-scheme: light;
+
   width: 1126px;
   max-width: 100%;
   margin: 0 auto;
   text-align: center;
+  background: var(--bg);
+  color: var(--text);
   border-inline: 1px solid var(--border);
   min-height: 100svh;
   display: flex;
@@ -68,6 +80,7 @@ html {
 
 body {
   margin: 0;
+  background: #ffffff; /* keep the viewport (incl. #root gutters) light in any OS theme */
 }
 
 h1,

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import './overview.css'
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { StarRating } from '@/components';
 import plhImg from '/images/cloth-placeholder.jpeg'
 import type { Product } from '@/types';
@@ -9,8 +9,12 @@ import { cartApi } from '@/api/cartApi';
 import { productApi } from '@/api/productApi';
 import { toast } from 'react-toastify';
 
+const COLORS = ['Red', 'Blue', 'Green'];
+const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
+
 export default function Overview() {
     const {productId} = useParams<{ productId: string }>();
+    const navigate = useNavigate();
 
     const [product, setProduct] = useState<Product | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -48,11 +52,19 @@ export default function Overview() {
         fetchProduct();
 
         setQuantity(1);
-        setColor(null);
-        setSize(null);
-        
+
         return () => { active = false; };
     }, [productId])
+
+    useEffect(() => {
+        const stocks = product?.stocks ?? [];
+        const firstColor = COLORS.find((c) => stocks.some((v) => v.color === c)) ?? null;
+        const firstSize = firstColor
+            ? SIZES.find((s) => stocks.some((v) => v.color === firstColor && v.size === s)) ?? null
+            : null;
+        setColor(firstColor);
+        setSize(firstSize);
+    }, [product])
 
     const handleQuantityChange = (type: 'increase' | 'decrease' | 'input', value? : string) => {
         const curQuantity = Number(quantity) || 0;
@@ -92,10 +104,10 @@ export default function Overview() {
         }
     };
 
-    const handleAddtoCart = async () => {
+    const addSelectionToCart = async (): Promise<boolean> => {
         if (!color || !size){
             toast.error("Please choose size and color!");
-            return;
+            return false;
         }
 
         const selectedStock = product?.stocks?.find(
@@ -103,11 +115,11 @@ export default function Overview() {
         );
         if (!selectedStock){
             toast.error("This option is not available!");
-            return;
+            return false;
         }
         if (selectedStock.stock <= 0){
             toast.error("This option is out of stock!");
-            return;
+            return false;
         }
 
         try {
@@ -115,11 +127,27 @@ export default function Overview() {
                 stockId: selectedStock.id,
                 quantity: Number(quantity),
             });
-            toast.success("Added to cart!");
+            return true;
         }
         catch {
             toast.error("Could not add to your cart!");
+            return false;
         }
+    };
+    
+    // TODO: implement checkout
+    const buyProducts = async (): Promise<boolean> => {
+        return true;
+    }
+
+    const handleAddtoCart = async () => {
+        const added = await addSelectionToCart();
+        if (added) toast.success("Added to cart!");
+    };
+
+    const handleBuyNow = async () => {
+        const added = await buyProducts();
+        if (added) navigate("/checkout");
     };
 
     if (isLoading){
@@ -145,8 +173,6 @@ export default function Overview() {
     );
 
     const stocks = product.stocks ?? [];
-    const COLORS = ['Red', 'Blue', 'Green'];
-    const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
     const colorExists = (c: string) =>
         stocks.some((v) => v.color === c);
@@ -159,117 +185,123 @@ export default function Overview() {
 
     const handleSelectColor = (c: string) => {
         setColor(c);
-        if (size && !variantExists(c, size)) setSize(null);
+        if (!size || !variantExists(c, size)) {
+            setSize(SIZES.find((s) => variantExists(c, s)) ?? null);
+        }
     };
 
     return (
-        <section className='detail-container'>
-            <nav className='detail-breadcrumb'>
-                <Link to='/'>Home</Link> {' > '}
-                <Link to='/products'>Product</Link> {' > '}
-                <span className="detail-current-page">{product.title}</span>
-            </nav>
+            <section className='detail-container'>
+                <nav className='detail-breadcrumb'>
+                    <Link to='/'>Home</Link> {' > '}
+                    <Link to='/products'>Product</Link> {' > '}
+                    <span className="detail-current-page">{product.title}</span>
+                </nav>
 
-            <div className='detail-main'>
-                <div className='detail-image-wrapper'>
-                    <img src={product.image || plhImg} alt={product.title} className='detail-main-img'/>
-                </div>
+                <div className='detail-main'>
+                    <div className='detail-image-wrapper'>
+                        <img src={product.image || plhImg} alt={product.title} className='detail-main-img'/>
+                    </div>
 
-                <div className='detail-info'>
-                    <h1 className='detail-title'>
-                        {product.title}
-                    </h1>
-                    
-                    {rating > 0 && (
-                        <div className='detail-rating-group'>
-                            <span className="detail-stars">
-                                <StarRating rating={rating}/>
-                            </span>
-                            <span className="detail-score">{rating}/5</span>
-                        </div>
-                    )}
-
-                    <div className='detail-price-group'>
-                        <span className='detail-current-price'>${promotionPrice ?? originalPrice}</span>
-
-                        {promotionPrice != null && (
-                            <span className='detail-original-price'>${originalPrice}</span>
+                    <div className='detail-info'>
+                        <h1 className='detail-title'>
+                            {product.title}
+                        </h1>
+                        
+                        {rating > 0 && (
+                            <div className='detail-rating-group'>
+                                <span className="detail-stars">
+                                    <StarRating rating={rating}/>
+                                </span>
+                                <span className="detail-score">{rating}/5</span>
+                            </div>
                         )}
 
-                        {discount ? (
-                            <span className='detail-discount-badge'>-{discount}%</span>
-                        ) : null}
-                    </div>
+                        <div className='detail-price-group'>
+                            <span className='detail-current-price'>${promotionPrice ?? originalPrice}</span>
 
-                    <p className='detail-desc'>
-                        {product.description}
-                    </p>
-
-                    <div className="detail-selector-group">
-                        <span className="detail-selector-label">Select colors</span>
-                        <div className="detail-color-options">
-                            {availableColors.length === 0 ? (
-                                <span className="detail-selector-hint">Currently unavailable</span>
-                            ) : (
-                                availableColors.map(c => (
-                                    <button
-                                        key={c}
-                                        className={`detail-color-btn ${c.toLowerCase()} ${color === c ? 'active' : ''}`}
-                                        onClick={() => { handleSelectColor(c); setQuantity(1); }}
-                                    ></button>
-                                ))
+                            {promotionPrice != null && (
+                                <span className='detail-original-price'>${originalPrice}</span>
                             )}
+
+                            {discount ? (
+                                <span className='detail-discount-badge'>-{discount}%</span>
+                            ) : null}
                         </div>
-                    </div>
 
-                    <hr className='detail-divider'/>
+                        <p className='detail-desc'>
+                            {product.description}
+                        </p>
 
-                    <div className="detail-selector-group">
-                        <span className="detail-selector-label">Choose Size</span>
-                        <div className="detail-size-options">
-                            {SIZES.map(s => {
-                                const disabled = !color || !variantExists(color, s);
-                                return (
-                                    <button
-                                        key={s}
-                                        disabled={disabled}
-                                        className={`detail-size-btn ${size === s ? 'active' : ''} ${disabled ? 'disabled' : ''}`}
-                                        onClick={() => {setSize(s), setQuantity(1)}}
-                                    >
-                                        {s}
-                                    </button>
-                                );
-                            })}
+                        <hr className='detail-divider'/>
+
+                        <div className="detail-selector-group">
+                            <span className="detail-selector-label">Select colors</span>
+                            <div className="detail-color-options">
+                                {availableColors.length === 0 ? (
+                                    <span className="detail-selector-hint">Currently unavailable</span>
+                                ) : (
+                                    availableColors.map(c => (
+                                        <button
+                                            key={c}
+                                            className={`detail-color-btn ${c.toLowerCase()} ${color === c ? 'active' : ''}`}
+                                            onClick={() => { handleSelectColor(c); setQuantity(1); }}
+                                        ></button>
+                                    ))
+                                )}
+                            </div>
                         </div>
-                    </div>
 
-                    {selectedStock && (
-                        outOfStock ? (
-                            <p className="detail-stock-info detail-stock-out">Out of stock</p>
-                        ) : (
-                            <p className="detail-stock-info">In stock: {selectedStock.stock}</p>
-                        )
-                    )}
+                        <hr className='detail-divider'/>
 
-                    <hr className="detail-divider" />
-
-                    <div className="detail-action-group">
-                        <div className="detail-quantity-selector">
-                            <button onClick={() => handleQuantityChange('decrease')}>-</button>
-                            <input
-                                type="text"
-                                className="detail-quantity-input"
-                                value={quantity}
-                                onChange={(e) => handleQuantityChange('input', e.target.value)}
-                                onBlur={handleQuantityEmpty}
-                            />
-                            <button onClick={() => handleQuantityChange('increase')}>+</button>
+                        <div className="detail-selector-group">
+                            <span className="detail-selector-label">Choose Size</span>
+                            <div className="detail-size-options">
+                                {SIZES.map(s => {
+                                    const disabled = !color || !variantExists(color, s);
+                                    return (
+                                        <button
+                                            key={s}
+                                            disabled={disabled}
+                                            className={`detail-size-btn ${size === s ? 'active' : ''} ${disabled ? 'disabled' : ''}`}
+                                            onClick={() => {setSize(s), setQuantity(1)}}
+                                        >
+                                            {s}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
-                        <button className="detail-add-to-cart-btn" onClick={handleAddtoCart} disabled={!selectedStock || outOfStock}>Add to Cart</button>
+
+                        {selectedStock && (
+                            outOfStock ? (
+                                <p className="detail-stock-info detail-stock-out">Out of stock</p>
+                            ) : (
+                                <p className="detail-stock-info">In stock: {selectedStock.stock}</p>
+                            )
+                        )}
+
+                        <div className="detail-action-group">
+                            <div className="detail-primary-actions">
+                                <div className="detail-quantity-selector">
+                                    <button onClick={() => handleQuantityChange('decrease')}>-</button>
+                                    <input
+                                        type="text"
+                                        className="detail-quantity-input"
+                                        value={quantity}
+                                        onChange={(e) => handleQuantityChange('input', e.target.value)}
+                                        onBlur={handleQuantityEmpty}
+                                    />
+                                    <button onClick={() => handleQuantityChange('increase')}>+</button>
+                                </div>
+                                <button className="detail-add-to-cart-btn" onClick={handleAddtoCart} disabled={!selectedStock || outOfStock}>Add to Cart</button>
+                            </div>
+                            <button className="detail-buy-now-btn" onClick={handleBuyNow} disabled={!selectedStock || outOfStock}>Buy Now</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        
     );
 }
 

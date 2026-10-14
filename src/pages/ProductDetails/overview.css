@@ -56,7 +56,8 @@
 .detail-breadcrumb {
   color: #666666;
   font-size: 14px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  padding: 20px 30px 0;
 }
 
 .detail-breadcrumb a {
@@ -107,6 +108,7 @@
   display: flex;
   flex-direction: column;
   text-align: left;
+  width: auto;
 }
 
 .detail-title {
@@ -138,7 +140,6 @@
   gap: 4px;
 }
 
-/* KHU VỰC GIÁ: Đã đổi tên class và ép căn trái tuyệt đối */
 .detail-price-group {
   display: flex;
   align-items: center;
@@ -146,6 +147,7 @@
   gap: 16px; 
   margin: 16px 0;
   width: 100%;
+  line-height: auto;
 }
 
 .detail-current-price {
@@ -175,6 +177,12 @@
   line-height: 1.6;
   margin-bottom: 24px;
   font-size: 16px;
+}
+
+.detail-divider {
+  border: none;
+  border-top: 0px solid #e5e5e5;
+  margin: 15px 0;
 }
 
 .detail-selector-label {
@@ -308,6 +316,14 @@
 
 .detail-action-group {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  width: 100%;
+}
+
+.detail-primary-actions {
+  display: flex;
   flex-direction: row;
   gap: 20px;
   width: 100%;
@@ -366,18 +382,48 @@
   width: 40%;
 }
 
+.detail-buy-now-btn {
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #000000;
+  border-radius: 40px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  width: calc(40% + 150px + 20px);
+  padding: 14px 0;
+}
+
+.detail-buy-now-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 @media (hover: hover) {
   .detail-add-to-cart-btn:hover {
     opacity: 0.8;
   }
+
+  .detail-buy-now-btn:not(:disabled):hover {
+    background-color: #000000;
+    color: #ffffff;
+  }
 }
 
 @media (max-width: 768px) {
+  .detail-container{
+    padding: 20px 30px 0;
+  }
   .detail-main {
     flex-direction: column;
     gap: 24px;
   }
-  
+
+  .detail-info{
+    padding: 5%;
+  }
+
   .detail-image-wrapper {
     flex: 0 0 auto;
     width: 80%;
@@ -387,7 +433,7 @@
   }
 
   .detail-title {
-    font-size: 28px;
+    font-size: 21px;
     text-align: left;
   }
   
@@ -402,7 +448,13 @@
   
   .detail-add-to-cart-btn {
     padding: 16px 0;
-    width: 60%;
+    flex: 1;
+    width: auto;
+  }
+
+  .detail-buy-now-btn {
+    padding: 16px 0;
+    width: 100%;
   }
 
   .detail-rating-group {
@@ -411,5 +463,9 @@
 
   .detail-desc {
     font-weight: 500;
+  }
+
+  .detail-divider{
+    border-top: 1px solid #e5e5e5;
   }
 }

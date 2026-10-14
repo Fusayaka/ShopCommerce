@@ -111,13 +111,15 @@
   }
 
   .banner-description{
-    text-align: left;
+    text-align: justify;
     font-size: 14px;
+    padding: 0 3%;
     font-weight: 600;
   }
 
   .banner-title{
     font-size: 36px;
+    padding: 0 4%;
   }
 
   .shop-btn {

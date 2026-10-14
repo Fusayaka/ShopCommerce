@@ -69,7 +69,7 @@ export default function ProductList(){
                 {'  >  '}
                 <span>Product</span>
             </nav>
-            
+
             <div className="product-list-container">
                 <div className={`filter-sidebar-wrapper ${!isDesktop && isMobileFilterOpen ? 'mobile-modal-open' : ''}`}>
                     {!isDesktop && isMobileFilterOpen && (

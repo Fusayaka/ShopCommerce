@@ -178,6 +178,8 @@ export default function Filter({isOpen = true, onClose, onApplyFilter}: FilterPr
                                     <option value="3">3 Stars & above</option>
                                     <option value="2">2 Stars & above</option>
                                     <option value="1">1 Stars & above</option>
+                                    <option value="new">New</option>
+                                    <option value="no-review">No review</option>
                                 </select>
                             </div>
                         )}

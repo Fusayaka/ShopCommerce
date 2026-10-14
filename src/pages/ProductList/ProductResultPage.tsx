@@ -16,6 +16,7 @@ export default function ProductResultPage({ onOpenFilter }: ProductResultPagePro
     const currentPage = Number(searchParams.get('page')) || 1;
     const [itemsPerPage, setItemsPerPage] = useState(9);
 
+    const sort = searchParams.get('sort') || 'latest';
     const [products, setProducts] = useState<Product[]>([]);
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
@@ -25,6 +26,13 @@ export default function ProductResultPage({ onOpenFilter }: ProductResultPagePro
     const handlePageChange = (newPage: number) => {
         const params = new URLSearchParams(searchParams);
         params.set('page', newPage.toString());
+        setSearchParams(params);
+    };
+
+    const handleSortChange = (value: string) => {
+        const params = new URLSearchParams(searchParams);
+        params.set('sort', value);
+        params.delete('page');
         setSearchParams(params);
     };
 
@@ -59,6 +67,7 @@ export default function ProductResultPage({ onOpenFilter }: ProductResultPagePro
             minPrice: minPriceParam ? Number(minPriceParam) : undefined,
             maxPrice: maxPriceParam ? Number(maxPriceParam) : undefined,
             hasDiscount: searchParams.get('hasDiscount') === 'true' || undefined,
+            sortBy: searchParams.get('sort') || 'latest',
         };
 
         const fetchProducts = async () => {
@@ -149,6 +158,23 @@ export default function ProductResultPage({ onOpenFilter }: ProductResultPagePro
                         <img src={filterMenu} alt="filter" />
                     </button>
                 </div>
+            </div>
+            <div className="product-sort">
+                <label htmlFor="product-sort-select">Sort by</label>
+                <select
+                    id="product-sort-select"
+                    value={sort}
+                    onChange={(e) => handleSortChange(e.target.value)}
+                    className="sort-select"
+                >
+                    <option value="latest">Latest</option>
+                    <option value="rating-asc">Rating &#8593;</option>
+                    <option value="rating-desc">Rating &#8595;</option>
+                    <option value="title-asc">Name &#8593;</option>
+                    <option value="title-desc">Name &#8595;</option>
+                    <option value="price-asc">Price &#8593;</option>
+                    <option value="price-desc">Price &#8595;</option>
+                </select>
             </div>
 
             {isLoading ? (

@@ -1,7 +1,6 @@
 .trending-section {
   padding: 60px 5%;
   font-family: 'Helvetica Neue', Arial, sans-serif;
-  border-bottom: 1px solid #0000001a;
   background-color: #ffffff;
   color: #000000
 }
@@ -49,7 +48,7 @@
 
 @media (max-width: 768px) {
   .trending-section {
-    padding: 40px 5%;
+    padding: 40px 30px;
   }
   
   .trending-title {

@@ -12,6 +12,7 @@ export interface GetProductsQuery {
     maxPrice?: number;
     hasDiscount?: boolean;
     rating?: number;
+    sortBy?: string;
     page?: number;
     limit?: number;
 }
