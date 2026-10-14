@@ -8,6 +8,7 @@ import { cartApi } from "@/api/cartApi";
 import { toast } from "react-toastify";
 
 export default function Cart() {
+    const isGuest = !localStorage.getItem('token');
     const [items, setItems] = useState<CartLineItem[]>([]);
     const [loading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -16,6 +17,11 @@ export default function Cart() {
     const userId = 1001;
 
     useEffect(() => {
+        if (isGuest) {
+            setIsLoading(false);
+            return;
+        }
+
         let active = true;
         const fetchItems = async () => {
             setIsLoading(true);
@@ -49,7 +55,7 @@ export default function Cart() {
 
         fetchItems();
         return () => { active = false; };
-    }, [userId])
+    }, [userId, isGuest])
 
     const handleUpdateQuantity = async (productItem: CartLineItem, newQuantity: number) => {
         const prevItems = items;
@@ -96,7 +102,12 @@ export default function Cart() {
             
             <h1 className="cart-title">SHOPPING CART</h1>
 
-            {loading ? (
+            {isGuest ? (
+                <div className="cart-login-prompt">
+                    <p>Please log in to view your cart.</p>
+                    <Link to="/login" className="cart-login-btn">Login</Link>
+                </div>
+            ) : loading ? (
                 <div className="cart-status">Loading...</div>
             ) : items.length === 0 ? (
                 <div className="cart-status">{error ?? "Your cart is empty."}</div>

@@ -1,7 +1,7 @@
 .cart-section {
     max-width: 1240px;
     margin: 0 auto;
-    padding: 24px 60px;
+    padding: 24px 5%;
     font-family: inherit;
 }
 
@@ -45,6 +45,40 @@
     color: #606060;
 }
 
+.cart-login-prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+
+    padding: 60px 0;
+    text-align: center;
+}
+
+.cart-login-prompt p {
+    margin: 0;
+    font-size: 16px;
+    color: #606060;
+}
+
+.cart-login-btn {
+    padding: 12px 40px;
+    border-radius: 99px;
+
+    background-color: #000000;
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+
+    transition: opacity 0.2s ease;
+}
+
+.cart-login-btn:hover {
+    opacity: 0.85;
+}
+
 .cart-status-error {
     padding: 12px 0;
     color: #ff3333;
@@ -73,6 +107,11 @@
 }
 
 @media screen and (max-width: 768px) {
+    .detail-breadcrumb {
+        /* Mobile: pull "Home > Cart" to a 30px inset (section padding is 60px here). */
+        margin-left: -30px;
+    }
+
     .cart-title {
         font-size: 32px;
         margin-bottom: 20px;
@@ -97,7 +136,7 @@
 
 @media screen and (max-width: 500px) {
     .cart-section {
-        padding: 16px 12px;
+        padding: 12px 30px;
     }
 
     .cart-title {
@@ -112,6 +151,7 @@
     .detail-breadcrumb {
         font-size: 12px;
         margin-bottom: 16px;
+        margin-left: 0;
     }
 
     .cart-bill-wrapper{
