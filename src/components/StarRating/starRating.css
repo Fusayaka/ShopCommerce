@@ -1,0 +1,15 @@
+.stars {
+  display: flex;
+  font-size: 16px;
+  gap: 2px;
+}
+
+.star-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.empty-star {
+  filter: opacity(30%) grayscale(70%);
+}

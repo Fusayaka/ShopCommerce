@@ -1,0 +1,17 @@
+.order-list-box {
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    background-color: #ffffff;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .order-list-box {
+        padding: 16px;
+        border-radius: 16px;
+    }
+}
