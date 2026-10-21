@@ -32,19 +32,13 @@ class User {
     + id: int <<PK>>
     + name: string
     + email: string
+    + password: string
+    + role: Role
     + avatar: string
     + contact: string
     + address: string
     + description: string
     + updatedAt: dateTime
-}
-
-class Authen {
-    + id: int <<PK>>
-    + userId: int <<FK>> <<unique>>
-    + username: string
-    + email: string
-    + password: string
 }
 
 class Product {
@@ -119,7 +113,6 @@ class OrderItem {
 User ||--o{ Comment : "writes"
 Product ||--o{ Comment : "has"
 
-User ||--|| Authen : "authenticates"
 User ||--|| Cart : "owns"
 Cart ||--|{ CartItem : "contains"
 

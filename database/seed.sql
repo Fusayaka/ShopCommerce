@@ -1,33 +1,30 @@
 -- ==============================================================================
 -- 1. CLEAR OLD DATA
 -- ==============================================================================
-TRUNCATE TABLE order_items, orders, cart_items, carts, comments, product_stocks, products, authen, users RESTART IDENTITY CASCADE;
+TRUNCATE TABLE order_items, orders, cart_items, carts, comments, product_stocks, products, users RESTART IDENTITY CASCADE;
 
 -- ==============================================================================
 -- 2. SEED USERS (10 Users, ids 1000-1009)
 -- ==============================================================================
-INSERT INTO users (id, name, email, avatar, contact, address, description) VALUES
-(1000, 'Minh Nguyen', 'minh@example.com', 'https://i.pravatar.cc/150?img=11', '+84 901 000 001', '12 Le Loi, District 1, Ho Chi Minh City', 'Streetwear enthusiast and weekend sneakerhead.'),
-(1001, 'Lan Pham', 'lan@example.com', 'https://i.pravatar.cc/150?img=5', '+84 901 000 002', '45 Nguyen Hue, District 1, Ho Chi Minh City', 'Loves minimal basics and soft cotton tees.'),
-(1002, 'Hoang Tran', 'hoang@example.com', 'https://i.pravatar.cc/150?img=15', '+84 901 000 003', '78 Tran Hung Dao, District 5, Ho Chi Minh City', 'Shops for comfy everyday fits.'),
-(1003, 'Trang Le', 'trang@example.com', 'https://i.pravatar.cc/150?img=20', '+84 901 000 004', '23 Hai Ba Trung, District 3, Ho Chi Minh City', 'Into oversized styles and neutral tones.'),
-(1004, 'Khoa Vu', 'khoa@example.com', 'https://i.pravatar.cc/150?img=33', '+84 901 000 005', '9 Pham Ngu Lao, District 1, Ho Chi Minh City', 'Casual dresser who values good fabric.'),
-(1005, 'Linh Bui', 'linh@example.com', 'https://i.pravatar.cc/150?img=44', '+84 901 000 006', '67 Vo Van Tan, District 3, Ho Chi Minh City', 'Fan of bold colors and premium cotton.'),
-(1006, 'Tuan Do', 'tuan@example.com', 'https://i.pravatar.cc/150?img=55', '+84 901 000 007', '34 Dien Bien Phu, Binh Thanh, Ho Chi Minh City', 'Collects classic tees in every color.'),
-(1007, 'Ngoc Dang', 'ngoc@example.com', 'https://i.pravatar.cc/150?img=66', '+84 901 000 008', '101 Cach Mang Thang 8, District 10, Ho Chi Minh City', 'Prefers relaxed fits for daily wear.'),
-(1008, 'Dat Ngo', 'dat@example.com', 'https://i.pravatar.cc/150?img=36', '+84 901 000 009', '56 Ly Thuong Kiet, District 11, Ho Chi Minh City', 'Always hunting for a good promo.'),
-(1009, 'Huyen Ly', 'huyen@example.com', 'https://i.pravatar.cc/150?img=38', '+84 901 000 010', '88 Nguyen Trai, District 5, Ho Chi Minh City', 'Likes clean, simple designs.');
+-- password is a bcrypt hash of "admin123" (same for every user).
+INSERT INTO users (id, name, email, password, avatar, contact, address, description) VALUES
+(1000, 'Minh Nguyen', 'minh@example.com', '$2b$10$5i3xf9.RLDnSUb.kUKKtLOHPHFWcY9LfJvdtqjeDfFXsfMJDQwBvK', 'https://i.pravatar.cc/150?img=11', '+84 901 000 001', '12 Le Loi, District 1, Ho Chi Minh City', 'Streetwear enthusiast and weekend sneakerhead.'),
+(1001, 'Lan Pham', 'lan@example.com', '$2b$10$5i3xf9.RLDnSUb.kUKKtLOHPHFWcY9LfJvdtqjeDfFXsfMJDQwBvK', 'https://i.pravatar.cc/150?img=5', '+84 901 000 002', '45 Nguyen Hue, District 1, Ho Chi Minh City', 'Loves minimal basics and soft cotton tees.'),
+(1002, 'Hoang Tran', 'hoang@example.com', '$2b$10$5i3xf9.RLDnSUb.kUKKtLOHPHFWcY9LfJvdtqjeDfFXsfMJDQwBvK', 'https://i.pravatar.cc/150?img=15', '+84 901 000 003', '78 Tran Hung Dao, District 5, Ho Chi Minh City', 'Shops for comfy everyday fits.'),
+(1003, 'Trang Le', 'trang@example.com', '$2b$10$5i3xf9.RLDnSUb.kUKKtLOHPHFWcY9LfJvdtqjeDfFXsfMJDQwBvK', 'https://i.pravatar.cc/150?img=20', '+84 901 000 004', '23 Hai Ba Trung, District 3, Ho Chi Minh City', 'Into oversized styles and neutral tones.'),
+(1004, 'Khoa Vu', 'khoa@example.com', '$2b$10$5i3xf9.RLDnSUb.kUKKtLOHPHFWcY9LfJvdtqjeDfFXsfMJDQwBvK', 'https://i.pravatar.cc/150?img=33', '+84 901 000 005', '9 Pham Ngu Lao, District 1, Ho Chi Minh City', 'Casual dresser who values good fabric.'),
+(1005, 'Linh Bui', 'linh@example.com', '$2b$10$5i3xf9.RLDnSUb.kUKKtLOHPHFWcY9LfJvdtqjeDfFXsfMJDQwBvK', 'https://i.pravatar.cc/150?img=44', '+84 901 000 006', '67 Vo Van Tan, District 3, Ho Chi Minh City', 'Fan of bold colors and premium cotton.'),
+(1006, 'Tuan Do', 'tuan@example.com', '$2b$10$5i3xf9.RLDnSUb.kUKKtLOHPHFWcY9LfJvdtqjeDfFXsfMJDQwBvK', 'https://i.pravatar.cc/150?img=55', '+84 901 000 007', '34 Dien Bien Phu, Binh Thanh, Ho Chi Minh City', 'Collects classic tees in every color.'),
+(1007, 'Ngoc Dang', 'ngoc@example.com', '$2b$10$5i3xf9.RLDnSUb.kUKKtLOHPHFWcY9LfJvdtqjeDfFXsfMJDQwBvK', 'https://i.pravatar.cc/150?img=66', '+84 901 000 008', '101 Cach Mang Thang 8, District 10, Ho Chi Minh City', 'Prefers relaxed fits for daily wear.'),
+(1008, 'Dat Ngo', 'dat@example.com', '$2b$10$5i3xf9.RLDnSUb.kUKKtLOHPHFWcY9LfJvdtqjeDfFXsfMJDQwBvK', 'https://i.pravatar.cc/150?img=36', '+84 901 000 009', '56 Ly Thuong Kiet, District 11, Ho Chi Minh City', 'Always hunting for a good promo.'),
+(1009, 'Huyen Ly', 'huyen@example.com', '$2b$10$5i3xf9.RLDnSUb.kUKKtLOHPHFWcY9LfJvdtqjeDfFXsfMJDQwBvK', 'https://i.pravatar.cc/150?img=38', '+84 901 000 010', '88 Nguyen Trai, District 5, Ho Chi Minh City', 'Likes clean, simple designs.');
+
+-- Roles: everyone defaults to 'customer'; promote a couple for testing.
+UPDATE users SET role = 'admin'   WHERE id = 1000;
+UPDATE users SET role = 'manager' WHERE id = 1001;
 
 -- ==============================================================================
--- 3. SEED AUTHEN (one credential row per user, password is a bcrypt placeholder)
--- ==============================================================================
-INSERT INTO authen (user_id, username, email, password)
-SELECT id, split_part(email, '@', 1), email,
-       '$2b$10$abcdefghijklmnopqrstuvQ8Z0m9rN0m9rN0m9rN0m9rN0m9rN0m9'
-FROM users;
-
--- ==============================================================================
--- 4. SEED PRODUCTS (30 Products)
+-- 3. SEED PRODUCTS (30 Products)
 -- ==============================================================================
 INSERT INTO products (id, title, image) VALUES
 (1, 'Owen Blue T-Shirt', 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80'),
@@ -62,7 +59,7 @@ INSERT INTO products (id, title, image) VALUES
 (30, 'Comfort Fit White T-Shirt', 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80');
 
 -- ==============================================================================
--- 5. SEED PRODUCT STOCKS (variants)
+-- 4. SEED PRODUCT STOCKS (variants)
 -- ==============================================================================
 WITH protected(product_id, size, color) AS (
     VALUES
@@ -144,7 +141,7 @@ WHERE EXISTS (
       );
 
 -- ==============================================================================
--- 5b. DERIVE products.price (lowest display price) from the seeded variants.
+-- 4b. DERIVE products.price (lowest display price) from the seeded variants.
 --     Same logic as the update_product_price trigger, so it is correct whether
 --     or not that trigger is installed at seed time.
 -- ==============================================================================
@@ -156,7 +153,7 @@ SET price = COALESCE(
 );
 
 -- ==============================================================================
--- 6. SEED COMMENTS (varied so ratings differ widely)
+-- 5. SEED COMMENTS (varied so ratings differ widely)
 --    Distribution (products.rating / num_reviews are derived from this below):
 --      * no reviews  : 4, 17, 22, 30                       -> rating 0 ("New")
 --      * many + high : 1, 2, 7, 13                         -> ~4.6-4.7
@@ -274,7 +271,7 @@ INSERT INTO comments (product_id, user_id, content, rating) VALUES
 (29, 1001, 'Okay shirt for the price.', 3);
 
 -- ==============================================================================
--- 6b. DERIVE products.rating / num_reviews from the seeded comments.
+-- 5b. DERIVE products.rating / num_reviews from the seeded comments.
 --     Same logic as the update_product_rating trigger, so the aggregates are
 --     correct whether or not that trigger is installed at seed time.
 --     Products with no comments stay at 0 / 0.
@@ -292,7 +289,7 @@ SET rating = COALESCE((
     );
 
 -- ==============================================================================
--- 7. SEED CARTS
+-- 6. SEED CARTS
 -- ==============================================================================
 INSERT INTO carts (id, user_id) VALUES
 (1, 1000),
@@ -318,7 +315,7 @@ JOIN product_stocks ps
  AND ps.color = v.color::color;
 
 -- ==============================================================================
--- 8. SEED ORDERS (placed orders only: checkout / completed)
+-- 7. SEED ORDERS (placed orders only: checkout / completed)
 -- ==============================================================================
 INSERT INTO orders (id, user_id, status, subtotal, discount, delivery_fee, promo_code) VALUES
 (1, 1000, 'completed', 240, 20, 15, 'SALE20'),
@@ -337,7 +334,7 @@ INSERT INTO orders (id, user_id, status, subtotal, discount, delivery_fee, promo
 (14, 1007, 'completed', 185, 0, 15, NULL);
 
 -- ==============================================================================
--- 9. SEED ORDER ITEMS
+-- 8. SEED ORDER ITEMS
 -- ==============================================================================
 INSERT INTO order_items (order_id, stock_id, title, image, quantity, price_at_purchase)
 SELECT v.order_id, ps.id, p.title, p.image, v.quantity, v.price_at_purchase
@@ -365,7 +362,7 @@ JOIN product_stocks ps
 JOIN products p ON p.id = v.product_id;
 
 -- ==============================================================================
--- 10. RESYNC IDENTITY SEQUENCES
+-- 9. RESYNC IDENTITY SEQUENCES
 -- ==============================================================================
 SELECT setval(pg_get_serial_sequence('users', 'id'), (SELECT MAX(id) FROM users));
 SELECT setval(pg_get_serial_sequence('products', 'id'), (SELECT MAX(id) FROM products));
