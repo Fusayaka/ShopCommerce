@@ -8,6 +8,7 @@ import { getCardPrice } from '@/utils/pricing';
 import { cartApi } from '@/api/cartApi';
 import { productApi } from '@/api/productApi';
 import { toast } from 'react-toastify';
+import { useAuth } from '@/utils/auth';
 
 const COLORS = ['Red', 'Blue', 'Green'];
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
@@ -15,6 +16,8 @@ const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 export default function Overview() {
     const {productId} = useParams<{ productId: string }>();
     const navigate = useNavigate();
+
+    const { user } = useAuth();
 
     const [product, setProduct] = useState<Product | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -24,8 +27,6 @@ export default function Overview() {
     const [color, setColor] = useState<string | null>(null);
     const [quantity, setQuantity] = useState<number | string>(1);
 
-    // TODO: implement userId
-    const userId = 1001;
 
     useEffect(() => {
         let active = true;
@@ -105,6 +106,12 @@ export default function Overview() {
     };
 
     const addSelectionToCart = async (): Promise<boolean> => {
+        if (!user) {
+            toast.error("Please log in to add items to your cart.");
+            navigate("/login");
+            return false;
+        }
+
         if (!color || !size){
             toast.error("Please choose size and color!");
             return false;
@@ -123,7 +130,7 @@ export default function Overview() {
         }
 
         try {
-            await cartApi.addToCart(userId, {
+            await cartApi.addToCart({
                 stockId: selectedStock.id,
                 quantity: Number(quantity),
             });

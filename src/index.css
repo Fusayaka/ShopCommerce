@@ -65,7 +65,7 @@ html {
   --border: #e5e4e7;
   color-scheme: light;
 
-  width: 1126px;
+  width: auto;
   max-width: 100%;
   margin: 0 auto;
   text-align: center;

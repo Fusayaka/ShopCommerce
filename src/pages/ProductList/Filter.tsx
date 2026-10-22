@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import './filter.css'
-import upArrow from '@/assets/up-arrow.png'
-import downArrow from '@/assets/down-arrow.png'
-import filterMenu from '@/assets/filter.png'
+import upArrow from '@/assets/up-arrow.svg'
+import downArrow from '@/assets/down-arrow.svg'
+import filterMenu from '@/assets/filter.svg'
 import { useSearchParams } from 'react-router-dom';
 import { productApi } from '@/api/productApi';
 

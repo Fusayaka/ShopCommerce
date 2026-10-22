@@ -1,6 +1,6 @@
 import React from 'react';
-import fullStar from '@/assets/fullstar.png';
-import halfStar from '@/assets/halfstar.png';
+import fullStar from '@/assets/fullstar.svg';
+import halfStar from '@/assets/halfstar.svg';
 import './starRating.css'
 
 interface StarRatingProps {

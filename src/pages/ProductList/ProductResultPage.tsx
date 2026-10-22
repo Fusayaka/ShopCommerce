@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import './productResultPage.css'
 import { ProductCard } from "@/components";
 import { type Product } from '@/types';
-import filterMenu from '@/assets/filter.png'
+import filterMenu from '@/assets/filter.svg'
 import { useSearchParams } from 'react-router-dom';
 import { productApi, type GetProductsQuery } from '@/api/productApi';
 
