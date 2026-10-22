@@ -1,27 +1,19 @@
 import './header.css'
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '@/assets/logo-placeholder.png'
-import cart from '@/assets/icon-cart.jpg'
-import lang from '@/assets/language.png'
-import search from '@/assets/search.png'
-import hamburgerbtn from '@/assets/hamburger.png'
+import logo from '@/assets/logo-placeholder.svg'
+import cart from '@/assets/icon-cart.svg'
+import lang from '@/assets/language.svg'
+import search from '@/assets/search.svg'
+import hamburgerbtn from '@/assets/hamburger.svg'
+import avatarPlaceholder from '@/assets/avatar-placeholder.svg'
 import { useEffect, useRef, useState } from 'react';
-
-type CurrentUser = { name?: string; avatar?: string };
-
-function getCurrentUser(): CurrentUser | null {
-    try {
-        const raw = localStorage.getItem('user');
-        return raw ? (JSON.parse(raw) as CurrentUser) : null;
-    } catch {
-        return null;
-    }
-}
+import { useAuth } from '@/utils/auth';
 
 export default function Header() {
-    const isGuest = !localStorage.getItem('token');
-    const currentUser = getCurrentUser();
-    const userInitial = (currentUser?.name ?? 'U').charAt(0).toUpperCase();
+    const { loggedIn, user: currentUser } = useAuth();
+
+    const isGuest = !loggedIn;
+    const avatarSrc = currentUser?.avatar || avatarPlaceholder;
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -113,9 +105,11 @@ export default function Header() {
                     </Link>
                     :
                     <Link to="/profile" className='avatar-btn' aria-label='Account'>
-                        {currentUser?.avatar
-                            ? <img src={currentUser.avatar} alt={currentUser?.name ?? 'User'} />
-                            : <span className='avatar-fallback'>{userInitial}</span>}
+                        <img
+                            src={avatarSrc}
+                            alt={currentUser?.name ?? 'User'}
+                            onError={(e) => { e.currentTarget.src = avatarPlaceholder; }}
+                        />
                     </Link>
                 }
             </div>
