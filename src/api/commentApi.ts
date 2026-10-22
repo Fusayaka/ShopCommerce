@@ -3,7 +3,6 @@ import axiosClient from "./axiosClient";
 
 export interface CreateCommentPayload {
     productId: number;
-    userId: number;
     content: string;
     rating: number;
 }
@@ -24,9 +23,9 @@ export const commentApi = {
         });
     },
 
-    checkReviewEligibility(userId: number, productId: number) {
+    checkReviewEligibility(productId: number) {
         return axiosClient.get<ReviewEligibility, ReviewEligibility>(`/comments/eligibility`, {
-            params: { userId, productId },
+            params: { productId },
         });
     },
 

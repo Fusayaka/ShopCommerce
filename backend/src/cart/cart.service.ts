@@ -65,6 +65,20 @@ export class CartService {
     const item = await this.prisma.cartItem.findUnique({ where });
     if (!item) throw new NotFoundException('Can not update: Cart item not found');
 
+    const productStock = await this.prisma.productStock.findUnique({where: {id: dto.stockId}});
+    if (!productStock) throw new NotFoundException(`Can not found Product Stock ${dto.stockId}`);
+    
+    const maxQuantity = productStock.stock;
+    if (dto.quantity > maxQuantity) {
+      await this.prisma.cartItem.update({
+        where,
+        data: {
+          quantity: maxQuantity,
+        }
+      });
+      throw new BadRequestException(`Requested quantity exceeeds avaiable stock ${maxQuantity}!`);
+    }
+
     return this.prisma.cartItem.update({
       where,
       data: {

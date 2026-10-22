@@ -6,18 +6,17 @@ import { useEffect, useState } from 'react';
 import type { CartLineItem } from "@/types";
 import { cartApi } from "@/api/cartApi";
 import { toast } from "react-toastify";
+import { useAuth } from "@/utils/auth";
 
 export default function Cart() {
-    const isGuest = !localStorage.getItem('token');
+    const { loggedIn, user } = useAuth();
+
     const [items, setItems] = useState<CartLineItem[]>([]);
     const [loading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    
-    // TODO: implement Guards => change userId
-    const userId = 1001;
 
     useEffect(() => {
-        if (isGuest) {
+        if (!user) {
             setIsLoading(false);
             return;
         }
@@ -27,7 +26,7 @@ export default function Cart() {
             setIsLoading(true);
             setError(null);
             try {
-                const cart = await cartApi.getCart(userId);
+                const cart = await cartApi.getCart();
                 if (!active) return;
 
                 const mapped: CartLineItem[] = (cart.items ?? []).map((item) => ({
@@ -55,7 +54,26 @@ export default function Cart() {
 
         fetchItems();
         return () => { active = false; };
-    }, [userId, isGuest])
+    }, [user])
+
+    if (!loggedIn) {
+        return (
+            <section className="cart-section">
+                <nav className="detail-breadcrumb">
+                    <Link to="/">Home</Link>
+                    <span className="breadcrumb-separator">{'>'}</span>
+                    <span>Cart</span>
+                </nav>
+
+                <h1 className="cart-title">SHOPPING CART</h1>
+
+                <div className="cart-login-prompt">
+                    <p>Please log in to view your cart.</p>
+                    <Link to="/login" className="cart-login-btn">Login</Link>
+                </div>
+            </section>
+        );
+    }
 
     const handleUpdateQuantity = async (productItem: CartLineItem, newQuantity: number) => {
         const prevItems = items;
@@ -68,7 +86,7 @@ export default function Cart() {
                 )
         );
         try {
-            await cartApi.updateQuantity(userId, {
+            await cartApi.updateQuantity({
                 stockId: productItem.stockId,
                 quantity: newQuantity,
             });
@@ -84,7 +102,7 @@ export default function Cart() {
         setError(null);
         setItems(prev => prev.filter(item => item.id !== productItem.id));
         try {
-            await cartApi.removeItem(userId, productItem.stockId);
+            await cartApi.removeItem(productItem.stockId);
             toast.success("Remove item successfully!");
         }
         catch {
@@ -102,12 +120,7 @@ export default function Cart() {
             
             <h1 className="cart-title">SHOPPING CART</h1>
 
-            {isGuest ? (
-                <div className="cart-login-prompt">
-                    <p>Please log in to view your cart.</p>
-                    <Link to="/login" className="cart-login-btn">Login</Link>
-                </div>
-            ) : loading ? (
+            {loading ? (
                 <div className="cart-status">Loading...</div>
             ) : items.length === 0 ? (
                 <div className="cart-status">{error ?? "Your cart is empty."}</div>

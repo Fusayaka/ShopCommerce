@@ -5,6 +5,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { type Comment as CommentType } from '@/types';
 import { commentApi } from '@/api/commentApi';
 import { toast } from 'react-toastify';
+import { useAuth } from '@/utils/auth';
 
 interface CommentCardProps {
   comment: CommentType;
@@ -86,7 +87,7 @@ export default function Comment() {
   const [comments, setComments] = useState<CommentType[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const isGuest = !localStorage.getItem('token');
+  const { loggedIn, user } = useAuth();
 
   const [newRating, setNewRating] = useState(5);
   const [newContent, setNewContent] = useState('');
@@ -114,9 +115,6 @@ export default function Comment() {
   }, [comments, sort]);
   const visibleComments = sortedComments.slice(0, visibleCount);
   const hasMore = visibleCount < sortedComments.length;
-
-  // TODO: implement userId
-  const userId = 1001;
 
   useEffect(() => {
     if (!productId) return;
@@ -146,7 +144,7 @@ export default function Comment() {
   }, [productId])
 
   useEffect(() => {
-    if (!productId || isGuest) {
+    if (!productId || !loggedIn) {
       setCanReview(false);
       return;
     }
@@ -155,7 +153,7 @@ export default function Comment() {
 
     const checkEligibility = async () => {
       try {
-        const eligibility = await commentApi.checkReviewEligibility(userId, Number(productId));
+        const eligibility = await commentApi.checkReviewEligibility(Number(productId));
         if (!active) return;
         setCanReview(eligibility.canReview);
       } catch {
@@ -167,7 +165,7 @@ export default function Comment() {
     checkEligibility();
     return () => { active = false; };
 
-  }, [productId, isGuest])
+  }, [productId, loggedIn])
 
   const handleDelete = async (commentId: number) => {
     if (!window.confirm("Delete this review?")) return;
@@ -194,6 +192,10 @@ export default function Comment() {
 
   const handleSubmit = async () => {
     if (!productId) return;
+    if (!user) {
+      setSubmitError("Please log in to write a review.");
+      return;
+    }
 
     const content = newContent.trim();
     if (!content) {
@@ -205,7 +207,7 @@ export default function Comment() {
     setSubmitError(null);
 
     try {
-      const eligibility = await commentApi.checkReviewEligibility(userId, Number(productId));
+      const eligibility = await commentApi.checkReviewEligibility(Number(productId));
       if (!eligibility.canReview) {
         setSubmitError(eligibility.reason || "You can only review products you have purchased.");
         return;
@@ -213,7 +215,6 @@ export default function Comment() {
 
       const created = await commentApi.createComment({
         productId: Number(productId),
-        userId,
         content,
         rating: newRating,
       });
@@ -231,7 +232,7 @@ export default function Comment() {
     <section className="comment-section">
       <h2 className="comment-section-title">Reviews</h2>
 
-      {!isGuest && canReview && (
+      {!loggedIn && canReview && (
         <form className="comment-form" onSubmit={e => { e.preventDefault(); handleSubmit(); }}>
           <div className="comment-form-rating">
             <span className="comment-form-label">Your rating</span>
@@ -302,7 +303,7 @@ export default function Comment() {
               <CommentCard
                 key={comment.id}
                 comment={comment}
-                canDelete={!isGuest && comment.userId === userId}
+                canDelete={loggedIn && comment.user?.id === user.id}
                 onDelete={handleDelete}
               />
             ))}

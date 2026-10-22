@@ -9,10 +9,40 @@ import { Prisma } from '@prisma/client';
 export class CommentsService {
   constructor(private readonly prisma: PrismaService){}
 
-  create(createCommentDto: CreateCommentDto) {
+  create(userId: number, createCommentDto: CreateCommentDto) {
     return this.prisma.comment.create({
-      data: createCommentDto,
+      data: { ...createCommentDto, userId },
     });
+  }
+
+  // Người dùng chỉ được đánh giá sản phẩm đã mua (đơn 'completed') và chưa đánh giá.
+  async checkEligibility(userId: number, productId: number) {
+    const purchased = await this.prisma.orderItem.findFirst({
+      where: {
+        order: { userId, status: 'completed' },
+        stock: { productId },
+      },
+      select: { id: true },
+    });
+    if (!purchased) {
+      return {
+        canReview: false,
+        reason: 'You can only review products you have purchased.',
+      };
+    }
+
+    const existing = await this.prisma.comment.findFirst({
+      where: { userId, productId },
+      select: { id: true },
+    });
+    if (existing) {
+      return {
+        canReview: false,
+        reason: 'You have already reviewed this product.',
+      };
+    }
+
+    return { canReview: true };
   }
 
   async findAll(query: GetCommentQueryDto) {

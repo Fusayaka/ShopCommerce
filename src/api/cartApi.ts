@@ -25,28 +25,22 @@ export interface CartResponse {
     items: CartItemResponse[];
 }
 
+// userId được lấy từ JWT ở backend (@CurrentUser), không gửi từ client nữa.
 export const cartApi = {
-    getCart(userId: number) {
-        return axiosClient.get<CartResponse, CartResponse>(`/carts`, {
-            params: { userId },
-        });
+    getCart() {
+        return axiosClient.get<CartResponse, CartResponse>(`/carts`);
     },
 
-    updateQuantity(userId: number, data: { stockId: number; quantity: number }) {
-        return axiosClient.patch<CartItem, CartItem>(`/carts/items`, data, {
-            params: { userId },
-        });
+    updateQuantity(data: { stockId: number; quantity: number }) {
+        return axiosClient.patch<CartItem, CartItem>(`/carts/items`, data);
     },
 
-    addToCart(userId: number, data: { stockId: number; quantity: number }) {
-        return axiosClient.post<CartItem, CartItem>(`/carts/items`, data, {
-            params: { userId },
-        });
+    addToCart(data: { stockId: number; quantity: number }) {
+        return axiosClient.post<CartItem, CartItem>(`/carts/items`, data);
     },
 
-    removeItem(userId: number, stockId: number) {
+    removeItem(stockId: number) {
         return axiosClient.delete<CartItem, CartItem>(`/carts/items`, {
-            params: { userId },
             data: { stockId },
         });
     },
