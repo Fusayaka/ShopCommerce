@@ -1,4 +1,4 @@
-import trashIcon from '@/assets/trash-icon.png'
+import trashIcon from '@/assets/trash-icon.svg'
 import plhImg from '/images/cloth-placeholder.jpeg'
 import type { CartLineItem } from '@/types'
 import { Link } from 'react-router-dom'

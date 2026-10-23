@@ -43,8 +43,7 @@
   
   .related-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 3%;
+    column-gap: 10%;
   }
-
-  
 }

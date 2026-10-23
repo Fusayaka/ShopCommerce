@@ -1,4 +1,4 @@
-import promo from '@/assets/promo-code.png';
+import promo from '@/assets/promo-code.svg';
 import type { CartLineItem } from '@/types';
 import './orderBill.css';
 import { useState } from 'react';

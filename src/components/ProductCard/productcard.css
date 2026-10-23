@@ -1,7 +1,7 @@
 .product-card {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   text-decoration: none;
   color: #000000;
   font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -13,12 +13,12 @@
 .product-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 0 0 2px cyan, 0 10px 20px rgba(0, 255, 255, .3);
-  border-radius: 20px;
+  border-radius: 16px;
 }
 
 .product-img-wrapper {
   background-color: #f0eeed;
-  border-radius: 20px;
+  border-radius: 16px;
   aspect-ratio: 4 / 5;
   overflow: hidden;
   position: relative;
@@ -35,10 +35,10 @@
 }
 
 .product-title {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 700;
   padding: 0 10%;
-  margin: 4px 0 0;
+  margin: 2px 0 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -47,8 +47,8 @@
 .product-rating {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
+  gap: 6px;
+  font-size: 13px;
   justify-content: center;
 }
 
@@ -76,7 +76,7 @@
 }
 
 .cur-price {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
   line-height: 1;
   flex-shrink: 0;
@@ -84,7 +84,7 @@
 }
 
 .ori-price {
-  font-size: 17px;
+  font-size: 14px;
   font-weight: 700;
   color: #0000004d;
   text-decoration: line-through;
@@ -98,7 +98,7 @@
   color: #0097a7;
   padding: 3px 10px;
   border-radius: 62px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0.3px;
@@ -120,7 +120,7 @@
   color: #ff3333;
   padding: 3px 8px;
   border-radius: 62px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   line-height: 1;
   display: inline-flex;
@@ -131,16 +131,16 @@
 
 @media (max-width: 768px) {
   .cur-price {
-    font-size: 16px;
+    font-size: 14px;
     margin-top: 2px;
   }
-  
+
   .ori-price {
-    font-size: 14px; 
+    font-size: 13px;
   }
-  
+
   .product-title {
-    font-size: 16px;
+    font-size: 15px;
     text-align: center;
   }
 

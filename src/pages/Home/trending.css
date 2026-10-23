@@ -58,6 +58,7 @@
   
   .trending-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    column-gap: 10%;
+    row-gap: 16px;
   }
 }
