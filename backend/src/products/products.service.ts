@@ -279,19 +279,9 @@ export class ProductsService {
     const currentMax = maxValues.length > 0 ? Math.max(...maxValues) : 0;
 
     return {
-      min: this.floorToPow10(currentMin),
-      max: this.ceilToPow10(currentMax),
+      min: this.niceFloor(currentMin),
+      max: this.niceCeil(currentMax),
     };
-  }
-
-  private floorToPow10(value: number): number {
-    if (value <= 0) return 0;
-    return Math.pow(10, Math.floor(Math.log10(value) + 1e-9));
-  }
-
-  private ceilToPow10(value: number): number {
-    if (value <= 0) return 0;
-    return Math.pow(10, Math.ceil(Math.log10(value) - 1e-9));
   }
 
   async remove(id: number) {
@@ -301,5 +291,32 @@ export class ProductsService {
     return this.prisma.product.delete({
       where: {id}
     });
+  }
+
+  private niceFloor(val: number): number {
+      if (val <= 0) return 0;
+      const magnitude = Math.pow(10, Math.floor(Math.log10(val)));
+      const normalized = val / magnitude;
+      let base = 1;
+      
+      if (normalized >= 5) base = 5;
+      else if (normalized >= 2) base = 2;
+      else base = 1;
+
+      return base * magnitude;
+  }
+
+  private niceCeil(val: number): number {
+      if (val <= 0) return 0;
+      const magnitude = Math.pow(10, Math.floor(Math.log10(val)));
+      const normalized = val / magnitude;
+      let base = 1;
+
+      if (normalized > 5) base = 10;
+      else if (normalized > 2) base = 5;
+      else if (normalized > 1) base = 2;
+      else base = 1;
+
+      return base * magnitude;
   }
 }
