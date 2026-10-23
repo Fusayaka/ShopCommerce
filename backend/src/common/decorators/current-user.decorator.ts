@@ -5,6 +5,8 @@ export interface JwtPayload {
     id: number;
     email: string;
     role: string;
+    name: string;
+    avatar: string | null;
 }
 
 type RequestWithUser = Request & {user: JwtPayload};

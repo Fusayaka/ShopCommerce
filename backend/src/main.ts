@@ -13,7 +13,10 @@ async function bootstrap() {
 
   app.use(cookieParser());
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.enableCors();
+  app.enableCors({
+    origin: configService.get<string>('FRONTEND_URL') ?? true,
+    credentials: true,
+  });
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
     transform: true

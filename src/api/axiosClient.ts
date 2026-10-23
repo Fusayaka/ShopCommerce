@@ -1,6 +1,7 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import { CONFIG } from '../config';
 import { toast } from 'react-toastify';
+import { setToken, clearAuth } from '@/utils/auth';
 
 const axiosClient = axios.create({
     baseURL: CONFIG.API_URL,
@@ -14,9 +15,53 @@ const MAX_RETRIES = 3;
 const RETRY_METHODS = ['get', 'head', 'options'];
 const RETRY_STATUSES = [408, 429, 500, 502, 503, 504];
 
-type RetryConfig = InternalAxiosRequestConfig & { _retryCount?: number };
+type RetryConfig = InternalAxiosRequestConfig & { _retryCount?: number; _retriedAuth?: boolean };
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+let isRefreshing = false;
+let refreshWaiters: { resolve: (token: string) => void; reject: (err: unknown) => void }[] = [];
+
+function flushWaiters(err: unknown, token: string | null) {
+    refreshWaiters.forEach((w) => (token ? w.resolve(token) : w.reject(err)));
+    refreshWaiters = [];
+}
+
+async function refreshAccessToken(): Promise<string> {
+    if (isRefreshing) {
+        return new Promise<string>((resolve, reject) => {
+            refreshWaiters.push({ resolve, reject });
+        });
+    }
+
+    isRefreshing = true;
+    try {
+        const res = await axios.post<{ accessToken: string }>(
+            `${CONFIG.API_URL}/auth/refresh`,
+            {},
+            { withCredentials: true },
+        );
+        const token = res.data.accessToken;
+        setToken(token);
+        flushWaiters(null, token);
+        return token;
+    } catch (err) {
+        flushWaiters(err, null);
+        throw err;
+    } finally {
+        isRefreshing = false;
+    }
+}
+
+function isAuthEndpoint(url?: string): boolean {
+    if (!url) return false;
+    return (
+        url.includes('/auth/login') ||
+        url.includes('/auth/register') ||
+        url.includes('/auth/refresh') ||
+        url.includes('/auth/login#')
+    );
+}
 
 function isRetryable(error: AxiosError): boolean {
     if (axios.isCancel(error)) return false;
@@ -38,13 +83,12 @@ function getRetryDelay(error: AxiosError, attempt: number): number {
     return 1000 * 2 ** (attempt - 2) + 5000;
 }
 
-// TODO: implement Authen first
 axiosClient.interceptors.request.use(
     (config) => {
-        // const token = localStorage.getItem('token');
-        // if (token && config.headers){
-        //     config.headers.Authorization = `Bearer ${token}`;
-        // }
+        const token = localStorage.getItem('accessToken');
+        if (token && config.headers){
+            config.headers.Authorization = `Bearer ${token}`;
+        }
         return config;
     },
     (error) => Promise.reject(error),
@@ -55,8 +99,30 @@ axiosClient.interceptors.response.use(
         return response.data;
     },
     async (error: AxiosError) => {
-        // Transparently retry transient failures before surfacing an error.
         const config = error.config as RetryConfig | undefined;
+
+        if (
+            error.response?.status === 401 &&
+            config &&
+            !config._retriedAuth &&
+            !isAuthEndpoint(config.url) &&
+            localStorage.getItem('accessToken')
+        ) {
+            config._retriedAuth = true;
+            try {
+                const newToken = await refreshAccessToken();
+                config.headers = config.headers ?? {};
+                config.headers.Authorization = `Bearer ${newToken}`;
+                return axiosClient(config);
+            } catch {
+                clearAuth();
+                toast.error('Your session has expired. Please sign in again.', {
+                    toastId: 'session-expired',
+                });
+                return Promise.reject(error);
+            }
+        }
+
         if (config && isRetryable(error)) {
             config._retryCount = config._retryCount ?? 0;
             if (config._retryCount < MAX_RETRIES) {
@@ -76,7 +142,7 @@ axiosClient.interceptors.response.use(
                     toast.error(message || "Invalid request. Please check your input.");
                     break;
                 case 401:
-                    toast.error("Your session has expired. Please sign in again.");
+                    toast.error(message || "Your session has expired. Please sign in again.");
                     break;
                 case 402:
                     toast.error("Payment is required to continue.");

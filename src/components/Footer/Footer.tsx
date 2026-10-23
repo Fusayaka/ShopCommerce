@@ -1,16 +1,19 @@
 import { Link } from "react-router-dom";
 import './footer.css'
 
-import facebook from '@/assets/facebook-icon.png'
-import email from '@/assets/mail-icon.png'
-import ig from '@/assets/ig-logo.webp'
-import creditcard from '@/assets/creditcard-logo.png'
-import mastercard from '@/assets/mastercard-logo.png'
-import paypal from '@/assets/paypal-logo.png'
-import visa from '@/assets/visa-logo.png'
+import facebook from '@/assets/facebook-icon.svg'
+import email from '@/assets/mail-icon.svg'
+import ig from '@/assets/ig-logo.svg'
+import creditcard from '@/assets/creditcard-logo.svg'
+import mastercard from '@/assets/mastercard-logo.svg'
+import paypal from '@/assets/paypal-logo.svg'
+import visa from '@/assets/visa-logo.svg'
+import { useAuth } from "@/utils/auth";
 
 export default function Footer(){
-    const isGuest = !localStorage.getItem("token");
+    const { loggedIn } = useAuth();
+
+    const isGuest = !loggedIn;
 
     return (
         <footer className={`footer-container${isGuest ? " has-subscribe" : ""}`}>
@@ -39,7 +42,7 @@ export default function Footer(){
 
             <div className="footer-top">
                 <div className="footer-brand">
-                    <h2>Demo Shop</h2>
+                    <h2>ShopCommerce</h2>
                     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque aspernatur quia corrupti aperiam ex ea possimus por</p>
                     <div className="social-icons">
                         <button aria-label="Facebook">
@@ -99,7 +102,7 @@ export default function Footer(){
             
 
             <div className="footer-bottom">
-                <p>Demo Shop @ 2026 All rights reserved</p>
+                <p>ShopCommerce @ 2026 All rights reserved</p>
                 <div className="payment-icons">
                     <button className="payment-badge" aria-label="Credit Card"><img src={creditcard} alt="Credit Card"/></button>
                     <button className="payment-badge" aria-label="Mastercard"><img src={mastercard} alt="Mastercard"/></button>
