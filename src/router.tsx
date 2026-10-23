@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, ScrollRestoration } from "react-router-dom";
 import App from "./App";
 import Home from "./pages/Home";
 import ProductDetails from "./pages/ProductDetails";
@@ -10,7 +10,12 @@ import Login from "./pages/Login";
 export const router = createBrowserRouter([
     {
         path: "/",
-        element: <App/>,
+        element: (
+            <>
+                <ScrollRestoration/>
+                <App/>
+            </>
+        ),
         children: [
             {
                 index: true,
