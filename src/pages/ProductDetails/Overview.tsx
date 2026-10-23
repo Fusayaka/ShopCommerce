@@ -6,6 +6,7 @@ import plhImg from '/images/cloth-placeholder.jpeg'
 import type { Product } from '@/types';
 import { getCardPrice } from '@/utils/pricing';
 import { cartApi } from '@/api/cartApi';
+import { notifyCartChanged } from '@/utils/cartCount';
 import { productApi } from '@/api/productApi';
 import { toast } from 'react-toastify';
 import { useAuth } from '@/utils/auth';
@@ -134,6 +135,7 @@ export default function Overview() {
                 stockId: selectedStock.id,
                 quantity: Number(quantity),
             });
+            notifyCartChanged();
             return true;
         }
         catch {
