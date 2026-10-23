@@ -5,6 +5,7 @@ import ProductDetails from "./pages/ProductDetails";
 import ProductList from "./pages/ProductList";
 import Cart from "./pages/Cart";
 import Login from "./pages/Login";
+import Profile from "./pages/Profile";
 
 
 export const router = createBrowserRouter([
@@ -26,7 +27,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: "cart",
-                element:<Cart/>
+                element: <Cart/>
             },
             {
                 path: "dashboard",
@@ -36,6 +37,10 @@ export const router = createBrowserRouter([
                 path: "download",
                 element:<h2> This is Download Page</h2>
             },
+            {
+                path: "profile",
+                element: <Profile/>
+            }
         ]
     },
     {
