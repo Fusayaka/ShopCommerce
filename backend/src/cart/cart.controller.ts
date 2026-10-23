@@ -51,4 +51,15 @@ export class CartController {
   deleteCart(@CurrentUser('id') userId: number){
     return this.cartService.deleteCart(userId);
   }
+
+  // Get total items in user's cart.
+  @Get('items/count')
+  getTotalItems(@CurrentUser('id') userId: number){
+    return this.cartService.getTotalItems(userId);
+  }
+
+  @Get('items/minicart')
+  getMiniCart(@CurrentUser('id') userId: number){
+    return this.cartService.getMiniCart(userId);
+  }
 }
