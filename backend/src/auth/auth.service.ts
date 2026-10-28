@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config';
-import * as bcrpyt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { RegisterDto } from './dto/register.dto.js';
 import { LoginDto } from './dto/login.dto.js';
@@ -19,11 +19,11 @@ export class AuthService {
         private readonly prisma: PrismaService
     ){}
 
-    async register(dto: RegisterDto){
+    async register(dto: RegisterDto, response: Response){
         const existingUser = await this.prisma.user.findUnique({where: {email: dto.email}});
         if (existingUser) throw new ConflictException("An account with this email already exists");
 
-        const passwordHash = await bcrpyt.hash(dto.password, 10);
+        const passwordHash = await bcrypt.hash(dto.password, 10);
 
         const newUser = await this.prisma.user.create({
             data: {
@@ -33,8 +33,14 @@ export class AuthService {
             }
         });
 
+        const {accessToken, refreshToken} = await this.generateToken(newUser);
+
+        await this.saveRefreshToken(newUser.id, refreshToken);
+        await this.setRefreshTokenCookie(response, refreshToken);
+
         return {
             message: "Registration successfully",
+            accessToken
         }
     }
 
@@ -42,13 +48,13 @@ export class AuthService {
         const user =  await this.prisma.user.findUnique({where: {email: dto.email}});
         if (!user) throw new UnauthorizedException("Invalid email or password");
 
-        const isValidPassword = await bcrpyt.compare(dto.password, user.password);
+        const isValidPassword = await bcrypt.compare(dto.password, user.password);
         if (!isValidPassword) throw new UnauthorizedException("Invalid email or password");
 
         const {accessToken, refreshToken} = await this.generateToken(user);
 
         await this.saveRefreshToken(user.id, refreshToken);
-        await this.setRefreshTokenCookie(response, refreshToken)
+        await this.setRefreshTokenCookie(response, refreshToken);
 
         return {
             message: "Login successfully",
