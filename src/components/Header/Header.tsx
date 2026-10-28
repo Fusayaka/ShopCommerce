@@ -95,7 +95,7 @@ export default function Header() {
     const handleLogout = () => {
         setIsAvatarOpen(false);
         clearAuth();
-        navigate('/');
+        navigate('/login');
     };
 
     return (
