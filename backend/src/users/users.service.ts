@@ -1,14 +1,34 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { CreateUsersDto } from './dto/create-users.dto.js';
 import { UpdateUsersDto } from './dto/update-users.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { CloudinaryService, UploadableFile } from '../cloudinary/cloudinary.service.js';
 
 const HIDDEN_USER_FIELDS = { password: true } as const;
+const MAX_AVATAR_BYTES = 1 * 1024 * 1024;
+
+interface UploadedImage extends UploadableFile {
+    mimetype: string;
+    size: number;
+}
+
+function extractPublicIdFromUrl(url: string): string | null {
+    try {
+        const regex = /\/upload\/(?:v\d+\/)?([^\.]+)/;
+        const match = url.match(regex);
+        return match ? match[1] : null;
+    } catch {
+        return null;
+    }
+}
 
 @Injectable()
 export class UsersService {
-    constructor(private readonly prisma: PrismaService){}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly cloudinary: CloudinaryService
+    ){}
 
     async findAll(){
         const users = await this.prisma.user.findMany({ omit: HIDDEN_USER_FIELDS });
@@ -39,19 +59,37 @@ export class UsersService {
         });
     }
 
-    async update(id: number, dto: UpdateUsersDto){
+    async update(id: number, dto: UpdateUsersDto, file?: UploadedImage){
         const existing = await this.prisma.user.findUnique({ where: {id} });
         if (!existing) throw new NotFoundException("Can not update: User not found");
 
-        if (dto.currentPassword && dto.newPassword){
-            const passwordMatches = await bcrypt.compare(dto.currentPassword, existing.password);
+        const { currentPassword, newPassword, ...data } = dto;
+
+        if (currentPassword && newPassword){
+            const passwordMatches = await bcrypt.compare(currentPassword, existing.password);
             if (!passwordMatches) throw new UnauthorizedException("Current password is incorrect");
-            dto.password = await bcrypt.hash(dto.newPassword, 10);
+            if ( currentPassword === newPassword) throw new BadRequestException("New password must be different from current password");
+            data.password = await bcrypt.hash(newPassword, 10);
+        }
+
+        if (file) {
+            if (!file.mimetype?.startsWith('image/')) throw new BadRequestException('Only image files are allowed');
+            if (file.size > MAX_AVATAR_BYTES) throw new BadRequestException('Image must be 1MB or smaller');
+
+            const newAvatarUrl = await this.cloudinary.uploadImage(file);
+            data.avatar = newAvatarUrl;
+
+            if (existing.avatar && existing.avatar.includes('cloudinary.com')) {
+                const oldPublicId = extractPublicIdFromUrl(existing.avatar);
+                if (oldPublicId) {
+                    await this.cloudinary.deleteImage(oldPublicId);
+                }
+            }
         }
 
         return this.prisma.user.update({
             where: {id},
-            data: {...dto},
+            data,       
             omit: HIDDEN_USER_FIELDS,
         });
     }
