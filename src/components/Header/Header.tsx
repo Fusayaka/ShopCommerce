@@ -7,7 +7,7 @@ import search from '@/assets/search.svg'
 import hamburgerbtn from '@/assets/hamburger.svg'
 import avatarPlaceholder from '@/assets/avatar-placeholder.svg'
 import { useEffect, useRef, useState } from 'react';
-import { useAuth } from '@/utils/auth';
+import { useAuth, clearAuth } from '@/utils/auth';
 import { useCartCount } from '@/utils/cartCount';
 import { cartApi, type MiniCartResponse } from '@/api/cartApi';
 import plhImg from '/images/cloth-placeholder.jpeg';
@@ -24,11 +24,13 @@ export default function Header() {
     const [miniItems, setMiniItems] = useState<MiniCartResponse[]>([]);
     const [miniLoading, setMiniLoading] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isAvatarOpen, setIsAvatarOpen] = useState(false);
     const [currentLang, setCurrentLang] = useState('vi');
     const [searchTerm, setSearchTerm] = useState("");
     const navigate = useNavigate();
     const searchInputRef = useRef<HTMLInputElement>(null);
-    
+    const avatarRef = useRef<HTMLDivElement>(null);
+
     const handleLangChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setCurrentLang(event.target.value);
     }
@@ -67,6 +69,34 @@ export default function Header() {
     useEffect(() => {
         if (isSearchOpen) searchInputRef.current?.focus();
     }, [isSearchOpen]);
+
+    useEffect(() => {
+        if (!isAvatarOpen) return;
+        const handleOutside = (e: Event) => {
+            if (avatarRef.current && !avatarRef.current.contains(e.target as Node)) {
+                setIsAvatarOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleOutside);
+        document.addEventListener('touchstart', handleOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleOutside);
+            document.removeEventListener('touchstart', handleOutside);
+        };
+    }, [isAvatarOpen]);
+
+    const handleAvatarClick = (e: React.MouseEvent) => {
+        if (window.matchMedia('(hover: none)').matches) {
+            e.preventDefault();
+            setIsAvatarOpen((open) => !open);
+        }
+    };
+
+    const handleLogout = () => {
+        setIsAvatarOpen(false);
+        clearAuth();
+        navigate('/');
+    };
 
     return (
         <header className='header-container'>
@@ -173,13 +203,53 @@ export default function Header() {
                         Login
                     </Link>
                     :
-                    <Link to="/profile" className='avatar-btn' aria-label='Account'>
-                        <img
-                            src={avatarSrc}
-                            alt={currentUser?.name ?? 'User'}
-                            onError={(e) => { e.currentTarget.src = avatarPlaceholder; }}
-                        />
-                    </Link>
+                    <div
+                        className='avatar-menu'
+                        ref={avatarRef}
+                        onMouseEnter={() => setIsAvatarOpen(true)}
+                        onMouseLeave={() => setIsAvatarOpen(false)}
+                    >
+                            <img
+                                src={avatarSrc}
+                                alt={currentUser?.name ?? 'User'}
+                                className='avatar-btn' aria-label='Account' 
+                                onClick={handleAvatarClick}
+                                onError={(e) => { e.currentTarget.src = avatarPlaceholder; }}
+                            />
+
+                        {isAvatarOpen && (
+                            <div className='avatar-dropdown' role='menu'>
+                                <div className='avatar-dropdown-header'>
+                                    <img
+                                        className='avatar-dropdown-img'
+                                        src={avatarSrc}
+                                        alt={currentUser?.name ?? 'User'}
+                                        onError={(e) => { e.currentTarget.src = avatarPlaceholder; }}
+                                    />
+                                    <div className='avatar-dropdown-info'>
+                                        <span className='avatar-dropdown-name'>{currentUser?.name ?? 'User'}</span>
+                                        {currentUser?.email && (
+                                            <span className='avatar-dropdown-email'>{currentUser.email}</span>
+                                        )}
+                                    </div>
+                                </div>
+                                <Link to='/profile' role='menuitem' onClick={() => setIsAvatarOpen(false)}>
+                                    Profile
+                                </Link>
+                                <Link to='/dashboard' role='menuitem' onClick={() => setIsAvatarOpen(false)}>
+                                    Dashboard
+                                </Link>
+                                <button
+                                    type='button'
+                                    role='menuitem'
+                                    className='avatar-dropdown-logout'
+                                    onClick={handleLogout}
+                                >
+                                    Logout
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 }
             </div>
 

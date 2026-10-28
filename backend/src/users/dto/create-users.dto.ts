@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, IsUrl, MinLength, MaxLength, Matches } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength, MaxLength, Matches } from "class-validator";
 
 export class CreateUsersDto {
     @IsString()
@@ -16,7 +16,7 @@ export class CreateUsersDto {
     password: string;
 
     @IsOptional()
-    @IsUrl()
+    @IsString()
     avatar?: string;
 
     @IsOptional()
@@ -24,8 +24,10 @@ export class CreateUsersDto {
     description?: string;
 
     @IsOptional()
-    @IsPhoneNumber()
     @IsString()
+    @Matches(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/, {
+        message: "Contact must be a valid phone number"
+    })
     contact?: string;
 
     @IsOptional()
