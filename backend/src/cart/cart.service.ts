@@ -118,4 +118,60 @@ export class CartService {
       where: {userId}
     });
   }
+
+  // Get total items in user's cart for badge icon
+  async getTotalItems(userId: number) {
+    const cart = await this.prisma.cart.findUnique({
+      where: { userId },
+    });
+    if (!cart) return 0;
+
+    const aggregate = await this.prisma.cartItem.aggregate({
+      where: { cartId: cart.id },
+      _sum: {
+        quantity: true,
+      },
+    });
+
+    return aggregate._sum.quantity || 0;
+  }
+
+  async getMiniCart(userId: number) {
+    const cart = await this.prisma.cart.findUnique({
+      where: { userId },
+      include: {
+        items: {
+          select: {
+            quantity: true,
+            stock: {
+              select: {
+                size: true,
+                color: true,
+                product: {
+                  select: {
+                    id: true,
+                    image: true,
+                    title: true
+                  }
+                }
+              }
+            }
+          },
+          orderBy: {
+            updatedAt: 'desc'
+          }
+        }
+      }
+    });
+    if (!cart) return [];
+
+    return cart.items.map((item) => ({
+      id: item.stock.product.id,
+      title: item.stock.product.title,
+      image: item.stock.product.image,
+      size: item.stock.size,
+      color: item.stock.color,
+      quantity: item.quantity,
+    }))
+  }
 }

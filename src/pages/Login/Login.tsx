@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './login.css'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { setAuth } from '@/utils/auth';
+import { setAuth, useAuth } from '@/utils/auth';
 import { loginApi } from '@/api/loginApi';
 
 const GoogleIcon = () => (
@@ -32,8 +32,12 @@ export default function Login(){
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+    
     const navigate = useNavigate();
+
+    const { loggedIn } = useAuth();
+    if (loggedIn) {navigate('/')};
+
 
     // Đổi giữa Sign In / Sign Up: 2 form mờ chéo nhau (hiệu ứng ở login.css).
     const switchMode = (toLogin: boolean) => {
@@ -118,10 +122,19 @@ export default function Login(){
                 navigate('/');
             }
             else {
-                await axios.post(
+                const response = await axios.post(
                     'http://localhost:3000/api/auth/register',
                     { email, password, name },
+                    { withCredentials: true }
                 );
+
+                const token = response.data.accessToken;
+                localStorage.setItem('accessToken', token);
+
+                const me = await loginApi.getMe().catch(() => null);
+                setAuth(token, me);
+                setName('');
+
                 setIsLogin(true);
                 setPassword('');
                 setConfirmPassword('');

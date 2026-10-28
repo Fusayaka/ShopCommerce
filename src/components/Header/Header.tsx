@@ -7,21 +7,30 @@ import search from '@/assets/search.svg'
 import hamburgerbtn from '@/assets/hamburger.svg'
 import avatarPlaceholder from '@/assets/avatar-placeholder.svg'
 import { useEffect, useRef, useState } from 'react';
-import { useAuth } from '@/utils/auth';
+import { useAuth, clearAuth } from '@/utils/auth';
+import { useCartCount } from '@/utils/cartCount';
+import { cartApi, type MiniCartResponse } from '@/api/cartApi';
+import plhImg from '/images/cloth-placeholder.jpeg';
 
 export default function Header() {
     const { loggedIn, user: currentUser } = useAuth();
+    const cartCount = useCartCount();
 
     const isGuest = !loggedIn;
     const avatarSrc = currentUser?.avatar || avatarPlaceholder;
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isCartOpen, setIsCartOpen] = useState(false);
+    const [miniItems, setMiniItems] = useState<MiniCartResponse[]>([]);
+    const [miniLoading, setMiniLoading] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isAvatarOpen, setIsAvatarOpen] = useState(false);
     const [currentLang, setCurrentLang] = useState('vi');
     const [searchTerm, setSearchTerm] = useState("");
     const navigate = useNavigate();
     const searchInputRef = useRef<HTMLInputElement>(null);
-    
+    const avatarRef = useRef<HTMLDivElement>(null);
+
     const handleLangChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setCurrentLang(event.target.value);
     }
@@ -29,6 +38,20 @@ export default function Header() {
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     }
+
+    const openMiniCart = async () => {
+        setIsCartOpen(true);
+        if (isGuest) return;
+        setMiniLoading(true);
+        try {
+            const items = await cartApi.getMiniCart();
+            setMiniItems(Array.isArray(items) ? items : []);
+        } catch {
+            setMiniItems([]);
+        } finally {
+            setMiniLoading(false);
+        }
+    };
 
     const handleSearchProducts = () => {
         if (searchTerm.trim() !== ""){
@@ -46,6 +69,34 @@ export default function Header() {
     useEffect(() => {
         if (isSearchOpen) searchInputRef.current?.focus();
     }, [isSearchOpen]);
+
+    useEffect(() => {
+        if (!isAvatarOpen) return;
+        const handleOutside = (e: Event) => {
+            if (avatarRef.current && !avatarRef.current.contains(e.target as Node)) {
+                setIsAvatarOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleOutside);
+        document.addEventListener('touchstart', handleOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleOutside);
+            document.removeEventListener('touchstart', handleOutside);
+        };
+    }, [isAvatarOpen]);
+
+    const handleAvatarClick = (e: React.MouseEvent) => {
+        if (window.matchMedia('(hover: none)').matches) {
+            e.preventDefault();
+            setIsAvatarOpen((open) => !open);
+        }
+    };
+
+    const handleLogout = () => {
+        setIsAvatarOpen(false);
+        clearAuth();
+        navigate('/');
+    };
 
     return (
         <header className='header-container'>
@@ -94,9 +145,57 @@ export default function Header() {
                     </select>
                 </div>
 
-                <Link to="/cart" className='cart-btn'aria-label='Cart'>
-                    <img src={cart} alt='Cart'></img>
-                </Link>
+                <div
+                    className='cart-menu'
+                    onMouseEnter={openMiniCart}
+                    onMouseLeave={() => setIsCartOpen(false)}
+                >
+                    <Link to="/cart" className='cart-btn' aria-label='Cart'>
+                        <img src={cart} alt='Cart'></img>
+                        {cartCount > 0 && (
+                            <span className='cart-badge'>{cartCount > 99 ? '99+' : cartCount}</span>
+                        )}
+                    </Link>
+
+                    {isCartOpen && (
+                        <div className='mini-cart'>
+                            {isGuest ? (
+                                <p className='mini-cart-empty'>Please sign in to view your cart.</p>
+                            ) : miniLoading ? (
+                                <p className='mini-cart-empty'>Loading…</p>
+                            ) : miniItems.length === 0 ? (
+                                <p className='mini-cart-empty'>Your cart is empty.</p>
+                            ) : (
+                                <>
+                                    <ul className='mini-cart-list'>
+                                        {miniItems.map((item) => (
+                                            <li
+                                                key={`${item.id}-${item.size}-${item.color}`}
+                                                className='mini-cart-item'
+                                            >
+                                                <img
+                                                    src={item.image || plhImg}
+                                                    alt={item.title}
+                                                    onError={(e) => { e.currentTarget.src = plhImg; }}
+                                                    onClick={() => navigate(`/product/${item.id}`)}
+                                                    style={{cursor: 'pointer'}}
+                                                />
+                                                <div className='mini-cart-info'>
+                                                    <Link to={`/product/${item.id}`} className='mini-cart-title'>
+                                                        {item.title}
+                                                    </Link>
+                                                    <span className='mini-cart-meta'>Size: {item.size} · Color: {item.color}</span>
+                                                </div>
+                                                <span className='mini-cart-qty'>x {item.quantity}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    <Link to="/cart" className='mini-cart-view'>View cart</Link>
+                                </>
+                            )}
+                        </div>
+                    )}
+                </div>
 
                 {isGuest
                     ?
@@ -104,13 +203,53 @@ export default function Header() {
                         Login
                     </Link>
                     :
-                    <Link to="/profile" className='avatar-btn' aria-label='Account'>
-                        <img
-                            src={avatarSrc}
-                            alt={currentUser?.name ?? 'User'}
-                            onError={(e) => { e.currentTarget.src = avatarPlaceholder; }}
-                        />
-                    </Link>
+                    <div
+                        className='avatar-menu'
+                        ref={avatarRef}
+                        onMouseEnter={() => setIsAvatarOpen(true)}
+                        onMouseLeave={() => setIsAvatarOpen(false)}
+                    >
+                            <img
+                                src={avatarSrc}
+                                alt={currentUser?.name ?? 'User'}
+                                className='avatar-btn' aria-label='Account' 
+                                onClick={handleAvatarClick}
+                                onError={(e) => { e.currentTarget.src = avatarPlaceholder; }}
+                            />
+
+                        {isAvatarOpen && (
+                            <div className='avatar-dropdown' role='menu'>
+                                <div className='avatar-dropdown-header'>
+                                    <img
+                                        className='avatar-dropdown-img'
+                                        src={avatarSrc}
+                                        alt={currentUser?.name ?? 'User'}
+                                        onError={(e) => { e.currentTarget.src = avatarPlaceholder; }}
+                                    />
+                                    <div className='avatar-dropdown-info'>
+                                        <span className='avatar-dropdown-name'>{currentUser?.name ?? 'User'}</span>
+                                        {currentUser?.email && (
+                                            <span className='avatar-dropdown-email'>{currentUser.email}</span>
+                                        )}
+                                    </div>
+                                </div>
+                                <Link to='/profile' role='menuitem' onClick={() => setIsAvatarOpen(false)}>
+                                    Profile
+                                </Link>
+                                <Link to='/dashboard' role='menuitem' onClick={() => setIsAvatarOpen(false)}>
+                                    Dashboard
+                                </Link>
+                                <button
+                                    type='button'
+                                    role='menuitem'
+                                    className='avatar-dropdown-logout'
+                                    onClick={handleLogout}
+                                >
+                                    Logout
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 }
             </div>
 

@@ -15,8 +15,11 @@ export class AuthController {
 
     @Public()
     @Post('register')
-    async register(@Body() dto: RegisterDto){
-        return this.authService.register(dto);
+    async register(
+        @Body() dto: RegisterDto,
+        @Res({passthrough: true}) response: Response
+    ){
+        return this.authService.register(dto, response);
     }
 
     @Public()

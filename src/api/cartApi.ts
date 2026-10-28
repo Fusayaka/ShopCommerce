@@ -25,6 +25,17 @@ export interface CartResponse {
     items: CartItemResponse[];
 }
 
+
+export interface MiniCartResponse {
+    id: number,
+    title: string,
+    image: string,
+    size: Size,
+    color: Color,
+    quantity: number
+}
+
+
 // userId được lấy từ JWT ở backend (@CurrentUser), không gửi từ client nữa.
 export const cartApi = {
     getCart() {
@@ -44,4 +55,12 @@ export const cartApi = {
             data: { stockId },
         });
     },
+
+    getTotalItems(){
+        return axiosClient.get<number, number>(`/carts/items/count`);
+    },
+
+    getMiniCart(){
+        return axiosClient.get<MiniCartResponse[], MiniCartResponse[]>(`/carts/items/minicart`);
+    }
 };

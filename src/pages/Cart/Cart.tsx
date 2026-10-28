@@ -5,6 +5,7 @@ import './cart.css';
 import { useEffect, useState } from 'react';
 import type { CartLineItem } from "@/types";
 import { cartApi } from "@/api/cartApi";
+import { notifyCartChanged } from "@/utils/cartCount";
 import { toast } from "react-toastify";
 import { useAuth } from "@/utils/auth";
 
@@ -90,6 +91,7 @@ export default function Cart() {
                 stockId: productItem.stockId,
                 quantity: newQuantity,
             });
+            notifyCartChanged();
         }
         catch {
             setItems(prevItems);
@@ -103,6 +105,7 @@ export default function Cart() {
         setItems(prev => prev.filter(item => item.id !== productItem.id));
         try {
             await cartApi.removeItem(productItem.stockId);
+            notifyCartChanged();
             toast.success("Remove item successfully!");
         }
         catch {
