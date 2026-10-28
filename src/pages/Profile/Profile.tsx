@@ -28,6 +28,7 @@ export default function Profile() {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [savingPassword, setSavingPassword] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [showPasswords, setShowPasswords] = useState({
         current: false,
         new: false,
@@ -70,35 +71,36 @@ export default function Profile() {
             ev.target.value = '';
             return;
         }
-        try {
-            // Upload to Cloudinary (via our API) and store the returned URL for Save to persist.
-            const { url } = await userApi.uploadAvatar(file);
-            setAvatar(url);
-        } catch {
-            // axiosClient already shows the error toast.
-        } finally {
-            ev.target.value = ''; // let the same file be re-selected later
-        }
+        setSelectedFile(file);
+
+        const previewUrl = URL.createObjectURL(file);
+        setAvatar(previewUrl);
+
+        ev.target.value = '';
     };
 
     const handleSaveProfile = async (e: React.SyntheticEvent) => {
-        // TODO: implement Avatar Change
-
         e.preventDefault();
         setSavingProfile(true);
+
         try {
             const updated = await userApi.updateProfile({
                 name: name.trim(),
                 email: email.trim(),
-                avatar: avatar.trim() || undefined,
                 contact: contact.trim() || undefined,
                 address: address.trim() || undefined,
                 description: description.trim() || undefined,
-            });
+            }, selectedFile);
+
             const token = getToken();
-            if (token) setAuth(token, updated);
+            if (token) {
+                setAuth(token, updated);
+            }
+
+            setSelectedFile(null);
             toast.success('Profile updated successfully!');
         } catch {
+            // Toast catch error
         } finally {
             setSavingProfile(false);
         }
