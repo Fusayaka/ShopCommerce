@@ -108,6 +108,7 @@
 
 .profile-field {
   display: flex;
+  position: relative;
   flex-direction: column;
   gap: 6px;
 }
@@ -130,6 +131,7 @@
   border-radius: 8px;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  padding-right: 42px;
 }
 
 .profile-textarea {
@@ -166,6 +168,26 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.profile-field .login-eye {
+    position: absolute;
+    right: 12px;
+    top: calc(50% + 4px);
+    transform: translateX(15px);
+    background: none;
+    border: none;
+    padding: 0 12px;
+    cursor: pointer;
+    color: #666;
+    display: flex;
+    align-items: center;
+}
+
+.profile.field .login-eye svg {
+    width: 20px;
+    height: 20px;
+}
+
 
 @media (max-width: 640px) {
   .profile-card {
