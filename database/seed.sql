@@ -317,21 +317,21 @@ JOIN product_stocks ps
 -- ==============================================================================
 -- 7. SEED ORDERS (placed orders only: checkout / completed)
 -- ==============================================================================
-INSERT INTO orders (id, user_id, status, subtotal, discount, delivery_fee, promo_code) VALUES
-(1, 1000, 'completed', 240, 20, 15, 'SALE20'),
-(2, 1000, 'completed', 144, 0, 15, NULL),
-(3, 1000, 'completed', 200, 0, 0, 'FREESHIP'),
-(4, 1000, 'checkout', 375, 30, 15, 'VIP30'),
-(5, 1001, 'completed', 316, 50, 15, 'HALFOFF'),
-(6, 1001, 'completed', 270, 0, 15, NULL),
-(7, 1001, 'checkout', 175, 0, 15, NULL),
-(8, 1002, 'completed', 300, 0, 0, NULL),
-(9, 1002, 'completed', 220, 0, 15, NULL),
-(10, 1003, 'completed', 145, 0, 15, NULL),
-(11, 1003, 'completed', 310, 30, 0, 'SAVE30'),
-(12, 1004, 'completed', 145, 0, 15, NULL),
-(13, 1005, 'completed', 195, 0, 15, NULL),
-(14, 1007, 'completed', 185, 0, 15, NULL);
+INSERT INTO orders (id, user_id, status, subtotal, discount, delivery_fee, promo_code, payment_method) VALUES
+(1, 1000, 'completed', 240, 20, 15, 'SALE20', 'delivery'),
+(2, 1000, 'completed', 144, 0, 15, NULL, 'delivery'),
+(3, 1000, 'completed', 200, 0, 0, 'FREESHIP', 'delivery'),
+(4, 1000, 'checkout', 375, 30, 15, 'VIP30', 'delivery'),
+(5, 1001, 'completed', 316, 50, 15, 'HALFOFF', 'delivery'),
+(6, 1001, 'completed', 270, 0, 15, NULL, 'delivery'),
+(7, 1001, 'checkout', 175, 0, 15, NULL, 'delivery'),
+(8, 1002, 'completed', 300, 0, 0, NULL, 'delivery'),
+(9, 1002, 'completed', 220, 0, 15, NULL, 'delivery'),
+(10, 1003, 'completed', 145, 0, 15, NULL, 'delivery'),
+(11, 1003, 'completed', 310, 30, 0, 'SAVE30', 'delivery'),
+(12, 1004, 'completed', 145, 0, 15, NULL, 'delivery'),
+(13, 1005, 'completed', 195, 0, 15, NULL, 'delivery'),
+(14, 1007, 'completed', 185, 0, 15, NULL, 'delivery');
 
 -- ==============================================================================
 -- 8. SEED ORDER ITEMS
@@ -362,7 +362,17 @@ JOIN product_stocks ps
 JOIN products p ON p.id = v.product_id;
 
 -- ==============================================================================
--- 9. RESYNC IDENTITY SEQUENCES
+-- 9. SEED PROMO CODES
+-- ==============================================================================
+INSERT INTO promo_codes (code, discount_num, discount_per, max_discount_num, min_to_apply, expired_at) VALUES 
+('HALLOWEEN', 50.00, NULL, NULL, 200, '2026-12-31'),
+('SALE15', NULL, 15, 100.00, 300, '2026-11-30'),
+('FREESHIP', 15.00, NULL, NULL, 150, '2026-10-31'),
+('FLASHSALE', NULL, 30, 200.00, 100, '2026-11-15'),
+('TEST', NULL, 30, 200.00, 100, '2026-10-15');
+
+-- ==============================================================================
+-- 10. RESYNC IDENTITY SEQUENCES
 -- ==============================================================================
 SELECT setval(pg_get_serial_sequence('users', 'id'), (SELECT MAX(id) FROM users));
 SELECT setval(pg_get_serial_sequence('products', 'id'), (SELECT MAX(id) FROM products));

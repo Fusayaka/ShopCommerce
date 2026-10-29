@@ -10,16 +10,19 @@ DROP TABLE IF EXISTS product_stocks CASCADE;
 DROP TABLE IF EXISTS products CASCADE;
 DROP TABLE IF EXISTS refresh_tokens CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE If EXISTS promo_codes CASCADE;
 
 DROP TYPE IF EXISTS order_status;
 DROP TYPE IF EXISTS color;
 DROP TYPE IF EXISTS item_size;
 DROP TYPE IF EXISTS user_role;
+DROP TYPE IF EXISTS payment_method;
 
 CREATE TYPE item_size AS ENUM ('S', 'M', 'L', 'XL', 'XXL');
 CREATE TYPE color as ENUM ('Red', 'Green', 'Blue');
 CREATE TYPE order_status as ENUM ('pending', 'checkout', 'completed', 'cancelled');
 CREATE TYPE user_role AS ENUM ('admin', 'customer', 'manager');
+CREATE TYPE payment_method AS ENUM ('delivery', 'bank', 'card');
 
 -- 1. Users
 CREATE TABLE users (
@@ -107,6 +110,7 @@ CREATE TABLE orders (
     subtotal DECIMAL(10, 2) NOT NULL DEFAULT 0,
     discount DECIMAL(10, 2) NOT NULL DEFAULT 0,
     delivery_fee DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    payment_method payment_method DEFAULT 'delivery',
     total DECIMAL(10, 2) GENERATED ALWAYS AS (subtotal - discount + delivery_fee) STORED,
     promo_code VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -124,3 +128,18 @@ CREATE TABLE order_items (
     price_at_purchase DECIMAL(10, 2) NOT NULL,
     total_price DECIMAL(10, 2) GENERATED ALWAYS AS (price_at_purchase * quantity) STORED
 );
+
+-- 9. Promo Code
+CREATE TABLE promo_codes (
+    code VARCHAR(50) NOT NULL PRIMARY KEY,
+    discount_num DECIMAL(10, 2),
+    discount_per INT,
+    max_discount_num DECIMAL(10, 2),
+    min_to_apply INT,
+    expired_at DATE,
+
+    CONSTRAINT check_discount_type CHECK (
+        (discount_num IS NOT NULL AND discount_per IS NULL) OR
+        (discount_per IS NOT NULL AND discount_num IS NULL)
+    )
+)
