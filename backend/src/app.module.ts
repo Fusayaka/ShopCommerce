@@ -11,6 +11,8 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { JwtModule } from '@nestjs/jwt';
+import { OrdersModule } from './orders/orders.module.js';
+import { PromosModule } from './promos/promos.module.js';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { JwtModule } from '@nestjs/jwt';
     CartModule, 
     AuthModule,
     JwtModule.register({global: true}),
+    OrdersModule,
+    PromosModule,
   ],
   controllers: [AppController],
   providers: [
