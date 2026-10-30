@@ -13,7 +13,7 @@ const axiosClient = axios.create({
 
 const MAX_RETRIES = 3;
 const RETRY_METHODS = ['get', 'head', 'options'];
-const RETRY_STATUSES = [408, 429, 500, 502, 503, 504];
+const RETRY_STATUSES = [408, 429, 502, 503, 504];
 
 type RetryConfig = InternalAxiosRequestConfig & { _retryCount?: number; _retriedAuth?: boolean };
 

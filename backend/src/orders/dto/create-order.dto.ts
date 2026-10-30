@@ -1,4 +1,5 @@
 import { PaymentMethod } from "@prisma/client";
+import { Transform } from "class-transformer";
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateOrderDto {
@@ -8,6 +9,7 @@ export class CreateOrderDto {
 
     @IsString()
     @IsOptional()
+    @Transform(({ value }) => (typeof value === 'string' ? value.trim().toUpperCase() : value))
     promoCode?: string;
 
     @IsOptional()

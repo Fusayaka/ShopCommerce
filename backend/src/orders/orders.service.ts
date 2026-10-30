@@ -5,11 +5,13 @@ import { UpdateOrderDto } from './dto/update-order.dto.js';
 import { Color, Prisma, ItemSize } from '@prisma/client';
 
 interface OrderItemInput {
-  stockId: number;
+  stock: {
+    connect: {
+      id: number;
+    };
+  };
   title: string;
   image: string | null;
-  size: ItemSize;
-  color: Color;
   quantity: number;
   priceAtPurchase: Prisma.Decimal;
 }
@@ -59,7 +61,7 @@ export class OrdersService {
       }
 
       if (cartItem.stock.stock < cartItem.quantity) {
-        throw new BadRequestException(`Sản phẩm "${cartItem.stock.product.title}" không đủ số lượng trong kho!`);
+        throw new BadRequestException(`Not enough "${cartItem.stock.product.title}" in stock!`);
       }
 
       const price = cartItem.stock.promotionPrice 
@@ -70,11 +72,13 @@ export class OrdersService {
       subtotal = subtotal.add(itemTotal);
 
       orderItemsData.push({
-        stockId: cartItem.stockId,
+        stock: {
+          connect: {
+            id: cartItem.stockId
+          }
+        },
         title: cartItem.stock.product.title,
         image: cartItem.stock.product.image,
-        size: cartItem.stock.size,
-        color: cartItem.stock.color,
         quantity: cartItem.quantity,
         priceAtPurchase: price,
       });
@@ -91,12 +95,20 @@ export class OrdersService {
         throw new BadRequestException(`Code "${dto.promoCode}" not found!`);
       }
 
-      if (promo.expiredAt && new Date(promo.expiredAt) < new Date()) {
-        throw new BadRequestException('Expired Code!');
+      if (promo.expiredAt) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const promoExpiry = new Date(promo.expiredAt);
+        promoExpiry.setHours(0, 0, 0, 0);
+
+        if (promoExpiry < today) {
+          throw new BadRequestException('Expired Code!');
+        }
       }
 
       if (promo.minToApply && subtotal.lessThan(promo.minToApply)) {
-        throw new BadRequestException(`Order should be at least ${promo.minToApply} USD to use this code!`);
+        throw new BadRequestException(`Order should be at least $${promo.minToApply} to use this code!`);
       }
 
       if (promo.discountNum) {
@@ -119,6 +131,7 @@ export class OrdersService {
     }
 
     const newOrder = await this.prisma.$transaction(async (tx) => {
+      console.log(1);
       const order = await tx.order.create({
         data: {
           userId,
@@ -136,12 +149,15 @@ export class OrdersService {
           items: true,
         },
       });
+      console.log(2);
 
       for (const item of userCart.items) {
-        await tx.productStock.update({
-          where: { id: item.stockId },
+        const updateStock = await tx.productStock.updateMany({
+          where: { id: item.stockId, stock: { gte: item.quantity} },
           data: { stock: { decrement: item.quantity } },
         });
+
+        if (updateStock.count === 0) throw new BadRequestException(`Not enough product in stock!`)
       }
 
       await tx.cartItem.deleteMany({
