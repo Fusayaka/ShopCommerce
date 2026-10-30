@@ -1,0 +1,138 @@
+/* ─── Checkout Page Overall Container ─── */
+.checkout-page-section {
+  margin: 0 auto;
+  padding: 24px 5%;
+  font-family: inherit;
+  box-sizing: border-box;
+  color: #111827;
+}
+
+.checkout-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #606060;
+  margin-bottom: 24px;
+}
+
+.checkout-breadcrumb a {
+    color: #606060;
+    text-decoration: none;
+}
+
+.checkout-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.checkout-breadcrumb-separator {
+  font-size: 12px;
+}
+
+.checkout-page-title {
+  font-size: 32px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #111827;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.checkout-login-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 64px 24px;
+  text-align: center;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  max-width: 480px;
+  margin: 40px auto;
+}
+
+.checkout-login-prompt p {
+  margin: 0;
+  font-size: 15px;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.checkout-login-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 36px;
+  border-radius: 12px;
+  background-color: #111827;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.checkout-login-btn:hover {
+  background-color: #1f2937;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.checkout-status-msg {
+  padding: 16px 20px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 24px;
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.checkout-status-error {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.checkout-content-container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+@media screen and (max-width: 768px) {
+    .checkout-page-section {
+        padding: 20px 30px;
+    }
+
+    .checkout-breadcrumb {
+        margin-left: 0;
+    }
+
+    .checkout-page-title {
+        font-size: 32px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .checkout-page-section {
+        padding: 20px 30px;
+    }
+
+    .checkout-page-title {
+        font-size: 26px;
+    }
+
+    .checkout-breadcrumb {
+        font-size: 12px;
+        margin-left: 0;
+    }
+
+}
