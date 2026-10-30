@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { PromosService } from './promos.service.js';
 import { CreatePromoDto } from './dto/create-promo.dto.js';
 import { UpdatePromoDto } from './dto/update-promo.dto.js';
+import { ValidatePromoDto } from './dto/validate-promo.dto.js';
 
 @Controller('promos')
 export class PromosController {
@@ -12,9 +13,19 @@ export class PromosController {
     return this.promosService.create(createPromoDto);
   }
 
+  @Post('/validate')
+  validate(@Body() validatePromoDto: ValidatePromoDto){
+    return this.promosService.validateCode(validatePromoDto);
+  }
+
   @Get(':code')
   findCode(@Param('code') code: string) {
     return this.promosService.getCode(code);
+  }
+
+  @Get()
+  findAll(){
+    return this.promosService.getAllCode();
   }
 
   @Patch()
