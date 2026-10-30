@@ -47,13 +47,15 @@ BEGIN
         RETURN NEW;
     END IF;
 
-    -- Allowed transitions:
-    --   pending                -> checkout | cancelled
-    --   checkout               -> completed | cancelled
-    --   completed, cancelled   -> terminal
+    --      Allowed transitions:
+    --   pending                  -> processing | cancelled
+    --   processing               -> shipping | cancelled
+    --   shipping                 -> delivered | cancelled
+    --   delivered, cancelled     -> Terminal states
     IF NOT (
-        (OLD.status = 'pending'  AND NEW.status IN ('checkout', 'cancelled')) OR
-        (OLD.status = 'checkout' AND NEW.status IN ('completed', 'cancelled'))
+        (OLD.status = 'pending'    AND NEW.status IN ('processing', 'cancelled')) OR
+        (OLD.status = 'processing' AND NEW.status IN ('shipping', 'cancelled'))   OR
+        (OLD.status = 'shipping'   AND NEW.status IN ('delivered', 'cancelled'))
     ) THEN
         RAISE EXCEPTION 'Invalid order status transition: % -> %', OLD.status, NEW.status
             USING ERRCODE = 'check_violation';

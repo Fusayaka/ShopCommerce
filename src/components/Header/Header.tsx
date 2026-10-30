@@ -184,7 +184,8 @@ export default function Header() {
                                                     <Link to={`/product/${item.id}`} className='mini-cart-title'>
                                                         {item.title}
                                                     </Link>
-                                                    <span className='mini-cart-meta'>Size: {item.size} · Color: {item.color}</span>
+                                                    <span className='mini-cart-meta'>Size: {item.size}</span>
+                                                    <span className='mini-cart-meta'>Color: {item.color}</span>
                                                 </div>
                                                 <span className='mini-cart-qty'>x {item.quantity}</span>
                                             </li>

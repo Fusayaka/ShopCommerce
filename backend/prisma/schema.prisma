@@ -107,18 +107,19 @@ model CartItem {
 }
 
 model Order {
-  id          Int         @id @default(autoincrement())
-  userId      Int         @map("user_id")
-  status      OrderStatus @default(pending)
-  subtotal    Decimal     @default(0) @db.Decimal(10, 2)
-  discount    Decimal     @default(0) @db.Decimal(10, 2)
-  deliveryFee Decimal     @default(0) @map("delivery_fee") @db.Decimal(10, 2)
-  total       Decimal?    @default(dbgenerated("((subtotal - discount) + delivery_fee)")) @db.Decimal(10, 2)
-  promoCode   String?     @map("promo_code") @db.VarChar(20)
-  createdAt   DateTime?   @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt   DateTime?   @default(now()) @map("updated_at") @db.Timestamp(6)
-  items       OrderItem[]
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id            Int            @id @default(autoincrement())
+  userId        Int            @map("user_id")
+  status        OrderStatus    @default(pending)
+  subtotal      Decimal        @default(0) @db.Decimal(10, 2)
+  discount      Decimal        @default(0) @db.Decimal(10, 2)
+  deliveryFee   Decimal        @default(0) @map("delivery_fee") @db.Decimal(10, 2)
+  total         Decimal?       @default(dbgenerated("((subtotal - discount) + delivery_fee)")) @db.Decimal(10, 2)
+  promoCode     String?        @map("promo_code") @db.VarChar(20)
+  createdAt     DateTime?      @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime?      @default(now()) @map("updated_at") @db.Timestamp(6)
+  paymentMethod PaymentMethod? @map("payment_method")
+  items         OrderItem[]
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("orders")
 }
@@ -136,6 +137,17 @@ model OrderItem {
   stock           ProductStock? @relation(fields: [stockId], references: [id], onUpdate: NoAction)
 
   @@map("order_items")
+}
+
+model promoCodes {
+  code           String    @id @db.VarChar(50)
+  discountNum    Decimal?  @map("discount_num") @db.Decimal(10, 2)
+  discountPer    Int?      @map("discount_per")
+  maxDiscountNum Decimal?  @map("max_discount_num") @db.Decimal(10, 2)
+  minToApply     Int?      @map("min_to_apply")
+  expiredAt      DateTime? @map("expired_at") @db.Date
+
+  @@map("promo_codes")
 }
 
 enum ItemSize {
@@ -158,9 +170,10 @@ enum Color {
 
 enum OrderStatus {
   pending
-  checkout
-  completed
+  processing
+  delivered
   cancelled
+  shipping
 
   @@map("order_status")
 }
@@ -171,4 +184,12 @@ enum UserRole {
   manager
 
   @@map("user_role")
+}
+
+enum PaymentMethod {
+  delivery
+  bank
+  card
+
+  @@map("payment_method")
 }

@@ -15,11 +15,11 @@ export class CommentsService {
     });
   }
 
-  // Người dùng chỉ được đánh giá sản phẩm đã mua (đơn 'completed') và chưa đánh giá.
+  // Người dùng chỉ được đánh giá sản phẩm đã mua và chưa đánh giá.
   async checkEligibility(userId: number, productId: number) {
     const purchased = await this.prisma.orderItem.findFirst({
       where: {
-        order: { userId, status: 'completed' },
+        order: { userId, status: 'delivered' },
         stock: { productId },
       },
       select: { id: true },

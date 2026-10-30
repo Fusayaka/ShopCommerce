@@ -10,6 +10,7 @@ export interface Paginated<T> {
 export type Size = 'S' | 'M' | 'L' | 'XL' | 'XXL';
 export type Color = 'Red' | 'Green' | 'Blue';
 export type OrderStatus = 'pending' | 'checkout' | 'completed' | 'cancelled';
+export type PaymentMethod = 'delivery' | 'bank' | 'card';
 
 export interface User {
     id: number;
@@ -117,8 +118,19 @@ export interface Order {
     discount: number;
     deliveryFee: number;
     total: number;
+    paymentMethod: PaymentMethod;
 
     promoCode?: string;
     createdAt?: string;
     updatedAt?: string;
+}
+
+
+export interface PromoCode{
+    code: string;
+    expiredAt: string;
+    discountPer: number;
+    discountNum: number;
+    maxDiscountNum: number;
+    minToApply: number;
 }

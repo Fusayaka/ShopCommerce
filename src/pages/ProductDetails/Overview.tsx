@@ -144,9 +144,9 @@ export default function Overview() {
         }
     };
     
-    // TODO: implement checkout
     const buyProducts = async (): Promise<boolean> => {
-        return true;
+        const added = await addSelectionToCart();
+        return added;
     }
 
     const handleAddtoCart = async () => {
@@ -156,7 +156,9 @@ export default function Overview() {
 
     const handleBuyNow = async () => {
         const added = await buyProducts();
-        if (added) navigate("/checkout");
+        if (added) {
+            navigate("/checkout");
+        }
     };
 
     if (isLoading){
