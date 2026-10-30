@@ -20,7 +20,7 @@ DROP TYPE IF EXISTS payment_method;
 
 CREATE TYPE item_size AS ENUM ('S', 'M', 'L', 'XL', 'XXL');
 CREATE TYPE color as ENUM ('Red', 'Green', 'Blue');
-CREATE TYPE order_status as ENUM ('pending', 'checkout', 'completed', 'cancelled');
+CREATE TYPE order_status as ENUM ('pending', 'shipping', 'processing', 'delivered', 'cancelled');
 CREATE TYPE user_role AS ENUM ('admin', 'customer', 'manager');
 CREATE TYPE payment_method AS ENUM ('delivery', 'bank', 'card');
 

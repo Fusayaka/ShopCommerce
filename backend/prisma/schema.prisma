@@ -140,12 +140,12 @@ model OrderItem {
 }
 
 model promoCodes {
-  code            String    @id @db.VarChar(50)
-  discountNum     Decimal?  @map("discount_num") @db.Decimal(10, 2)
-  discountPer     Int?      @map("discount_per")
-  maxDiscountNum  Decimal?  @map("max_discount_num") @db.Decimal(10, 2)
-  minToApply      Int?      @map("min_to_apply")
-  expiredAt       DateTime? @map("expired_at") @db.Date
+  code           String    @id @db.VarChar(50)
+  discountNum    Decimal?  @map("discount_num") @db.Decimal(10, 2)
+  discountPer    Int?      @map("discount_per")
+  maxDiscountNum Decimal?  @map("max_discount_num") @db.Decimal(10, 2)
+  minToApply     Int?      @map("min_to_apply")
+  expiredAt      DateTime? @map("expired_at") @db.Date
 
   @@map("promo_codes")
 }
@@ -170,9 +170,10 @@ enum Color {
 
 enum OrderStatus {
   pending
-  checkout
-  completed
+  processing
+  delivered
   cancelled
+  shipping
 
   @@map("order_status")
 }

@@ -315,23 +315,23 @@ JOIN product_stocks ps
  AND ps.color = v.color::color;
 
 -- ==============================================================================
--- 7. SEED ORDERS (placed orders only: checkout / completed)
+-- 7. SEED ORDERS (placed orders only: pending / completed)
 -- ==============================================================================
 INSERT INTO orders (id, user_id, status, subtotal, discount, delivery_fee, promo_code, payment_method) VALUES
-(1, 1000, 'completed', 240, 20, 15, 'SALE20', 'delivery'),
-(2, 1000, 'completed', 144, 0, 15, NULL, 'delivery'),
-(3, 1000, 'completed', 200, 0, 0, 'FREESHIP', 'delivery'),
-(4, 1000, 'checkout', 375, 30, 15, 'VIP30', 'delivery'),
-(5, 1001, 'completed', 316, 50, 15, 'HALFOFF', 'delivery'),
-(6, 1001, 'completed', 270, 0, 15, NULL, 'delivery'),
-(7, 1001, 'checkout', 175, 0, 15, NULL, 'delivery'),
-(8, 1002, 'completed', 300, 0, 0, NULL, 'delivery'),
-(9, 1002, 'completed', 220, 0, 15, NULL, 'delivery'),
-(10, 1003, 'completed', 145, 0, 15, NULL, 'delivery'),
-(11, 1003, 'completed', 310, 30, 0, 'SAVE30', 'delivery'),
-(12, 1004, 'completed', 145, 0, 15, NULL, 'delivery'),
-(13, 1005, 'completed', 195, 0, 15, NULL, 'delivery'),
-(14, 1007, 'completed', 185, 0, 15, NULL, 'delivery');
+(1, 1000, 'delivered', 240, 20, 15, 'SALE20', 'delivery'),
+(2, 1000, 'delivered', 144, 0, 15, NULL, 'delivery'),
+(3, 1000, 'delivered', 200, 0, 0, 'FREESHIP', 'delivery'),
+(4, 1000, 'processing', 375, 30, 15, 'VIP30', 'delivery'),
+(5, 1001, 'delivered', 316, 50, 15, 'HALFOFF', 'delivery'),
+(6, 1001, 'delivered', 270, 0, 15, NULL, 'delivery'),
+(7, 1001, 'delivered', 175, 0, 15, NULL, 'delivery'),
+(8, 1002, 'delivered', 300, 0, 0, NULL, 'delivery'),
+(9, 1002, 'delivered', 220, 0, 15, NULL, 'delivery'),
+(10, 1003, 'shipping', 145, 0, 15, NULL, 'delivery'),
+(11, 1003, 'delivered', 310, 30, 0, 'SAVE30', 'delivery'),
+(12, 1004, 'delivered', 145, 0, 15, NULL, 'delivery'),
+(13, 1005, 'shipping', 195, 0, 15, NULL, 'delivery'),
+(14, 1007, 'delivered', 185, 0, 15, NULL, 'delivery');
 
 -- ==============================================================================
 -- 8. SEED ORDER ITEMS
