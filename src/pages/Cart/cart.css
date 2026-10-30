@@ -109,7 +109,7 @@
 @media screen and (max-width: 768px) {
     .cart-section {
         /* Lề ngang cố định 30px = padding của header -> breadcrumb thẳng hàng với nút hamburger */
-        padding: 24px 30px;
+        padding: 20px 30px;
     }
 
     .detail-breadcrumb {
@@ -139,10 +139,6 @@
 }
 
 @media screen and (max-width: 500px) {
-    .cart-section {
-        padding: 12px 30px;
-    }
-
     .cart-title {
         font-size: 26px;
         margin-bottom: 16px;

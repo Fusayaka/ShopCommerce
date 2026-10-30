@@ -55,6 +55,8 @@
     border-radius: 24px;
     padding: 6px 6px 6px 16px;
     margin-bottom: 24px;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .promo-icon {
@@ -62,20 +64,24 @@
     height: 20px;
     color: #888;
     margin-right: 12px;
+    flex-shrink: 0;
 }
 
 .promo-box input {
     flex: 1;
+    min-width: 0;
     border: none;
     background: transparent;
     outline: none;
     font-size: 14px;
     color: #000;
-    padding-left: 5px;
+    padding: 0 5px;
+    text-transform: uppercase;
 }
 
 .promo-box input::placeholder {
     color: #888;
+    text-transform: none;
 }
 
 .apply-btn {
@@ -87,6 +93,7 @@
     font-weight: 500;
     cursor: pointer;
     transition: opacity 0.2s;
+    flex-shrink: 0;
 }
 
 .apply-btn:hover {
@@ -142,9 +149,12 @@
 
     .promo-box {
         padding: 4px 4px 4px 12px;
+        position: relative;
     }
 
     .apply-btn {
         padding: 8px 16px;
+        position: static;
+        margin: 0;
     }
 }
