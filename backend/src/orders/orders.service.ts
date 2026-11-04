@@ -131,7 +131,6 @@ export class OrdersService {
     }
 
     const newOrder = await this.prisma.$transaction(async (tx) => {
-      console.log(1);
       const order = await tx.order.create({
         data: {
           userId,
@@ -149,7 +148,6 @@ export class OrdersService {
           items: true,
         },
       });
-      console.log(2);
 
       for (const item of userCart.items) {
         const updateStock = await tx.productStock.updateMany({

@@ -25,7 +25,6 @@ export class CommentsController {
   }
 
   // Kiểm tra người dùng hiện tại có được đánh giá sản phẩm hay không.
-  // Phải khai báo TRƯỚC @Get(':id') để không bị route ':id' bắt mất.
   @Get('eligibility')
   checkEligibility(
     @CurrentUser('id') userId: number,
