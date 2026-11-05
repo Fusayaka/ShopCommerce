@@ -1,8 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { UpdateOrderDto } from './dto/update-order.dto.js';
-import { Color, Prisma, ItemSize } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
 
 interface OrderItemInput {
   stock: {
@@ -189,11 +189,17 @@ export class OrdersService {
     };
   }
 
-  async getOrderById(userId: number, orderId: number) {
+  async getAllOrders(){
+    return this.prisma.order.findMany({
+      include: { user: true, items: true },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async getOrderById(userId: number, orderId: number, isAdminOrManager: boolean) {
     const order = await this.prisma.order.findFirst({
       where: {
         id: orderId,
-        userId: userId,
       },
       include: {
         items: true,
@@ -204,13 +210,18 @@ export class OrdersService {
       throw new NotFoundException(`Not found Order ID ${orderId}!`);
     }
 
+    if (!isAdminOrManager && order.userId !== userId){
+      throw new ForbiddenException("User is not allowed to see another user's order!")
+    }
+
     return {
       success: true,
       data: order,
     };
   }
 
-  async updateOrder(orderId: number, dto: UpdateOrderDto) {
+  async updateOrder(orderId: number, dto: UpdateOrderDto, userRole: UserRole) {
+    // TODO: check role and status flow
     const existingOrder = await this.prisma.order.findUnique({
       where: { id: orderId },
     });

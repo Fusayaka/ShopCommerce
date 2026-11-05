@@ -18,6 +18,10 @@ export const orderApi = {
   },
 
   getUserOrders() {
+    return axiosClient.get<Order[], Order[]>(`/orders/me`);
+  },
+
+  getAllOrders() {
     return axiosClient.get<Order[], Order[]>(`/orders`);
   },
 

@@ -4,6 +4,7 @@ import { CreateUsersDto } from './dto/create-users.dto.js';
 import { UpdateUsersDto } from './dto/update-users.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CloudinaryService, UploadableFile } from '../cloudinary/cloudinary.service.js';
+import { User, UserRole } from '@prisma/client';
 
 const HIDDEN_USER_FIELDS = { password: true } as const;
 const MAX_AVATAR_BYTES = 1 * 1024 * 1024;
@@ -92,6 +93,25 @@ export class UsersService {
             data,       
             omit: HIDDEN_USER_FIELDS,
         });
+    }
+
+    async updateRole(id: number, newRole: UserRole, currentUser: User){
+        if (currentUser.id === id) throw new BadRequestException("You can not set your role!");
+
+        const user = await this.prisma.user.findUnique({
+            where: { id },
+        });
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        await this.prisma.user.update({
+            where: {id},
+            data: {role: newRole},
+        })
+
+        return { message: "Update User Role success"};
     }
 
     async delete(id: number){

@@ -1,16 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe, UseGuards, ForbiddenException } from '@nestjs/common';
 import { CommentsService } from './comments.service.js';
 import { CreateCommentDto } from './dto/create-comment.dto.js';
 import { UpdateCommentDto } from './dto/update-comment.dto.js';
 import { GetCommentQueryDto } from './dto/get-comment.dto.js';
 import { Public } from '../common/decorators/public.decorator.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard.js';
+import { UserRole, type User } from '@prisma/client';
 
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   create(
     @CurrentUser('id') userId: number,
     @Body() createCommentDto: CreateCommentDto,
@@ -25,6 +28,7 @@ export class CommentsController {
   }
 
   // Kiểm tra người dùng hiện tại có được đánh giá sản phẩm hay không.
+  @UseGuards(JwtAuthGuard)
   @Get('eligibility')
   checkEligibility(
     @CurrentUser('id') userId: number,
@@ -40,12 +44,22 @@ export class CommentsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
+  @UseGuards(JwtAuthGuard)
+  update(
+    @Param('id') id: string, 
+    @Body() updateCommentDto: UpdateCommentDto,
+    @CurrentUser() user: User
+  ) {
+    if (!(user.id === +id)) throw new ForbiddenException("User is not allowed to edit another user's review!");
     return this.commentsService.update(+id, updateCommentDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(
+    @Param('id') id: string,
+    @CurrentUser() user: User
+  ) {
+    if (!(user.id === +id) || user.role == UserRole.admin) throw new ForbiddenException("User is not allowed to delete another user's review!");
     return this.commentsService.remove(+id);
   }
 }
