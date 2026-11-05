@@ -1,17 +1,20 @@
-import './header.css'
+import './header.css';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '@/assets/logo-placeholder.svg'
-import cart from '@/assets/icon-cart.svg'
-import lang from '@/assets/language.svg'
-import search from '@/assets/search.svg'
-import hamburgerbtn from '@/assets/hamburger.svg'
-import avatarPlaceholder from '@/assets/avatar-placeholder.svg'
+import logo from '@/assets/logo-placeholder.svg';
+import cart from '@/assets/icon-cart.svg';
+import lang from '@/assets/language.svg';
+import search from '@/assets/search.svg';
+import hamburgerbtn from '@/assets/hamburger.svg';
+import avatarPlaceholder from '@/assets/avatar-placeholder.svg';
 import { useEffect, useRef, useState } from 'react';
 import { useAuth, clearAuth } from '@/utils/auth';
 import { useCartCount } from '@/utils/cartCount';
 import { cartApi, type MiniCartResponse } from '@/api/cartApi';
 import plhImg from '/images/cloth-placeholder.jpeg';
 import { loginApi } from '@/api/loginApi';
+import { productApi } from '@/api/productApi';
+
+const DEBOUNCE = 600;
 
 export default function Header() {
     const { loggedIn, user: currentUser } = useAuth();
@@ -27,9 +30,15 @@ export default function Header() {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isAvatarOpen, setIsAvatarOpen] = useState(false);
     const [currentLang, setCurrentLang] = useState('vi');
+    
     const [searchTerm, setSearchTerm] = useState("");
+    const [searchProducts, setSearchProducts] = useState<any[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
     const navigate = useNavigate();
     const searchInputRef = useRef<HTMLInputElement>(null);
+    const searchContainerRef = useRef<HTMLDivElement>(null);
     const avatarRef = useRef<HTMLDivElement>(null);
 
     const handleLangChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -54,18 +63,57 @@ export default function Header() {
         }
     };
 
-    const handleSearchProducts = () => {
-        if (searchTerm.trim() !== ""){
-            navigate(`/products?search=${encodeURIComponent(searchTerm.trim())}`)
+    const handleSearchSubmit = () => {
+        if (searchTerm.trim() !== "") {
+            navigate(`/products?search=${encodeURIComponent(searchTerm.trim())}`);
         }
         setIsSearchOpen(false);
+        setShowSuggestions(false);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key == "Enter"){
-            handleSearchProducts();
+        if (e.key === "Enter") {
+            handleSearchSubmit();
+            setShowSuggestions(false);
         }
-    }
+    };
+
+    useEffect(() => {
+        const query = searchTerm.trim();
+        if (!query) {
+            setSearchProducts([]);
+            setIsSearching(false);
+            setShowSuggestions(false);
+            return;
+        }
+
+        setIsSearching(true);
+        const timer = setTimeout(async () => {
+            try {
+                const res = await productApi.getProducts({ search: query, limit: 10 });
+                const list = res?.data || [];
+                setSearchProducts(Array.isArray(list) ? list : []);
+                setShowSuggestions(true);
+            } catch (err) {
+                console.error("Failed to search products:", err);
+                setSearchProducts([]);
+            } finally {
+                setIsSearching(false);
+            }
+        }, DEBOUNCE);
+
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+                setShowSuggestions(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     useEffect(() => {
         if (isSearchOpen) searchInputRef.current?.focus();
@@ -100,6 +148,49 @@ export default function Header() {
         navigate('/login');
     };
 
+    const renderSearchDropdown = () => {
+        if (!showSuggestions || !searchTerm.trim()) return null;
+
+        return (
+            <div className="search-dropdown-menu">
+                {isSearching ? (
+                    <div className="search-dropdown-message">Searching...</div>
+                ) : searchProducts.length > 0 ? (
+                    <>
+                        <ul className="search-dropdown-list">
+                            {searchProducts.map((prod) => (
+                                <li
+                                    key={prod.id}
+                                    className="search-dropdown-item"
+                                    onMouseDown={() => {
+                                        navigate(`/product/${prod.id}`);
+                                        setShowSuggestions(false);
+                                        setIsSearchOpen(false);
+                                    }}
+                                >
+                                    <img
+                                        src={prod.image || plhImg}
+                                        alt={prod.title}
+                                        onError={(e) => { e.currentTarget.src = plhImg; }}
+                                    />
+                                    <div className="search-item-info">
+                                        <span className="search-item-title">{prod.title}</span>
+                                        {prod.price && <span className="search-item-price">${prod.price}</span>}
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                        <div className="search-dropdown-footer" onClick={handleSearchSubmit}>
+                            View all results for "{searchTerm}"
+                        </div>
+                    </>
+                ) : (
+                    <div className="search-dropdown-message">No products found</div>
+                )}
+            </div>
+        );
+    };
+
     return (
         <header className='header-container'>
             <button className='hamburger-btn' onClick={toggleMenu}>
@@ -118,15 +209,17 @@ export default function Header() {
                 <a href='/dashboard'>Dashboard</a>
             </nav>
 
-            <div className='header-search'>
+            <div className='header-search' ref={searchContainerRef}>
                 <input 
                     type='text' 
                     placeholder='Search for products'
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    onFocus={() => searchTerm.trim() && setShowSuggestions(true)}
                     onKeyDown={handleKeyDown}
                 />
-                <img src={search} alt='search' className='search-icon' onClick={handleSearchProducts} />
+                <img src={search} alt='search' className='search-icon' onClick={handleSearchSubmit} />
+                {renderSearchDropdown()}
             </div>
 
             <div className='header-actions'>
@@ -200,25 +293,24 @@ export default function Header() {
                     )}
                 </div>
 
-                {isGuest
-                    ?
+                {isGuest ? (
                     <Link to="login" className='login-btn'>
                         Login
                     </Link>
-                    :
+                ) : (
                     <div
                         className='avatar-menu'
                         ref={avatarRef}
                         onMouseEnter={() => setIsAvatarOpen(true)}
                         onMouseLeave={() => setIsAvatarOpen(false)}
                     >
-                            <img
-                                src={avatarSrc}
-                                alt={currentUser?.name ?? 'User'}
-                                className='avatar-btn' aria-label='Account' 
-                                onClick={handleAvatarClick}
-                                onError={(e) => { e.currentTarget.src = avatarPlaceholder; }}
-                            />
+                        <img
+                            src={avatarSrc}
+                            alt={currentUser?.name ?? 'User'}
+                            className='avatar-btn' aria-label='Account' 
+                            onClick={handleAvatarClick}
+                            onError={(e) => { e.currentTarget.src = avatarPlaceholder; }}
+                        />
 
                         {isAvatarOpen && (
                             <div className='avatar-dropdown' role='menu'>
@@ -253,7 +345,7 @@ export default function Header() {
                             </div>
                         )}
                     </div>
-                }
+                )}
             </div>
 
             <div className={`mobile-search-bar ${isSearchOpen ? 'open' : ''}`}>
@@ -263,9 +355,11 @@ export default function Header() {
                     placeholder='Search for products'
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    onFocus={() => searchTerm.trim() && setShowSuggestions(true)}
                     onKeyDown={handleKeyDown}
                 />
-                <img src={search} alt='search' className='search-icon' onClick={handleSearchProducts} />
+                <img src={search} alt='search' className='search-icon' onClick={handleSearchSubmit} />
+                {renderSearchDropdown()}
             </div>
 
             <div className={`mobile-menu-overlay ${isMenuOpen ? 'open' : ''}`} onClick={toggleMenu}>
@@ -283,7 +377,6 @@ export default function Header() {
                     </nav>
                 </div>
             </div>
-
         </header>
     );
 }
