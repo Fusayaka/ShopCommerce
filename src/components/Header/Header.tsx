@@ -11,6 +11,7 @@ import { useAuth, clearAuth } from '@/utils/auth';
 import { useCartCount } from '@/utils/cartCount';
 import { cartApi, type MiniCartResponse } from '@/api/cartApi';
 import plhImg from '/images/cloth-placeholder.jpeg';
+import { loginApi } from '@/api/loginApi';
 
 export default function Header() {
     const { loggedIn, user: currentUser } = useAuth();
@@ -92,8 +93,9 @@ export default function Header() {
         }
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         setIsAvatarOpen(false);
+        await loginApi.logout();
         clearAuth();
         navigate('/login');
     };
