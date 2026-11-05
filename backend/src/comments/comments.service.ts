@@ -12,6 +12,15 @@ export class CommentsService {
   create(userId: number, createCommentDto: CreateCommentDto) {
     return this.prisma.comment.create({
       data: { ...createCommentDto, userId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            avatar: true,
+            name: true
+          }
+        }
+      }
     });
   }
 
@@ -46,27 +55,54 @@ export class CommentsService {
   }
 
   async findAll(query: GetCommentQueryDto) {
-    const comments = await this.prisma.comment.findMany({
-      where: {
-        productId: query.productId,
-        userId: query.userId
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            avatar: true
-          }
-        }
-      },
-      orderBy: {
-        updatedAt: 'desc'
-      },
-      take: 50,
-    });
-    if (!comments) throw new NotFoundException("Comment not found");
-    return comments;
+    const { productId, userId } = query;
+
+    const [userComment, otherComments] = await Promise.all([
+      userId
+        ? this.prisma.comment.findFirst({
+            where: { productId, userId },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  avatar: true,
+                },
+              },
+            },
+          })
+        : null,
+
+      this.prisma.comment.findMany({
+        where: {
+          productId,
+          ...(userId && { NOT: { userId } }),
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              avatar: true,
+            },
+          },
+        },
+        orderBy: {
+          updatedAt: 'desc',
+        },
+        take: 50,
+      }),
+    ]);
+
+    const allComments = userComment
+      ? [userComment, ...otherComments]
+      : otherComments;
+
+    if (allComments.length === 0) {
+      throw new NotFoundException('Comment not found');
+    }
+
+    return allComments;
   }
 
   async findOne(id: number) {

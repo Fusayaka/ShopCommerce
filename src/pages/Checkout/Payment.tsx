@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { orderApi } from '@/api/orderApi';
@@ -32,7 +32,7 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
 
   const safeSubtotal = Number(subtotal) || 0;
   const deliveryFee = safeSubtotal > 0 ? 15 : 0;
-  const totalPayment = Math.max(0, safeSubtotal + deliveryFee - discount);
+  const totalPayment = Math.max(1, safeSubtotal + deliveryFee - discount);
 
   const formatPrice = (val: number): string => {
     return `$${val.toLocaleString('en-US', {
@@ -41,31 +41,22 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
     })}`;
   };
 
-  const handleApplyPromo = async () => {
-    setPromoMessage(null);
-    const code = promoInput.trim();
-    
-    if (!code) {
-      setPromoMessage({ text: 'Please enter a promo code.', type: 'error' });
-      return;
-    }
-
-    if (appliedPromo === code) {
-      setPromoMessage({ text: 'Promo code is already applied.', type: 'error' });
-      return;
-    }
+  const validateAndApplyPromo = useCallback(async (codeToValidate: string, currentSubtotal: number, isAutoRevalidate = true) => {
+    if (!codeToValidate) return;
 
     setValidatingPromo(true);
+    if (!isAutoRevalidate) setPromoMessage(null);
+
     try {
-      const res = await promoApi.validateCode(code, safeSubtotal);
+      const res = await promoApi.validateCode(codeToValidate, currentSubtotal);
       const data = (res as any)?.data || res;
 
       if (data.isValid) {
-        const discount = Number(data.discount || 0);
-        setdiscount(discount);
-        setAppliedPromo(code);
+        const discountVal = Number(data.discount || 0);
+        setdiscount(discountVal);
+        setAppliedPromo(codeToValidate);
         setPromoMessage({
-          text: `Applied successfully! Saved ${formatPrice(discount)}`,
+          text: `Applied successfully! Saved ${formatPrice(discountVal)}`,
           type: 'success',
         });
       } else {
@@ -81,10 +72,40 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
       setAppliedPromo(null);
       const apiErr = err as { response?: { data?: { message?: string } }; message?: string };
       const msg = apiErr?.response?.data?.message || apiErr?.message || 'Invalid or expired promo code.';
-      setPromoMessage({ text: typeof msg === 'string' ? msg : 'Error validating code', type: 'error' });
+      setPromoMessage({
+        text: typeof msg === 'string' ? msg : 'Error validating code',
+        type: 'error',
+      });
     } finally {
       setValidatingPromo(false);
     }
+  }, []);
+
+  useEffect(() => {
+    if (!appliedPromo) return;
+
+    const timer = setTimeout(() => {
+      validateAndApplyPromo(appliedPromo, safeSubtotal, true);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [safeSubtotal, appliedPromo, validateAndApplyPromo]);
+
+  const handleApplyPromo = async () => {
+    setPromoMessage(null);
+    const code = promoInput.trim();
+
+    if (!code) {
+      setPromoMessage({ text: 'Please enter a promo code.', type: 'error' });
+      return;
+    }
+
+    if (appliedPromo === code) {
+      setPromoMessage({ text: 'Promo code is already applied.', type: 'error' });
+      return;
+    }
+
+    await validateAndApplyPromo(code, safeSubtotal, false);
   };
 
   const handlePlaceOrder = async () => {
@@ -103,7 +124,7 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
 
       notifyCartChanged();
       toast.success('Order placed successfully!');
-      navigate('/orders');
+      navigate('/purchases');
     } catch (err: unknown) {
       console.error('Failed to place order:', err);
       const apiErr = err as { response?: { data?: { message?: string } }; message?: string };

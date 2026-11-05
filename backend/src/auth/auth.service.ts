@@ -73,7 +73,10 @@ export class AuthService {
         }); 
 
         if (!storedToken || storedToken.expiresAt < new Date()){
-            throw new UnauthorizedException("Invalid or expired Refresh Token")
+            if (storedToken) {
+                await this.prisma.refreshToken.delete({ where: { tokenHash } }).catch(() => {});
+            }
+            throw new UnauthorizedException("Invalid or expired Refresh Token");
         }
 
         const {accessToken, refreshToken: newRefreshToken} = await this.generateToken(storedToken.user);

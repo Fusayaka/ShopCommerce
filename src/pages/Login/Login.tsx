@@ -173,6 +173,7 @@ export default function Login(){
     };
 
     const handleSocialLogin = (provider: string) => {
+        // TODO: implement login with social link
         console.log(`Login with ${provider} clicked!`);
     };
 

@@ -1,6 +1,6 @@
 import { PaymentMethod } from "@prisma/client";
 import { Transform } from "class-transformer";
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from "class-validator";
 
 export class CreateOrderDto {
     @IsNotEmpty({message: "Payment Method must not empty"})
@@ -14,5 +14,6 @@ export class CreateOrderDto {
 
     @IsOptional()
     @IsNumber()
+    @Min(0)
     deliveryFee: number;
 }

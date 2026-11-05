@@ -328,7 +328,7 @@
   }
 
   .checkout-promo-wrapper {
-    align-items: stretch;
+    align-items: center;
   }
 
   .checkout-promo-input-group {
@@ -341,5 +341,20 @@
 
   .place-order-btn {
     width: 100%;
+  }
+
+  .option-sub{
+    text-align: left;
+    font-size: 12px;
+  }
+
+  .checkout-promo-msg{
+    width: 100%;
+    max-width: fit-content;
+  }
+
+  .checkout-promo-input-group input{
+    flex: 1;
+    min-width: 0;
   }
 }

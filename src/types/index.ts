@@ -9,7 +9,7 @@ export interface Paginated<T> {
 
 export type Size = 'S' | 'M' | 'L' | 'XL' | 'XXL';
 export type Color = 'Red' | 'Green' | 'Blue';
-export type OrderStatus = 'pending' | 'checkout' | 'completed' | 'cancelled';
+export type OrderStatus = 'pending' | 'shipping' | 'processing' | 'cancelled' | "delivered";
 export type PaymentMethod = 'delivery' | 'bank' | 'card';
 
 export interface User {

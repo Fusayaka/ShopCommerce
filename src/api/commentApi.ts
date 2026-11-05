@@ -1,8 +1,12 @@
 import type { Comment } from "@/types";
 import axiosClient from "./axiosClient";
-
 export interface CreateCommentPayload {
     productId: number;
+    content: string;
+    rating: number;
+}
+
+export interface UpdateCommentPayload {
     content: string;
     rating: number;
 }
@@ -35,5 +39,9 @@ export const commentApi = {
 
     deleteComment(commentId: number) {
         return axiosClient.delete<Comment, Comment>(`/comments/${commentId}`);
+    },
+
+    updateComment(commentId: number, data: UpdateCommentPayload) {
+        return axiosClient.patch<Comment, Comment>(`/comments/${commentId}`, data);
     },
 };

@@ -463,4 +463,17 @@
     justify-content: space-between;
     align-items: center;
   }
+
+  .order-item-count {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .highlight-total {
+    align-items: flex-end;
+    font-weight: 800;
+    font-size: 15px;
+  }
 }

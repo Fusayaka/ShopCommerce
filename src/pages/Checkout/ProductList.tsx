@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { cartApi, type CartItemResponse } from '@/api/cartApi';
 import { notifyCartChanged } from '@/utils/cartCount';
+import { ConfirmModal } from '@/components';
 import plhImg from '/images/cloth-placeholder.jpeg';
 import './productList.css';
 
@@ -26,6 +27,15 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
   const [items, setItems] = useState<CheckoutLineItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [actionStockId, setActionStockId] = useState<number | null>(null);
+
+  const [removingStockId, setRemovingStockId] = useState<number | null>(null);
+  const [isRemoving, setIsRemoving] = useState<boolean>(false);
+
+  // Tìm sản phẩm đang chờ xóa để lấy thông tin hiển thị lên Modal
+  const removingItem = useMemo(() => {
+    if (removingStockId === null) return null;
+    return items.find((item) => item.stockId === removingStockId) || null;
+  }, [items, removingStockId]);
 
   const fetchCart = useCallback(async () => {
     setLoading(true);
@@ -88,7 +98,10 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
   };
 
   const handleQuantityChange = async (stockId: number, nextQty: number) => {
-    if (nextQty < 1) return;
+    if (nextQty < 0) return;
+    if (nextQty === 0) {
+      return handleRequestRemove(stockId);
+    }
     setActionStockId(stockId);
     const prevItems = items;
     setItems((prev) =>
@@ -105,17 +118,27 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
     }
   };
 
-  const handleRemove = async (stockId: number) => {
-    setActionStockId(stockId);
+  const handleRequestRemove = (stockId: number) => {
+    setRemovingStockId(stockId);
+  };
+
+  const handleConfirmRemove = async () => {
+    if (removingStockId === null) return;
+
+    setIsRemoving(true);
+    setActionStockId(removingStockId);
     const prevItems = items;
-    setItems((prev) => prev.filter((item) => item.stockId !== stockId));
+    setItems((prev) => prev.filter((item) => item.stockId !== removingStockId));
+
     try {
-      await cartApi.removeItem(stockId);
+      await cartApi.removeItem(removingStockId);
       notifyCartChanged();
+      setRemovingStockId(null);
     } catch (err) {
       setItems(prevItems);
       console.error('Failed to remove item:', err);
     } finally {
+      setIsRemoving(false);
       setActionStockId(null);
     }
   };
@@ -203,7 +226,7 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
                         <button
                           type="button"
                           className="qty-btn"
-                          disabled={item.quantity <= 1 || isBusy}
+                          disabled={isBusy}
                           onClick={() => handleQuantityChange(item.stockId, item.quantity - 1)}
                         >
                           -
@@ -231,7 +254,7 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
                           type="button"
                           className="item-delete-btn"
                           title="Remove item"
-                          onClick={() => handleRemove(item.stockId)}
+                          onClick={() => handleRequestRemove(item.stockId)}
                         >
                           ✕
                         </button>
@@ -270,7 +293,7 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
                     <button
                       type="button"
                       className="mobile-item-delete-btn"
-                      onClick={() => handleRemove(item.stockId)}
+                      onClick={() => handleRequestRemove(item.stockId)}
                     >
                       ✕
                     </button>
@@ -291,7 +314,7 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
                         <button
                           type="button"
                           className="qty-btn"
-                          disabled={item.quantity <= 1 || isBusy}
+                          disabled={isBusy}
                           onClick={() => handleQuantityChange(item.stockId, item.quantity - 1)}
                         >
                           -
@@ -321,12 +344,30 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
 
       <div className="checkout-subtotal-bar-wrapper">
         <div className="checkout-subtotal-bordered-box">
-          <div className="order-item-count">Total: {totalQuantity} item{totalQuantity > 1 && "s"}</div>
+          <div className="order-item-count">
+            Total: <span className="highlight-total">{totalQuantity} item{totalQuantity > 1 && "s"}</span>
+          </div>
           <div className="order-sum-subtotal">
             Sum of subtotal: <span className="highlight-price">{formatPrice(sumOfSubtotal)}</span>
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={removingStockId !== null}
+        isLoading={isRemoving}
+        title="Remove Item"
+        content={
+          <span>
+            Are you sure you want to remove <strong>{removingItem?.title || 'this item'}</strong> from your cart?
+          </span>
+        }
+        confirmText="Remove"
+        cancelText="Cancel"
+        variant="danger"
+        onClose={() => setRemovingStockId(null)}
+        onConfirm={handleConfirmRemove}
+      />
     </div>
   );
 }
