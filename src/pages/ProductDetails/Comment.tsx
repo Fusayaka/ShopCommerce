@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import './Comment.css';
-import { StarRating } from '@/components';
+import './comment.css';
+import { StarRating, ConfirmModal } from '@/components';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { type Comment as CommentType } from '@/types';
 import { commentApi } from '@/api/commentApi';
@@ -9,12 +9,28 @@ import { useAuth } from '@/utils/auth';
 
 interface CommentCardProps {
   comment: CommentType;
-  canDelete?: boolean;
-  onDelete?: (id: number) => void;
+  canManage?: boolean;
+  isEditing?: boolean;
+  onStartEdit?: () => void;
+  onCancelEdit?: () => void;
+  onSaveEdit?: (id: number, content: string, rating: number) => Promise<void>;
+  onRequestDelete?: (id: number) => void;
 }
 
-const CommentCard = ({ comment, canDelete = false, onDelete }: CommentCardProps) => {
+const CommentCard = ({
+  comment,
+  canManage = false,
+  isEditing = false,
+  onStartEdit,
+  onCancelEdit,
+  onSaveEdit,
+  onRequestDelete,
+}: CommentCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [editContent, setEditContent] = useState(comment.content);
+  const [editRating, setEditRating] = useState(comment.rating);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   const maxLength = 50;
   const isLongContent = comment.content.length > maxLength;
@@ -35,12 +51,28 @@ const CommentCard = ({ comment, canDelete = false, onDelete }: CommentCardProps)
   const displayName = comment.user?.name || 'Anonymous';
   const avatar = comment.user?.avatar;
 
-  return (
-    <div className="comment-card">
-      <div className="comment-stars">
-        <StarRating rating={comment.rating} />
-      </div>
+  const handleSave = async () => {
+    const trimmed = editContent.trim();
+    if (!trimmed) {
+      toast.error('Content cannot be empty.');
+      return;
+    }
+    setIsUpdating(true);
+    try {
+      await onSaveEdit?.(comment.id, trimmed, editRating);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
+  const handleCancel = () => {
+    setEditContent(comment.content);
+    setEditRating(comment.rating);
+    onCancelEdit?.();
+  };
+
+return (
+    <div className="comment-card">
       <div className="comment-user-header">
         <div className="comment-avatar">
           {avatar ? (
@@ -52,31 +84,132 @@ const CommentCard = ({ comment, canDelete = false, onDelete }: CommentCardProps)
 
         <h4 className="comment-username">{displayName}</h4>
 
-        {canDelete && (
-          <button
-            type="button"
-            className="comment-delete-btn"
-            onClick={() => onDelete?.(comment.id)}
-            aria-label="Delete your review"
-          >
-            Delete
-          </button>
+        {canManage && !isEditing && (
+          <div className="comment-menu-container">
+            <button
+              type="button"
+              className="comment-menu-trigger"
+              onClick={() => setShowMenu(prev => !prev)}
+              aria-label="More options"
+            >
+              <svg 
+                width="20" 
+                height="20" 
+                viewBox="0 0 24 24" 
+                fill="currentColor"
+              >
+                <circle cx="5" cy="12" r="2" />
+                <circle cx="12" cy="12" r="2" />
+                <circle cx="19" cy="12" r="2" />
+              </svg>
+            </button>
+
+            {showMenu && (
+              <>
+                <div
+                  className="comment-menu-backdrop"
+                  onClick={() => setShowMenu(false)}
+                />
+
+                <div className="comment-dropdown">
+                  <button
+                    type="button"
+                    className="comment-dropdown-item"
+                    onClick={() => {
+                      setShowMenu(false);
+                      onStartEdit?.();
+                    }}
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    type="button"
+                    className="comment-dropdown-item comment-dropdown-delete"
+                    onClick={() => {
+                      setShowMenu(false);
+                      onRequestDelete?.(comment.id);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         )}
       </div>
 
-      <p className="comment-content">{content}</p>
-
-      {isLongContent && (
-        <button
-          type="button"
-          className="comment-toggle-btn"
-          onClick={() => setIsExpanded(prev => !prev)}
-        >
-          {isExpanded ? 'Show less' : 'Show more'}
-        </button>
+      {!isEditing && (
+        <div className="comment-sub-header">
+          <div className="comment-stars">
+            <StarRating rating={comment.rating} />
+          </div>
+          <span className="comment-date">{date}</span>
+        </div>
       )}
 
-      <span className="comment-date">{date}</span>
+      {isEditing ? (
+        <div className="comment-edit-form">
+          <div className="comment-form-rating">
+            <span className="comment-form-label">Your rating</span>
+            <div className="comment-form-stars">
+              {[1, 2, 3, 4, 5].map(n => (
+                <button
+                  key={n}
+                  type="button"
+                  className={`comment-form-star ${n <= editRating ? 'active' : ''}`}
+                  onClick={() => setEditRating(n)}
+                  aria-label={`${n} star${n > 1 ? 's' : ''}`}
+                >
+                  ★
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <textarea
+            className="comment-form-input"
+            rows={3}
+            value={editContent}
+            onChange={e => setEditContent(e.target.value)}
+          />
+
+          <div className="comment-edit-actions">
+            <button
+              type="button"
+              className="comment-edit-cancel-btn"
+              onClick={handleCancel}
+              disabled={isUpdating}
+            >
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              className="comment-form-submit"
+              onClick={handleSave}
+              disabled={isUpdating}
+            >
+              {isUpdating ? 'Saving...' : 'Save'}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          <p className="comment-content">{content}</p>
+
+          {isLongContent && (
+            <button
+              type="button"
+              className="comment-toggle-btn"
+              onClick={() => setIsExpanded(prev => !prev)}
+            >
+              {isExpanded ? 'Show less' : 'Show more'}
+            </button>
+          )}
+        </>
+      )}
     </div>
   );
 };
@@ -96,6 +229,10 @@ export default function Comment() {
 
   const [canReview, setCanReview] = useState(false);
 
+  const [deletingCommentId, setDeletingCommentId] = useState<number | null>(null);
+  const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const REVIEW_STEP = 2;
   const [visibleCount, setVisibleCount] = useState(REVIEW_STEP);
 
@@ -113,6 +250,7 @@ export default function Comment() {
       return db - da;
     });
   }, [comments, sort]);
+
   const visibleComments = sortedComments.slice(0, visibleCount);
   const hasMore = visibleCount < sortedComments.length;
 
@@ -128,7 +266,7 @@ export default function Comment() {
       try {
         const data = await commentApi.getProductComment(Number(productId));
         if (!active) return;
-        setComments(data ?? [])
+        setComments(data ?? []);
       } catch {
         if (!active) return;
         setError("Could not load comments.");
@@ -140,8 +278,7 @@ export default function Comment() {
 
     fetchComments();
     return () => { active = false; };
-
-  }, [productId])
+  }, [productId]);
 
   useEffect(() => {
     if (!productId || !loggedIn) {
@@ -164,30 +301,51 @@ export default function Comment() {
 
     checkEligibility();
     return () => { active = false; };
+  }, [productId, loggedIn]);
 
-  }, [productId, loggedIn])
+  const handleConfirmDelete = async () => {
+    if (!deletingCommentId) return;
 
-  const handleDelete = async (commentId: number) => {
-    if (!window.confirm("Delete this review?")) return;
-
+    setIsDeleting(true);
     const previous = comments;
-    setComments(prev => prev.filter(c => c.id !== commentId));
+    setComments(prev => prev.filter(c => c.id !== deletingCommentId));
 
     try {
-      await commentApi.deleteComment(commentId);
+      await commentApi.deleteComment(deletingCommentId);
       toast.success("Review deleted.");
+      setCanReview(true);
+      setDeletingCommentId(null);
     } catch {
       setComments(previous);
       toast.error("Could not delete your review. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleSaveEdit = async (commentId: number, updatedContent: string, updatedRating: number) => {
+    try {
+      const updated = await commentApi.updateComment(commentId, {
+        content: updatedContent,
+        rating: updatedRating,
+      });
+
+      setComments(prev =>
+        prev.map(c => (c.id === commentId ? { ...c, ...updated } : c))
+      );
+      toast.success("Review updated.");
+      setEditingCommentId(null);
+    } catch {
+      toast.error("Could not update your review. Please try again.");
     }
   };
 
   const handleSortChange = (value: string) => {
-      const params = new URLSearchParams(searchParams);
-      params.set('sort', value);
-      params.delete('page');
-      setSearchParams(params);
-      setVisibleCount(REVIEW_STEP);
+    const params = new URLSearchParams(searchParams);
+    params.set('sort', value);
+    params.delete('page');
+    setSearchParams(params);
+    setVisibleCount(REVIEW_STEP);
   };
 
   const handleSubmit = async () => {
@@ -221,6 +379,7 @@ export default function Comment() {
       setComments(prev => [created, ...prev]);
       setNewContent('');
       setNewRating(5);
+      setCanReview(false);
     } catch {
       setSubmitError("Could not post your review. Please try again.");
     } finally {
@@ -232,7 +391,7 @@ export default function Comment() {
     <section className="comment-section">
       <h2 className="comment-section-title">Reviews</h2>
 
-      {!loggedIn && canReview && (
+      {loggedIn && canReview && (
         <form className="comment-form" onSubmit={e => { e.preventDefault(); handleSubmit(); }}>
           <div className="comment-form-rating">
             <span className="comment-form-label">Your rating</span>
@@ -253,7 +412,7 @@ export default function Comment() {
 
           <textarea
             className="comment-form-input"
-            placeholder="Share your thoughts about this product... (Enter to post, Shift+Enter for a new line)"
+            placeholder="Share your thoughts about this product..."
             value={newContent}
             onChange={e => setNewContent(e.target.value)}
             onKeyDown={e => {
@@ -276,6 +435,7 @@ export default function Comment() {
           </button>
         </form>
       )}
+
       {sortedComments.length > 0 && (
         <div className="comment-sort">
           <label htmlFor="comment-sort-select">Sort by</label>
@@ -303,8 +463,12 @@ export default function Comment() {
               <CommentCard
                 key={comment.id}
                 comment={comment}
-                canDelete={loggedIn && comment.user?.id === user.id}
-                onDelete={handleDelete}
+                canManage={loggedIn && comment.user?.id === user?.id}
+                isEditing={editingCommentId === comment.id}
+                onStartEdit={() => setEditingCommentId(comment.id)}
+                onCancelEdit={() => setEditingCommentId(null)}
+                onSaveEdit={handleSaveEdit}
+                onRequestDelete={(id) => setDeletingCommentId(id)}
               />
             ))}
 
@@ -320,6 +484,18 @@ export default function Comment() {
           </>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={deletingCommentId !== null}
+        isLoading={isDeleting}
+        title="Delete Review"
+        content="Are you sure you want to delete this review? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        onClose={() => setDeletingCommentId(null)}
+        onConfirm={handleConfirmDelete}
+      />
     </section>
   );
 }
