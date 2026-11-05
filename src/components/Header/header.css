@@ -141,6 +141,10 @@
   text-align: left;
 }
 
+.search-item-title:hover{
+  text-decoration: underline;
+}
+
 .search-item-price {
   font-size: 13px;
   color: #000;
@@ -157,9 +161,9 @@
 
 .search-dropdown-footer {
   padding: 5px 10px;
-  background-color: #d8ffc7;
+  background-color: #fff;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: #94b6ff;
   text-align: center;
   cursor: pointer;
@@ -168,7 +172,7 @@
 }
 
 .search-dropdown-footer:hover {
-  background-color: #fff1cb;
+  background-color: #f3f4f6;
 }
 
 .header-actions {
