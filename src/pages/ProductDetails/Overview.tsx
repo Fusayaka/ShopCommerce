@@ -184,9 +184,9 @@ export default function Overview() {
         setPendingAction(null);
 
         navigate('/login', {
-        state: { 
-            from: isBuyNow ? '/checkout' : location.pathname 
-        }
+            state: { 
+                from: isBuyNow ? '/checkout' : location.pathname 
+            }
         });
     };
 

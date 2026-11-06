@@ -146,7 +146,7 @@ export default function Header() {
         setIsAvatarOpen(false);
         await loginApi.logout();
         clearAuth();
-        navigate('/login');
+        navigate('/', {replace: true});
     };
 
     const renderSearchDropdown = () => {

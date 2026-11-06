@@ -9,7 +9,7 @@ import { useAuth } from '@/utils/auth';
 
 interface CommentCardProps {
   comment: CommentType;
-  canManage?: boolean;
+  isOwner?: boolean;
   isAdmin?: boolean;
   isEditing?: boolean;
   onStartEdit?: () => void;
@@ -20,7 +20,7 @@ interface CommentCardProps {
 
 const CommentCard = ({
   comment,
-  canManage = false,
+  isOwner = false,
   isAdmin = false,
   isEditing = false,
   onStartEdit,
@@ -86,7 +86,7 @@ return (
 
         <h4 className="comment-username">{displayName}</h4>
 
-        {canManage && !isEditing && (
+        {(isOwner || isAdmin) && !isEditing && (
           <div className="comment-menu-container">
             <button
               type="button"
@@ -114,7 +114,7 @@ return (
                 />
 
                 <div className="comment-dropdown">
-                  {!isAdmin && (<button
+                  {(!isAdmin || isOwner) && (<button
                     type="button"
                     className="comment-dropdown-item"
                     onClick={(e) => {
@@ -469,8 +469,8 @@ export default function Comment() {
               <CommentCard
                 key={comment.id}
                 comment={comment}
-                canManage={loggedIn && (comment.user?.id === user?.id || isAdmin)}
-                isAdmin={isAdmin}
+                isOwner={loggedIn && comment.user?.id === user?.id}
+                isAdmin={loggedIn && isAdmin}
                 isEditing={editingCommentId === comment.id}
                 onStartEdit={() => setEditingCommentId(comment.id)}
                 onCancelEdit={() => setEditingCommentId(null)}
