@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { CreateUsersDto } from './dto/create-users.dto.js';
 import { UpdateUsersDto } from './dto/update-users.dto.js';
@@ -114,12 +114,22 @@ export class UsersService {
         return { message: "Update User Role success"};
     }
 
-    async delete(id: number){
-        const user = await this.prisma.user.delete({
+    async delete(id: number, userRole: UserRole){
+        const existUser = await this.prisma.user.findFirst({
             where: {id},
-            omit: HIDDEN_USER_FIELDS,
         });
-        if(!user) throw new NotFoundException("Can not delete: User not found");
-        return user;
+        if(!existUser) throw new NotFoundException("Can not delete: User not found");
+        
+        const admminCount = await this.prisma.user.count({
+            where: {
+                role: 'admin'
+            }
+        })
+        if (admminCount === 1 && userRole === UserRole.admin) throw new ForbiddenException("Can not delete: User is last admin")
+        
+        return this.prisma.user.delete({
+            where: { id },
+            omit: HIDDEN_USER_FIELDS
+        });
     }
 }

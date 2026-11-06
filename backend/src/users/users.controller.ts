@@ -72,8 +72,10 @@ export class UsersController {
     update(
         @Param("id") id: number, 
         @Body() updateUSersDto: UpdateUsersDto,
+        @CurrentUser() user: User,
         @UploadedFile() file?: UploadedImage,
     ){
+        if (user.id !== id || user.role !== UserRole.admin) throw new ForbiddenException("You are not allowed to update another user's data");
         return this.usersService.update(+id, updateUSersDto, file);
     }
 
@@ -98,6 +100,6 @@ export class UsersController {
         const isSelf = user.id === id;
         if (!isSelf && !isAdmin) throw new ForbiddenException("You are not allowed to delete this user!");
 
-        return this.usersService.delete(+id);
+        return this.usersService.delete(+id, user.role);
     }
 }
