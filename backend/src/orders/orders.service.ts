@@ -191,7 +191,18 @@ export class OrdersService {
 
   async getAllOrders(){
     return this.prisma.order.findMany({
-      include: { user: true, items: true },
+      include: { 
+        user: {
+          select: {
+            avatar: true,
+            name: true,
+            contact: true,
+            address: true,      // As delivered based on user's address
+            email: true,
+          }
+        }, 
+        items: true 
+      },
       orderBy: { createdAt: 'desc' },
     });
   }

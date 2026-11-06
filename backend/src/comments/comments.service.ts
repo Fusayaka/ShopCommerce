@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto.js';
 import { UpdateCommentDto } from './dto/update-comment.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { GetCommentQueryDto } from './dto/get-comment.dto.js';
-import { Prisma } from '@prisma/client';
+import { User, UserRole } from '@prisma/client';
 
 @Injectable()
 export class CommentsService {
@@ -98,10 +98,6 @@ export class CommentsService {
       ? [userComment, ...otherComments]
       : otherComments;
 
-    if (allComments.length === 0) {
-      throw new NotFoundException('Comment not found');
-    }
-
     return allComments;
   }
 
@@ -113,19 +109,21 @@ export class CommentsService {
     return comment;
   }
 
-  async update(id: number, updateCommentDto: UpdateCommentDto) {
-    // Rating is locked so that Product does not need update.
-    const comment = await this.prisma.comment.update({
+  async update(id: number, userId: number, updateCommentDto: UpdateCommentDto) {
+    const comment = await this.prisma.comment.findFirst({where: {id}});
+    if (!comment) throw new NotFoundException("Can not update: Comment not found");
+    if (comment.userId !== userId) throw new ForbiddenException("User is not allowed to edit another user's review!")
+
+    return await this.prisma.comment.update({
       where: {id},
       data: updateCommentDto,
     });
-    if (!comment) throw new NotFoundException("Can not update: Comment not found");
-    return comment;
   }
 
-  async remove(id: number) {
-    const comment = await this.prisma.comment.delete({where: {id}});
+  async remove(id: number, user: User) {
+    const comment = await this.prisma.comment.findFirst({where: {id}});
     if (!comment) throw new NotFoundException("Can not remove: Comment not found");
-    return comment;
+    if (comment.userId !== user.id && user.role !== UserRole.admin) throw new ForbiddenException("User is not allowed to delete another user's review!")
+    return this.prisma.comment.delete({where: {id}});
   }
 }

@@ -6,7 +6,7 @@ import { GetCommentQueryDto } from './dto/get-comment.dto.js';
 import { Public } from '../common/decorators/public.decorator.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard.js';
-import { UserRole, type User } from '@prisma/client';
+import { type User } from '@prisma/client';
 
 @Controller('comments')
 export class CommentsController {
@@ -27,7 +27,7 @@ export class CommentsController {
     return this.commentsService.findAll(query);
   }
 
-  // Kiểm tra người dùng hiện tại có được đánh giá sản phẩm hay không.
+  // Check whether user can comment or not
   @UseGuards(JwtAuthGuard)
   @Get('eligibility')
   checkEligibility(
@@ -48,10 +48,9 @@ export class CommentsController {
   update(
     @Param('id') id: string, 
     @Body() updateCommentDto: UpdateCommentDto,
-    @CurrentUser() user: User
+    @CurrentUser('id') userId: number
   ) {
-    if (!(user.id === +id)) throw new ForbiddenException("User is not allowed to edit another user's review!");
-    return this.commentsService.update(+id, updateCommentDto);
+    return this.commentsService.update(+id, userId, updateCommentDto);
   }
 
   @Delete(':id')
@@ -59,7 +58,7 @@ export class CommentsController {
     @Param('id') id: string,
     @CurrentUser() user: User
   ) {
-    if (!(user.id === +id) || user.role == UserRole.admin) throw new ForbiddenException("User is not allowed to delete another user's review!");
-    return this.commentsService.remove(+id);
+    
+    return this.commentsService.remove(+id, user);
   }
 }

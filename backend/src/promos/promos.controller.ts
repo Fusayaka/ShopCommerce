@@ -20,13 +20,11 @@ export class PromosController {
     return this.promosService.create(createPromoDto);
   }
 
-  @Public()
   @Post('/validate')
   validate(@Body() validatePromoDto: ValidatePromoDto){
     return this.promosService.validateCode(validatePromoDto);
   }
 
-  @Public()
   @Get(':code')
   findCode(@Param('code') code: string) {
     return this.promosService.getCode(code);
