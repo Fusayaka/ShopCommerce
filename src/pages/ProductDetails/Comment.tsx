@@ -9,7 +9,8 @@ import { useAuth } from '@/utils/auth';
 
 interface CommentCardProps {
   comment: CommentType;
-  canManage?: boolean;
+  isOwner?: boolean;
+  isAdmin?: boolean;
   isEditing?: boolean;
   onStartEdit?: () => void;
   onCancelEdit?: () => void;
@@ -19,7 +20,8 @@ interface CommentCardProps {
 
 const CommentCard = ({
   comment,
-  canManage = false,
+  isOwner = false,
+  isAdmin = false,
   isEditing = false,
   onStartEdit,
   onCancelEdit,
@@ -46,7 +48,7 @@ const CommentCard = ({
         day: 'numeric',
         year: 'numeric',
       })
-    : 'August 21, 2025';
+    : null;
 
   const displayName = comment.user?.name || 'Anonymous';
   const avatar = comment.user?.avatar;
@@ -84,7 +86,7 @@ return (
 
         <h4 className="comment-username">{displayName}</h4>
 
-        {canManage && !isEditing && (
+        {(isOwner || isAdmin) && !isEditing && (
           <div className="comment-menu-container">
             <button
               type="button"
@@ -112,21 +114,24 @@ return (
                 />
 
                 <div className="comment-dropdown">
-                  <button
+                  {(!isAdmin || isOwner) && (<button
                     type="button"
                     className="comment-dropdown-item"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setShowMenu(false);
                       onStartEdit?.();
                     }}
                   >
                     Edit
                   </button>
+                  )}
 
                   <button
                     type="button"
                     className="comment-dropdown-item comment-dropdown-delete"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setShowMenu(false);
                       onRequestDelete?.(comment.id);
                     }}
@@ -145,7 +150,7 @@ return (
           <div className="comment-stars">
             <StarRating rating={comment.rating} />
           </div>
-          <span className="comment-date">{date}</span>
+          {date && <span className="comment-date">{date}</span>}
         </div>
       )}
 
@@ -221,6 +226,7 @@ export default function Comment() {
   const [error, setError] = useState<string | null>(null);
 
   const { loggedIn, user } = useAuth();
+  const isAdmin = user?.role === 'admin';
 
   const [newRating, setNewRating] = useState(5);
   const [newContent, setNewContent] = useState('');
@@ -463,7 +469,8 @@ export default function Comment() {
               <CommentCard
                 key={comment.id}
                 comment={comment}
-                canManage={loggedIn && comment.user?.id === user?.id}
+                isOwner={loggedIn && comment.user?.id === user?.id}
+                isAdmin={loggedIn && isAdmin}
                 isEditing={editingCommentId === comment.id}
                 onStartEdit={() => setEditingCommentId(comment.id)}
                 onCancelEdit={() => setEditingCommentId(null)}

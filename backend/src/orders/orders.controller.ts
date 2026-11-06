@@ -1,10 +1,14 @@
 import { 
-  Controller, Get, Post, Patch, Body, Param, ParseIntPipe, Res, Req
+  Controller, Get, Post, Patch, Body, Param, ParseIntPipe, UseGuards
 } from '@nestjs/common';
 import { OrdersService } from './orders.service.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { UpdateOrderDto } from './dto/update-order.dto.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard.js';
+import { UserRole, type User } from '@prisma/client';
+import { Roles } from '../common/decorators/roles.decorator.js';
+import { RolesGuard } from '../guards/roles.guard.js';
 
 @Controller('orders')
 export class OrdersController {
@@ -12,6 +16,7 @@ export class OrdersController {
 
   // 1. POST /orders
   @Post()
+  @UseGuards(JwtAuthGuard)
   createOrder(
     @CurrentUser('id') userId: number,
     @Body() createOrderDto: CreateOrderDto, 
@@ -20,26 +25,40 @@ export class OrdersController {
   }
 
   // 2. GET /orders
-  @Get()
-  getUserOrders(@CurrentUser('id') userId: number,) {
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  getUserOrders(
+    @CurrentUser('id') userId: number,
+  ) {
     return this.ordersService.getUserOrders(userId);
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.admin, UserRole.manager)
+  getAllOrders() {
+    return this.ordersService.getAllOrders();
   }
 
   // 3. GET /orders/:id
   @Get(':id')
   getOrderById(
-    @CurrentUser('id') userId: number,
+    @CurrentUser() user: User,
     @Param('id', ParseIntPipe) id: number, 
   ) {
-    return this.ordersService.getOrderById(userId, id);
+    const isAdminOrManager = !(user.role == UserRole.customer);
+    return this.ordersService.getOrderById(user.id, id, isAdminOrManager);
   }
 
   // 4. PATCH /orders/:id
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.admin, UserRole.manager)
   updateOrder(
     @Param('id', ParseIntPipe) id: number, 
-    @Body() updateOrderDto: UpdateOrderDto
+    @Body() updateOrderDto: UpdateOrderDto,
+    @CurrentUser() user: User
   ) {
-    return this.ordersService.updateOrder(id, updateOrderDto);
+    return this.ordersService.updateOrder(id, updateOrderDto, user.role);
   }
 }

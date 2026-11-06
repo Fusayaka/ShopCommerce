@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Delete, Param, Query, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, Query, Patch, UseGuards } from '@nestjs/common';
 import { ProductsService } from './products.service.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
@@ -6,6 +6,10 @@ import { UpsertStockDto } from './dto/upsert-stock.dto.js';
 import { GetStockDto } from './dto/get-stock.dto.js';
 import { GetProductsQueryDto } from './dto/get-product.dto.js';
 import { Public } from '../common/decorators/public.decorator.js';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard.js';
+import { RolesGuard } from '../guards/roles.guard.js';
+import { Roles } from '../common/decorators/roles.decorator.js';
+import { UserRole } from '@prisma/client';
 
 @Controller('products')
 export class ProductsController {
@@ -42,11 +46,15 @@ export class ProductsController {
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.admin, UserRole.manager)
   create(@Body() dto: CreateProductDto) {
     return this.productsService.create(dto);
   }
 
   @Post(':id/stocks')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.admin, UserRole.manager)
   upsertStock(
     @Param('id') id: string,
     @Body() dto: UpsertStockDto,
@@ -55,11 +63,15 @@ export class ProductsController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.admin, UserRole.manager)
   update(@Param('id') id: string, @Body() dto: UpdateProductDto) {
     return this.productsService.update(+id, dto);
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.admin, UserRole.manager)
   remove(@Param('id') id: string) {
     return this.productsService.remove(+id);
   }
