@@ -52,7 +52,8 @@ export class OrdersController {
 
   // 4. PATCH /orders/:id
   @Patch(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.admin, UserRole.manager)
   updateOrder(
     @Param('id', ParseIntPipe) id: number, 
     @Body() updateOrderDto: UpdateOrderDto,
