@@ -22,6 +22,7 @@ export default function Header() {
 
     const isGuest = !loggedIn;
     const avatarSrc = currentUser?.avatar || avatarPlaceholder;
+    const isAdminOrManager = currentUser?.role === 'admin' || currentUser?.role === 'manager';
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isCartOpen, setIsCartOpen] = useState(false);
@@ -204,9 +205,9 @@ export default function Header() {
             </div>
 
             <nav className='header-nav'>
-                <a href='/products'>Products</a>
-                <a href='/download'>Download</a>
-                <a href='/dashboard'>Dashboard</a>
+                <Link to='/products'>Products</Link>
+                <Link to='/download'>Download</Link>
+                {isAdminOrManager && <Link to='/dashboard'>Dashboard</Link>}
             </nav>
 
             <div className='header-search' ref={searchContainerRef}>
@@ -331,9 +332,9 @@ export default function Header() {
                                 <Link to='/profile' role='menuitem' onClick={() => setIsAvatarOpen(false)}>
                                     Profile
                                 </Link>
-                                <Link to='/dashboard' role='menuitem' onClick={() => setIsAvatarOpen(false)}>
+                                {isAdminOrManager && (<Link to='/dashboard' role='menuitem' onClick={() => setIsAvatarOpen(false)}>
                                     Dashboard
-                                </Link>
+                                </Link>)}
                                 <button
                                     type='button'
                                     role='menuitem'

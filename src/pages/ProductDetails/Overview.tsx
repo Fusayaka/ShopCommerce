@@ -10,6 +10,7 @@ import { notifyCartChanged } from '@/utils/cartCount';
 import { productApi } from '@/api/productApi';
 import { toast } from 'react-toastify';
 import { useAuth } from '@/utils/auth';
+import { ConfirmModal } from '@/components';
 
 const COLORS = ['Red', 'Blue', 'Green'];
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
@@ -18,7 +19,8 @@ export default function Overview() {
     const {productId} = useParams<{ productId: string }>();
     const navigate = useNavigate();
 
-    const { user } = useAuth();
+    const { loggedIn, user } = useAuth();
+    const [pendingAction, setPendingAction] = useState<'cart' | 'buy' | null>(null);
 
     const [product, setProduct] = useState<Product | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -149,16 +151,43 @@ export default function Overview() {
         return added;
     }
 
-    const handleAddtoCart = async () => {
+    const executeAddtoCart = async () => {
         const added = await addSelectionToCart();
         if (added) toast.success("Added to cart!");
     };
 
-    const handleBuyNow = async () => {
+    const executeBuyNow = async () => {
         const added = await buyProducts();
         if (added) {
             navigate("/checkout");
         }
+    };
+
+    const handleAddtoCart = async () => {
+        if (!loggedIn){
+            setPendingAction('cart');
+            return;
+        }
+        await executeAddtoCart();
+    }
+
+    const handleBuyNow = async () => {
+        if (!loggedIn){
+            setPendingAction('buy');
+            return;
+        }
+        executeBuyNow();
+    }
+
+    const handleConfirmLogin = () => {
+        const isBuyNow = pendingAction === 'buy';
+        setPendingAction(null);
+
+        navigate('/login', {
+        state: { 
+            from: isBuyNow ? '/checkout' : location.pathname 
+        }
+        });
     };
 
     if (isLoading){
@@ -309,6 +338,21 @@ export default function Overview() {
                             </div>
                             <button className="detail-buy-now-btn" onClick={handleBuyNow} disabled={!selectedStock || outOfStock}>Buy Now</button>
                         </div>
+
+                        <ConfirmModal
+                            isOpen={pendingAction !== null}
+                            onClose={() => setPendingAction(null)}
+                            onConfirm={handleConfirmLogin}
+                            title="Login Required"
+                            content={
+                            pendingAction === 'buy'
+                                ? "You need to log in to proceed with direct checkout."
+                                : "You need to log in to add items to your shopping cart."
+                            }
+                            confirmText="Login"
+                            cancelText="Continue Browsing"
+                            variant="primary"
+                        />
                     </div>
                 </div>
             </section>

@@ -11,9 +11,11 @@ export type Size = 'S' | 'M' | 'L' | 'XL' | 'XXL';
 export type Color = 'Red' | 'Green' | 'Blue';
 export type OrderStatus = 'pending' | 'shipping' | 'processing' | 'cancelled' | "delivered";
 export type PaymentMethod = 'delivery' | 'bank' | 'card';
+export type Role = 'admin' | 'manager' | 'customer';
 
 export interface User {
     id: number;
+    role: Role; 
     name: string;
     email: string;
     avatar?: string;
