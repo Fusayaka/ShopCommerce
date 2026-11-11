@@ -5,6 +5,8 @@ export interface CreateOrderDto {
   paymentMethod: PaymentMethod;
   promoCode?: string | undefined;
   deliveryFee?: number;
+  address?: string;
+  contact?: string;
 }
 
 export interface UpdateOrderDto {
@@ -18,6 +20,10 @@ export const orderApi = {
   },
 
   getUserOrders() {
+    return axiosClient.get<Order[], Order[]>(`/orders/me`);
+  },
+
+  getAllOrders() {
     return axiosClient.get<Order[], Order[]>(`/orders`);
   },
 

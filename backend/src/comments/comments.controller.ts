@@ -1,16 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe, UseGuards, ForbiddenException } from '@nestjs/common';
 import { CommentsService } from './comments.service.js';
 import { CreateCommentDto } from './dto/create-comment.dto.js';
 import { UpdateCommentDto } from './dto/update-comment.dto.js';
 import { GetCommentQueryDto } from './dto/get-comment.dto.js';
 import { Public } from '../common/decorators/public.decorator.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard.js';
+import { type User } from '@prisma/client';
 
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   create(
     @CurrentUser('id') userId: number,
     @Body() createCommentDto: CreateCommentDto,
@@ -24,7 +27,8 @@ export class CommentsController {
     return this.commentsService.findAll(query);
   }
 
-  // Kiểm tra người dùng hiện tại có được đánh giá sản phẩm hay không.
+  // Check whether user can comment or not
+  @UseGuards(JwtAuthGuard)
   @Get('eligibility')
   checkEligibility(
     @CurrentUser('id') userId: number,
@@ -40,12 +44,21 @@ export class CommentsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
-    return this.commentsService.update(+id, updateCommentDto);
+  @UseGuards(JwtAuthGuard)
+  update(
+    @Param('id') id: string, 
+    @Body() updateCommentDto: UpdateCommentDto,
+    @CurrentUser('id') userId: number
+  ) {
+    return this.commentsService.update(+id, userId, updateCommentDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.commentsService.remove(+id);
+  remove(
+    @Param('id') id: string,
+    @CurrentUser() user: User
+  ) {
+    
+    return this.commentsService.remove(+id, user);
   }
 }

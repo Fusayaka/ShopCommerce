@@ -16,4 +16,14 @@ export class CreateOrderDto {
     @IsNumber()
     @Min(0)
     deliveryFee: number;
+
+    @IsOptional()
+    @IsString()
+    @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+    address?: string;
+
+    @IsOptional()
+    @IsString()
+    @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+    contact?: string;
 }

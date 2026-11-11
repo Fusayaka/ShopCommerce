@@ -9,11 +9,13 @@ export interface Paginated<T> {
 
 export type Size = 'S' | 'M' | 'L' | 'XL' | 'XXL';
 export type Color = 'Red' | 'Green' | 'Blue';
-export type OrderStatus = 'pending' | 'shipping' | 'processing' | 'cancelled' | "delivered";
+export type OrderStatus = 'pending' | 'redelivery' | 'shipping' | 'processing' | 'cancelled' | "delivered";
 export type PaymentMethod = 'delivery' | 'bank' | 'card';
+export type Role = 'admin' | 'manager' | 'customer';
 
 export interface User {
     id: number;
+    role: Role; 
     name: string;
     email: string;
     avatar?: string;
@@ -119,6 +121,9 @@ export interface Order {
     deliveryFee: number;
     total: number;
     paymentMethod: PaymentMethod;
+
+    address?: string;
+    contact?: string;
 
     promoCode?: string;
     createdAt?: string;

@@ -37,41 +37,44 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
     return items.find((item) => item.stockId === removingStockId) || null;
   }, [items, removingStockId]);
 
-  const fetchCart = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await cartApi.getCart();
-      const rawItems = res?.items || (res as any)?.data?.items || [];
-      const mapped: CheckoutLineItem[] = rawItems.map((item: CartItemResponse) => {
-        const unitPrice =
-          item.stock?.promotionPrice !== null && item.stock?.promotionPrice !== undefined
-            ? Number(item.stock.promotionPrice)
-            : Number(item.stock?.originalPrice || 0);
+  const mapCartItem = useCallback((item: CartItemResponse): CheckoutLineItem => {
+    const unitPrice =
+      item.stock?.promotionPrice !== null && item.stock?.promotionPrice !== undefined
+        ? Number(item.stock.promotionPrice)
+        : Number(item.stock?.originalPrice || 0);
 
-        return {
-          id: item.id,
-          stockId: item.stockId,
-          productId: item.stock?.productId || item.stockId,
-          title: item.stock?.product?.title || 'Unknown Product',
-          image: item.stock?.product?.image,
-          size: item.stock?.size,
-          color: item.stock?.color,
-          unitPrice,
-          quantity: item.quantity,
-        };
-      });
-
-      setItems(mapped);
-    } catch (err) {
-      console.error('Failed to load cart items:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [onDataLoaded]);
+    return {
+      id: item.id,
+      stockId: item.stockId,
+      productId: item.stock?.productId || item.stockId,
+      title: item.stock?.product?.title || 'Unknown Product',
+      image: item.stock?.product?.image,
+      size: item.stock?.size,
+      color: item.stock?.color,
+      unitPrice,
+      quantity: item.quantity,
+    };
+  }, []);
 
   useEffect(() => {
-    fetchCart();
-  }, [fetchCart]);
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const res = await cartApi.getCart();
+        if (cancelled) return;
+        setItems((res?.items ?? []).map(mapCartItem));
+      } catch (err) {
+        console.error('Failed to load cart items:', err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [mapCartItem]);
 
   const { totalQuantity, sumOfSubtotal } = useMemo(() => {
     return items.reduce(

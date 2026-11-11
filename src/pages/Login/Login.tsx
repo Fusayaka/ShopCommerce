@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './login.css'
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { setAuth, useAuth } from '@/utils/auth';
 import { loginApi } from '@/api/loginApi';
 
@@ -34,9 +34,11 @@ export default function Login(){
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     
     const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from || '/';
 
     const { loggedIn } = useAuth();
-    if (loggedIn) {navigate('/')};
+    if (loggedIn) {navigate(from, {replace: true})};
 
 
     // Đổi giữa Sign In / Sign Up: 2 form mờ chéo nhau (hiệu ứng ở login.css).
@@ -119,7 +121,7 @@ export default function Login(){
                 setAuth(token, me);
 
                 setName('');
-                navigate('/');
+                navigate(from, {replace: true});
             }
             else {
                 const response = await axios.post(
@@ -138,7 +140,7 @@ export default function Login(){
                 setIsLogin(true);
                 setPassword('');
                 setConfirmPassword('');
-                navigate('/');
+                navigate(from, {replace: true});
             }
         }
         catch (err: any) {

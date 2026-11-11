@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { orderApi } from '@/api/orderApi';
 import { promoApi } from '@/api/promoApi';
 import type { PaymentMethod } from '@/types';
+import { useAuth } from '@/utils/auth';
 import { notifyCartChanged } from '@/utils/cartCount';
 import promoIcon from '@/assets/promo-code.svg';
 import './payment.css';
@@ -21,6 +22,9 @@ const PAYMENT_METHODS: { id: PaymentMethod; label: string; description: string }
 
 export default function Payment({ subtotal, itemCount }: PaymentProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [address, setAddress] = useState<string>(user?.address ?? '');
+  const [contact, setContact] = useState<string>(user?.contact ?? '');
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>('delivery');
   const [isChangingMethod, setIsChangingMethod] = useState<boolean>(false);
   const [promoInput, setPromoInput] = useState<string>('');
@@ -48,8 +52,7 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
     if (!isAutoRevalidate) setPromoMessage(null);
 
     try {
-      const res = await promoApi.validateCode(codeToValidate, currentSubtotal);
-      const data = (res as any)?.data || res;
+      const data = await promoApi.validateCode(codeToValidate, currentSubtotal);
 
       if (data.isValid) {
         const discountVal = Number(data.discount || 0);
@@ -114,12 +117,27 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
       return;
     }
 
+    const trimmedAddress = address.trim();
+    const trimmedContact = contact.trim();
+
+    if (!trimmedAddress) {
+      toast.error('Please enter a delivery address.');
+      return;
+    }
+
+    if (!trimmedContact) {
+      toast.error('Please enter a contact number.');
+      return;
+    }
+
     setSubmitting(true);
     try {
       await orderApi.createOrder({
         paymentMethod: selectedMethod,
         deliveryFee,
         promoCode: appliedPromo || undefined,
+        address: trimmedAddress,
+        contact: trimmedContact,
       });
 
       notifyCartChanged();
@@ -139,6 +157,38 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
 
   return (
     <div className="checkout-payment-section">
+      <div className="checkout-shipping-box">
+        <p className="checkout-shipping-title">Delivery Details</p>
+
+        <div className="checkout-shipping-field">
+          <label htmlFor="shipping-address">Address</label>
+          <input
+            id="shipping-address"
+            type="text"
+            placeholder="Enter delivery address"
+            value={address}
+            maxLength={255}
+            onChange={(e) => setAddress(e.target.value)}
+          />
+        </div>
+
+        <div className="checkout-shipping-field">
+          <label htmlFor="shipping-contact">Contact</label>
+          <input
+            id="shipping-contact"
+            type="text"
+            placeholder="Enter contact number"
+            value={contact}
+            maxLength={20}
+            onChange={(e) => setContact(e.target.value)}
+          />
+        </div>
+
+        <p className="checkout-shipping-hint">
+          Prefilled from your profile — edit if this order ships elsewhere.
+        </p>
+      </div>
+
       <div className="payment-method-box">
         <div className="payment-method-left">
           <span className="payment-method-title">Payment Method</span>
