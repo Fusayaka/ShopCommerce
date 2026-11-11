@@ -39,20 +39,19 @@ export default function OrderBill({ items }: OrderBillProps) {
   useEffect(() => {
     if (!appliedCode) return;
 
-    if (subtotal === 0) {
-      setDiscount(0);
-      setAppliedCode(null);
-      setMessage(null);
-      return;
-    }
-
     const revalidatePromo = async () => {
+      if (subtotal === 0) {
+        setDiscount(0);
+        setAppliedCode(null);
+        setMessage(null);
+        return;
+      }
+
       try {
-        const res = await promoApi.validateCode(appliedCode, subtotal);
-        const data = (res as any)?.data || res;
+        const data = await promoApi.validateCode(appliedCode, subtotal);
 
         if (data.isValid) {
-          const newDiscount = Number(data.discount || data.discount || 0);
+          const newDiscount = Number(data.discount || 0);
           setDiscount(newDiscount);
           setMessage({
             text: `Discount saved: $${formatPrice(newDiscount)}`,
@@ -77,7 +76,7 @@ export default function OrderBill({ items }: OrderBillProps) {
     };
 
     revalidatePromo();
-  }, [subtotal]);
+  }, [subtotal, appliedCode]);
 
   const handlePromoCode = async () => {
     setMessage(null);
@@ -95,11 +94,10 @@ export default function OrderBill({ items }: OrderBillProps) {
 
     setValidatingPromo(true);
     try {
-      const res = await promoApi.validateCode(code, subtotal);
-      const data = (res as any)?.data || res;
+      const data = await promoApi.validateCode(code, subtotal);
 
       if (data.isValid) {
-        const discount = Number(data.discount || data.discount || 0);
+        const discount = Number(data.discount || 0);
         setDiscount(discount);
         setAppliedCode(code);
         setMessage({

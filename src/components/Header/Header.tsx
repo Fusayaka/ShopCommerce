@@ -13,6 +13,7 @@ import { cartApi, type MiniCartResponse } from '@/api/cartApi';
 import plhImg from '/images/cloth-placeholder.jpeg';
 import { loginApi } from '@/api/loginApi';
 import { productApi } from '@/api/productApi';
+import type { Product } from '@/types';
 
 const DEBOUNCE = 600;
 
@@ -33,7 +34,7 @@ export default function Header() {
     const [currentLang, setCurrentLang] = useState('vi');
     
     const [searchTerm, setSearchTerm] = useState("");
-    const [searchProducts, setSearchProducts] = useState<any[]>([]);
+    const [searchProducts, setSearchProducts] = useState<Product[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
 
@@ -81,15 +82,16 @@ export default function Header() {
 
     useEffect(() => {
         const query = searchTerm.trim();
-        if (!query) {
-            setSearchProducts([]);
-            setIsSearching(false);
-            setShowSuggestions(false);
-            return;
-        }
 
-        setIsSearching(true);
         const timer = setTimeout(async () => {
+            if (!query) {
+                setSearchProducts([]);
+                setIsSearching(false);
+                setShowSuggestions(false);
+                return;
+            }
+
+            setIsSearching(true);
             try {
                 const res = await productApi.getProducts({ search: query, limit: 10 });
                 const list = res?.data || [];
@@ -101,7 +103,7 @@ export default function Header() {
             } finally {
                 setIsSearching(false);
             }
-        }, DEBOUNCE);
+        }, query ? DEBOUNCE : 0);
 
         return () => clearTimeout(timer);
     }, [searchTerm]);
@@ -373,7 +375,7 @@ export default function Header() {
                         <Link to={'/'} onClick={toggleMenu}>Home</Link>
                         <Link to={'/products'} onClick={toggleMenu}>Products</Link>
                         <Link to={'/download'} onClick={toggleMenu}>Download</Link>
-                        <Link to={'/dashboard'} onClick={toggleMenu}>Dashboard</Link>
+                        {isAdminOrManager && <Link to='/dashboard' onClick={toggleMenu}>Dashboard</Link>}
                         {isGuest && <Link to={'/login'} onClick={toggleMenu}>Login</Link>}
                     </nav>
                 </div>
