@@ -48,12 +48,13 @@ BEGIN
     END IF;
 
     --      Allowed transitions:
-    --   pending                  -> processing | cancelled
+    --   pending, re-delivery     -> processing | cancelled
     --   processing               -> shipping | cancelled
     --   shipping                 -> delivered | cancelled
     --   delivered, cancelled     -> Terminal states
     IF NOT (
         (OLD.status = 'pending'    AND NEW.status IN ('processing', 'cancelled')) OR
+        (OLD.status = 'redelivery' AND NEW.status IN ('processing', 'cancelled'))   OR
         (OLD.status = 'processing' AND NEW.status IN ('shipping', 'cancelled'))   OR
         (OLD.status = 'shipping'   AND NEW.status IN ('delivered', 'cancelled'))
     ) THEN
