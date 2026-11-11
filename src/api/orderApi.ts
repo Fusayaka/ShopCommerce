@@ -5,6 +5,8 @@ export interface CreateOrderDto {
   paymentMethod: PaymentMethod;
   promoCode?: string | undefined;
   deliveryFee?: number;
+  address?: string;
+  contact?: string;
 }
 
 export interface UpdateOrderDto {

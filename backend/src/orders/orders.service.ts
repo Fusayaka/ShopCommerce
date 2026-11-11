@@ -140,6 +140,8 @@ export class OrdersService {
           subtotal,
           discount,
           deliveryFee,
+          address: dto.address ?? user.address,
+          contact: dto.contact ?? user.contact,
           promoCode: dto.promoCode || null,
           paymentMethod: dto.paymentMethod,
           items: {
