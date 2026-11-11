@@ -2,7 +2,9 @@ import { Injectable, BadRequestException, NotFoundException, ForbiddenException 
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { UpdateOrderDto } from './dto/update-order.dto.js';
-import { Prisma, UserRole } from '@prisma/client';
+import { CreateRedeliveryOrderDto } from './dto/create-redelivery-order.dto.js';
+import { UpdateRedeliveryOrderDto } from './dto/update-redelivery-order.dto.js';
+import { Prisma, OrderStatus, type User } from '@prisma/client';
 
 interface OrderItemInput {
   stock: {
@@ -231,14 +233,17 @@ export class OrdersService {
     };
   }
 
-  async updateOrder(orderId: number, dto: UpdateOrderDto, userRole: UserRole) {
-    // TODO: check role and status flow
+  async updateOrder(orderId: number, dto: UpdateOrderDto) {
     const existingOrder = await this.prisma.order.findUnique({
       where: { id: orderId },
     });
 
     if (!existingOrder) {
       throw new NotFoundException(`Not found Order ID ${orderId}!`);
+    }
+
+    if (dto.status && dto.status !== existingOrder.status) {
+      this.assertValidRedeliveryTransition(existingOrder.status, dto.status);
     }
 
     const updatedOrder = await this.prisma.order.update({
@@ -254,5 +259,141 @@ export class OrdersService {
       message: 'Update succeessfully!',
       data: updatedOrder,
     };
+  }
+
+  async createRedelivery(user: User, orderId: number, dto: CreateRedeliveryOrderDto) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        user: {
+          select: { address: true, contact: true },
+        },
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Not found Order ID ${orderId}!`);
+    }
+
+    if (order.status === 'cancelled') {
+      throw new BadRequestException(
+        `Cannot create a redelivery for an order with status "${order.status}"!`,
+      );
+    }
+
+    const redelivery = await this.prisma.redeliveryOrder.create({
+      data: {
+        order: { connect: { id: orderId } },
+        createdBy: { connect: { id: user.id } },
+        reason: dto.reason,
+        note: dto.note ?? null,
+        address: dto.address ?? order.address ?? order.user.address,
+        contact: dto.contact ?? order.contact ?? order.user.contact,
+        total: order.total,
+        paymentMethod: dto.paymentMethod ?? order.paymentMethod ?? 'delivery',
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Redelivery order created successfully!',
+      data: redelivery,
+    };
+  }
+
+  async getOrderRedeliveries(userId: number, orderId: number, isAdminOrManager: boolean) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Not found Order ID ${orderId}!`);
+    }
+
+    if (!isAdminOrManager && order.userId !== userId) {
+      throw new ForbiddenException("User is not allowed to see another user's redelivery orders!");
+    }
+
+    const redeliveries = await this.prisma.redeliveryOrder.findMany({
+      where: { orderId },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return {
+      success: true,
+      data: redeliveries,
+    };
+  }
+
+  async getRedeliveryById(userId: number, redeliveryId: number, isAdminOrManager: boolean) {
+    const redelivery = await this.prisma.redeliveryOrder.findUnique({
+      where: { id: redeliveryId },
+      include: {
+        order: {
+          include: { items: true },
+        },
+        createdBy: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    });
+
+    if (!redelivery) {
+      throw new NotFoundException(`Not found Redelivery Order ID ${redeliveryId}!`);
+    }
+
+    if (!isAdminOrManager && redelivery.order.userId !== userId) {
+      throw new ForbiddenException("User is not allowed to see another user's redelivery order!");
+    }
+
+    return {
+      success: true,
+      data: redelivery,
+    };
+  }
+
+  async updateRedelivery(redeliveryId: number, dto: UpdateRedeliveryOrderDto) {
+    const existingOrder = await this.prisma.redeliveryOrder.findUnique({
+      where: { id: redeliveryId },
+    });
+
+    if (!existingOrder) {
+      throw new NotFoundException(`Not found Redelivery Order ID ${redeliveryId}!`);
+    }
+
+    if (dto.status && dto.status !== existingOrder.status) {
+      this.assertValidRedeliveryTransition(existingOrder.status, dto.status);
+    }
+
+    const updated = await this.prisma.redeliveryOrder.update({
+      where: { id: redeliveryId },
+      data: {
+        ...dto,
+        updatedAt: new Date(),
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Redelivery order updated successfully!',
+      data: updated,
+    };
+  }
+
+  private assertValidRedeliveryTransition(from: OrderStatus, to: OrderStatus) {
+    const allowed: Record<OrderStatus, OrderStatus[]> = {
+      redelivery: ['processing', 'cancelled'],
+      processing: ['shipping', 'cancelled'],
+      shipping: ['delivered', 'cancelled'],
+      pending: ['processing', 'cancelled'],
+      delivered: [],
+      cancelled: [],
+    };
+
+    if (!allowed[from]?.includes(to)) {
+      throw new BadRequestException(
+        `Invalid redelivery status transition: ${from} -> ${to}`,
+      );
+    }
   }
 }

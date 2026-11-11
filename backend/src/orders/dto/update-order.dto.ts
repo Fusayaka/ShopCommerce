@@ -1,7 +1,7 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateOrderDto } from './create-order.dto.js';
 import { IsEnum, IsOptional } from 'class-validator';
-import { $Enums, OrderStatus, PaymentMethod } from '@prisma/client';
+import { OrderStatus, PaymentMethod } from '@prisma/client';
 
 export class UpdateOrderDto extends PartialType(CreateOrderDto) {
   @IsOptional()
