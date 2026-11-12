@@ -22,6 +22,31 @@ export interface PriceRange {
     max: number;
 }
 
+export interface UpsertStockDto {
+    size: Size;
+    color: Color;
+    originalPrice?: number;
+    promotionPrice?: number;
+    stock?: number;
+}
+
+export interface CreateProductDto {
+    title: string;
+    description?: string;
+    image?: string;
+    stocks?: UpsertStockDto[];
+    rating?: number;
+    numReviews?: number;
+}
+
+export type UpdateProductDto = Partial<CreateProductDto>;
+
+export interface UpdateStockDto {
+    stock?: number;
+    originalPrice?: number;
+    promotionPrice?: number | null;
+}
+
 export const productApi = {
     getProducts(params?: GetProductsQuery) {
         return axiosClient.get<Paginated<Product>, Paginated<Product>>(`/products`, {
@@ -45,6 +70,41 @@ export const productApi = {
         return axiosClient.get<ProductStock | null, ProductStock | null>(
             `/products/${productId}/stock`,
             { params },
+        );
+    },
+
+    uploadImage(file: File) {
+        const formData = new FormData();
+        formData.append('file', file);
+        return axiosClient.post<{ url: string }, { url: string }>(`/products/image`, formData);
+    },
+
+    createProduct(dto: CreateProductDto) {
+        return axiosClient.post<Product, Product>(`/products`, dto);
+    },
+
+    updateProduct(productId: number, dto: UpdateProductDto) {
+        return axiosClient.patch<Product, Product>(`/products/${productId}`, dto);
+    },
+
+    updateProductStock(productId: number, dto: UpsertStockDto) {
+        return axiosClient.post<ProductStock, ProductStock>(`/products/${productId}/stocks`, dto);
+    },
+
+    updateStock(productId: number, stockId: number, dto: UpdateStockDto) {
+        return axiosClient.patch<ProductStock, ProductStock>(
+            `/products/${productId}/stocks/${stockId}`,
+            dto,
+        );
+    },
+
+    deleteProduct(productId: number) {
+        return axiosClient.delete<{ message?: string }, { message?: string }>(`/products/${productId}`);
+    },
+
+    deleteVariant(productId: number, stockId: number) {
+        return axiosClient.delete<ProductStock, ProductStock>(
+            `/products/${productId}/${stockId}`,
         );
     },
 };

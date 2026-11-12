@@ -2,14 +2,33 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CreateProductDto } from './dto/create-product.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
 import { UpsertStockDto } from './dto/upsert-stock.dto.js';
+import { UpdateStockDto } from './dto/update-stock.dto.js';
 import { GetStockDto } from './dto/get-stock.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { GetProductsQueryDto } from './dto/get-product.dto.js';
 import { Prisma } from '@prisma/client';
+import { CloudinaryService, UploadableFile } from '../cloudinary/cloudinary.service.js';
+
+const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
 
 @Injectable()
 export class ProductsService {
-  constructor(private readonly prisma: PrismaService){}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cloudinary: CloudinaryService,
+  ){}
+
+  async uploadImage(file?: UploadableFile & { size?: number }) {
+    if (!file) throw new BadRequestException('No image file provided');
+    if (!file.mimetype?.startsWith('image/')) {
+      throw new BadRequestException('Only image files are allowed');
+    }
+    if (file.size !== undefined && file.size > MAX_IMAGE_BYTES) {
+      throw new BadRequestException('Image must be 3MB or smaller');
+    }
+    const url = await this.cloudinary.uploadImage(file, 'products');
+    return { url };
+  }
 
   create(createProductDto: CreateProductDto) {
     const { stocks, ...productData } = createProductDto;
@@ -216,6 +235,30 @@ export class ProductsService {
     throw new BadRequestException('Provide price fields or stock to update');
   }
 
+  async updateStock(productId: number, stockId: number, dto: UpdateStockDto) {
+    const existing = await this.prisma.productStock.findUnique({ where: { id: stockId } });
+    if (!existing || existing.productId !== productId) {
+      throw new NotFoundException('Stock variant not found for this product');
+    }
+
+    const { stock, originalPrice, promotionPrice } = dto;
+
+    const nextPromo =
+      promotionPrice === undefined
+        ? existing.promotionPrice?.toNumber()
+        : (promotionPrice ?? undefined);
+    this.assertValidPromotion(originalPrice ?? Number(existing.originalPrice), nextPromo);
+
+    return this.prisma.productStock.update({
+      where: { id: stockId },
+      data: {
+        ...(stock !== undefined ? { stock } : {}),
+        ...(originalPrice !== undefined ? { originalPrice } : {}),
+        ...(promotionPrice !== undefined ? { promotionPrice } : {}),
+      },
+    });
+  }
+
   private assertValidPromotion(originalPrice: number, promotionPrice?: number) {
     if (promotionPrice !== undefined && promotionPrice > originalPrice) {
       throw new BadRequestException(
@@ -284,13 +327,25 @@ export class ProductsService {
     };
   }
 
-  async remove(id: number) {
+  async removeProduct(id: number) {
     const existing = await this.prisma.product.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Can not remove: Product not found');
 
     return this.prisma.product.delete({
       where: {id}
     });
+  }
+
+  async removeVariant(id: number, stockId: number){
+    const existingProduct = await this.prisma.product.findUnique({ where: { id } });
+    if (!existingProduct) throw new NotFoundException('Can not remove: Product not found');
+    
+    const existingVariant = await this.prisma.productStock.findUnique({ where: {id: stockId}});
+    if (!existingVariant) throw new NotFoundException('Can not remove: Variant not found');
+
+    return this.prisma.productStock.delete({
+      where: {id: stockId}
+    })
   }
 
   private niceFloor(val: number): number {

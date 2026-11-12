@@ -7,6 +7,7 @@ import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Checkout from "./pages/Checkout";
+import Dashboard from "./pages/Dashboard";
 
 
 export const router = createBrowserRouter([
@@ -36,10 +37,6 @@ export const router = createBrowserRouter([
                 element: <Cart/>
             },
             {
-                path: "dashboard",
-                element:<h2> This is Dashboard Page</h2>
-            },
-            {
                 path: "download",
                 element:<h2> This is Download Page</h2>
             },
@@ -60,5 +57,9 @@ export const router = createBrowserRouter([
     {
         path: "*",
         element: <h2>Page Not Found</h2> 
-    }
+    },
+    {
+        path: "dashboard",
+        element: <Dashboard/>
+    },
 ])
