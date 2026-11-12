@@ -404,7 +404,7 @@ export default function StockEditor({ productId, productTitle, onClose, onSaved 
                         </button>
                     </div>
                     {hasErrors(newVariantErrors) && (
-                        <ul className="mt-1 space-y-0.5 text-xs text-red-600">
+                        <ul className="mt-1 space-y-0.5 text-xs text-red-600 list-none">
                             {newVariantErrors.stock && <li>{newVariantErrors.stock}</li>}
                             {newVariantErrors.originalPrice && <li>{newVariantErrors.originalPrice}</li>}
                             {newVariantErrors.promotionPrice && <li>{newVariantErrors.promotionPrice}</li>}

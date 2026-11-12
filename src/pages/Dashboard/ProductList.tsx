@@ -1,25 +1,32 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { productApi } from '@/api/productApi';
 import type { Product } from '@/types';
 import plhImg from '/images/cloth-placeholder.jpeg';
 import trashIcon from '@/assets/trash-icon.svg';
-import { ConfirmModal } from '@/components';
+import { ConfirmModal, Pagination } from '@/components';
 import { toast } from 'react-toastify';
 import { ProductForm, type ProductFormData } from './Form';
 import StockEditor from './StockEditor';
 
+interface PriceRange {
+    minPrice: number;
+    maxPrice: number;
+}
 function formatPrice(value?: number) {
     if (value === undefined || value === null) return '—';
-    return `$${Number(value).toLocaleString('en-US', {
+    return `${Number(value).toLocaleString('en-US', {
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     })}`;
 }
 
-function displayPrice(product: Product): number | undefined {
+function displayPrice(product: Product): PriceRange | undefined {
     if (!product.stocks || product.stocks.length === 0) return undefined;
     const prices = product.stocks.map((s) => Number(s.promotionPrice ?? s.originalPrice));
-    return prices.length ? Math.min(...prices) : undefined;
+    return prices.length ? {
+        minPrice: Math.min(...prices),
+        maxPrice: Math.max(...prices)
+    } : undefined;
 }
 
 function totalStock(product: Product) {
@@ -49,18 +56,6 @@ function BoxIcon() {
 }
 
 const LIMIT = 10;
-
-function getPageNumbers(current: number, last: number): (number | '…')[] {
-    if (last <= 7) return Array.from({ length: last }, (_, i) => i + 1);
-    const pages: (number | '…')[] = [1];
-    const start = Math.max(2, current - 1);
-    const end = Math.min(last - 1, current + 1);
-    if (start > 2) pages.push('…');
-    for (let i = start; i <= end; i++) pages.push(i);
-    if (end < last - 1) pages.push('…');
-    pages.push(last);
-    return pages;
-}
 
 export default function ProductList() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -200,7 +195,6 @@ export default function ProductList() {
         }
     };
 
-    const pageNumbers = useMemo(() => getPageNumbers(page, lastPage), [page, lastPage]);
 
     return (
         <section className="flex flex-1 flex-col gap-5">
@@ -244,7 +238,7 @@ export default function ProductList() {
                                 <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
                                     <th className="px-4 py-3 font-semibold">Product</th>
                                     <th className="px-4 py-3 font-semibold">Description</th>
-                                    <th className="px-4 py-3 font-semibold">Price</th>
+                                    <th className="px-4 py-3 font-semibold">Price ($)</th>
                                     <th className="px-4 py-3 font-semibold">Rating</th>
                                     <th className="px-4 py-3 font-semibold">Stock</th>
                                     <th className="px-4 py-3 font-semibold">Actions</th>
@@ -253,6 +247,14 @@ export default function ProductList() {
                             <tbody>
                                 {products.map((product) => {
                                     const stock = totalStock(product);
+                                    const prices = displayPrice(product);
+                                    let priceString;
+                                    if (!prices) {priceString = '-';}
+                                    else 
+                                        {
+                                            priceString = (prices.minPrice === prices.maxPrice) ? `${formatPrice(prices.minPrice)}`
+                                             : `${formatPrice(prices.minPrice)} - ${formatPrice(prices.maxPrice)}`;
+                                        }
                                     return (
                                         <tr
                                             key={product.id}
@@ -275,7 +277,7 @@ export default function ProductList() {
                                                 {product.description}
                                             </td>
                                             <td className="px-4 py-3 font-medium text-slate-700">
-                                                {formatPrice(displayPrice(product))}
+                                                {priceString}
                                             </td>
                                             <td className="px-4 py-3 text-slate-700">
                                                 <span className="inline-flex items-center gap-1">
@@ -293,7 +295,7 @@ export default function ProductList() {
                                                                 : 'bg-red-50 text-red-700'
                                                         }`}
                                                     >
-                                                        {stock > 0 ? `${stock} in stock` : 'Out of stock'}
+                                                        {stock > 0 ? `${stock}` : '0'}
                                                     </span>
                                                 )}
                                             </td>
@@ -336,49 +338,11 @@ export default function ProductList() {
                     </div>
 
                     {lastPage > 1 && (
-                        <div className="flex flex-wrap items-center h-15 justify-between gap-3 border-t border-slate-200 px-4 py-3 text-sm">
+                        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 px-4 py-3 text-sm">
                             <span className="text-slate-500">
                                 Page {page} of {lastPage}
                             </span>
-                            <div className="flex items-center gap-1">
-                                <button
-                                    type="button"
-                                    onClick={() => goToPage(page - 1)}
-                                    disabled={page <= 1}
-                                    className="cursor-pointer rounded-md border border-slate-200 bg-white px-2 py-2 text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-                                >
-                                    Prev
-                                </button>
-                                {pageNumbers.map((p, i) =>
-                                    p === '…' ? (
-                                        <span key={`ellipsis-${i}`} className="px-2 text-slate-400">
-                                            …
-                                        </span>
-                                    ) : (
-                                        <button
-                                            key={p}
-                                            type="button"
-                                            onClick={() => goToPage(p)}
-                                            aria-current={p === page ? 'page' : undefined}
-                                            className={`min-w-8 cursor-pointer rounded-md border px-2 py-2 transition-colors ${
-                                                p === page
-                                                    ? 'border-slate-900 bg-slate-900 text-white'
-                                                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                                            }`}
-                                        >
-                                            {p}
-                                        </button>
-                                    )
-                                )}
-                                <button
-                                    type="button"
-                                    onClick={() => goToPage(page + 1)}
-                                    disabled={page >= lastPage}
-                                    className="cursor-pointer rounded-md border border-slate-200 bg-white px-2 py-2 text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-                                >
-                                    Next
-                                </button>
-                            </div>
+                            <Pagination page={page} totalPages={lastPage} onPageChange={goToPage} />
                         </div>
                     )}
                     </>
