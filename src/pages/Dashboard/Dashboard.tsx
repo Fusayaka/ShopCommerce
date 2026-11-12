@@ -1,17 +1,27 @@
 import './tailwind.css';
 import Sidebar from './Sidebar';
 import MainContent from './MainContent';
-import { useState } from 'react';
 import { useAuth } from '@/utils/auth';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
 
 export type DashboardTab = 'product' | 'promotion' | 'order' | 'user';
+
+const DASHBOARD_TABS: DashboardTab[] = ['product', 'promotion', 'order', 'user'];
 
 export default function Dashboard() {
     const location = useLocation();
     const from = location.state?.from || '/';
 
-    const [activeTab, setActiveTab] = useState<DashboardTab>('product');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const tabParam = searchParams.get('tab');
+    const activeTab: DashboardTab = DASHBOARD_TABS.includes(tabParam as DashboardTab)
+        ? (tabParam as DashboardTab)
+        : 'product';
+
+    const setActiveTab = (tab: DashboardTab) => {
+        setSearchParams({tab});
+    };
+
     const { loggedIn, user } = useAuth();
 
     if (!loggedIn) return <Navigate to="/login" replace />;

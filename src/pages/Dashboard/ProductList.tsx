@@ -1,17 +1,71 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { productApi } from '@/api/productApi';
 import type { Product } from '@/types';
 import plhImg from '/images/cloth-placeholder.jpeg';
 import trashIcon from '@/assets/trash-icon.svg';
+import upArrow from '@/assets/up-arrow.svg';
+import downArrow from '@/assets/down-arrow.svg';
+import filterMenu from '@/assets/filter.svg';
 import { ConfirmModal, Pagination } from '@/components';
 import { toast } from 'react-toastify';
 import { ProductForm, type ProductFormData } from './Form';
 import StockEditor from './StockEditor';
+import '../ProductList/filter.css';
+import { useSearchParams } from 'react-router-dom';
+
+interface DualPriceRangeProps {
+    minPrice: number;
+    maxPrice: number;
+    minLimit: number;
+    maxLimit: number;
+    onMinChange: (value: number) => void;
+    onMaxChange: (value: number) => void;
+}
+
+function DualPriceRange({ minPrice, maxPrice, minLimit, maxLimit, onMinChange, onMaxChange }: DualPriceRangeProps) {
+    const span = maxLimit - minLimit || 1;
+    const minPercent = ((minPrice - minLimit) / span) * 100;
+    const maxPercent = ((maxPrice - minLimit) / span) * 100;
+    const minPos = `calc(${minPercent}% + ${9 - minPercent * 0.18}px)`;
+    const maxPos = `calc(${maxPercent}% + ${9 - maxPercent * 0.18}px)`;
+
+    return (
+        <div className="dual-range-container">
+            <div className="price-range-values">
+                <span style={{ left: minPos }}>${minPrice}</span>
+                <span style={{ left: maxPos }}>${maxPrice}</span>
+            </div>
+            <div
+                className="price-slider-track-wrapper"
+                style={{ '--min-pos': minPos, '--max-pos': maxPos } as React.CSSProperties}
+            >
+                <div className="price-slider-active-range"></div>
+                <input
+                    type="range"
+                    min={minLimit}
+                    max={maxLimit}
+                    value={minPrice}
+                    onChange={(e) => onMinChange(Number(e.target.value))}
+                    className="price-range-input min-input"
+                />
+                <input
+                    type="range"
+                    min={minLimit}
+                    max={maxLimit}
+                    value={maxPrice}
+                    onChange={(e) => onMaxChange(Number(e.target.value))}
+                    className="price-range-input max-input"
+                />
+            </div>
+        </div>
+    );
+}
 
 interface PriceRange {
     minPrice: number;
     maxPrice: number;
 }
+
 function formatPrice(value?: number) {
     if (value === undefined || value === null) return '—';
     return `${Number(value).toLocaleString('en-US', {
@@ -58,12 +112,27 @@ function BoxIcon() {
 const LIMIT = 10;
 
 export default function ProductList() {
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // The applied query lives in the URL (?search=&minPrice=&maxPrice=&hasDiscount=&sort=&page=),
+    // so it's shareable and survives refresh. The `tab` param is preserved by cloning.
+    const page = Math.max(1, Number(searchParams.get('page')) || 1);
+    const qSearch = searchParams.get('search') ?? '';
+    const qMin = searchParams.get('minPrice');
+    const qMax = searchParams.get('maxPrice');
+    const qDiscount = searchParams.get('hasDiscount') === 'true';
+    const qSort = searchParams.get('sort') || 'latest';
+
+    const updateParams = (mutate: (p: URLSearchParams) => void) => {
+        const params = new URLSearchParams(searchParams);
+        mutate(params);
+        setSearchParams(params);
+    };
+
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [search, setSearch] = useState<string>('');
-    const [debouncedSearch, setDebouncedSearch] = useState<string>('');
-    const [page, setPage] = useState<number>(1);
+    const [search, setSearch] = useState<string>(qSearch);
     const [lastPage, setLastPage] = useState<number>(1);
     const [total, setTotal] = useState<number>(0);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -75,24 +144,51 @@ export default function ProductList() {
     const [submitting, setSubmitting] = useState<boolean>(false);
     const [stockProduct, setStockProduct] = useState<Product | null>(null);
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setDebouncedSearch(search.trim());
-            setPage(1);
-        }, 400);
-        return () => clearTimeout(timer);
-    }, [search]);
+    const [minLimit, setMinLimit] = useState<number>(0);
+    const [maxLimit, setMaxLimit] = useState<number>(500);
+    const [minPrice, setMinPrice] = useState<number>(qMin ? Number(qMin) : 0);
+    const [maxPrice, setMaxPrice] = useState<number>(qMax ? Number(qMax) : 500);
+    const [discountDraft, setDiscountDraft] = useState<boolean>(qDiscount);
+    const [sortDraft, setSortDraft] = useState<string>(qSort);
+    const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
+    const [isPriceOpen, setIsPriceOpen] = useState<boolean>(true);
+    const [isDiscountOpen, setIsDiscountOpen] = useState<boolean>(true);
+    const [isSortOpen, setIsSortOpen] = useState<boolean>(true);
+
+    const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
         let cancelled = false;
+        productApi
+            .getRoundRange()
+            .then(({ min, max }) => {
+                if (cancelled) return;
+                setMinLimit(min);
+                setMaxLimit(max);
+                setMinPrice((prev) => (prev === 0 ? min : prev));
+                setMaxPrice((prev) => (prev === 500 ? max : prev));
+            })
+            .catch((err) => console.error('Error loading price range:', err));
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    useEffect(() => {
+        let cancelled = false;
+        const min = searchParams.get('minPrice');
+        const max = searchParams.get('maxPrice');
 
         (async () => {
             try {
                 const res = await productApi.getProducts({
-                    page,
+                    page: Math.max(1, Number(searchParams.get('page')) || 1),
                     limit: LIMIT,
-                    sortBy: 'latest',
-                    search: debouncedSearch || undefined,
+                    sortBy: searchParams.get('sort') || 'latest',
+                    search: searchParams.get('search') || undefined,
+                    minPrice: min ? Number(min) : undefined,
+                    maxPrice: max ? Number(max) : undefined,
+                    hasDiscount: searchParams.get('hasDiscount') === 'true' || undefined,
                 });
                 if (cancelled) return;
                 setProducts(res?.data ?? []);
@@ -110,13 +206,60 @@ export default function ProductList() {
         return () => {
             cancelled = true;
         };
-    }, [page, debouncedSearch, reloadToken]);
+    }, [searchParams, reloadToken]);
+
+    const onSearchChange = (value: string) => {
+        setSearch(value);
+        if (searchTimer.current) clearTimeout(searchTimer.current);
+        searchTimer.current = setTimeout(() => {
+            updateParams((p) => {
+                const v = value.trim();
+                if (v) p.set('search', v);
+                else p.delete('search');
+                p.delete('page');
+            });
+        }, 400);
+    };
 
     const goToPage = (p: number) => {
         if (p < 1 || p > lastPage || p === page || loading) return;
         setLoading(true);
-        setPage(p);
+        updateParams((params) => {
+            if (p <= 1) params.delete('page');
+            else params.set('page', String(p));
+        });
     };
+
+    const applyFilters = () => {
+        updateParams((p) => {
+            if (minPrice > minLimit) p.set('minPrice', String(minPrice));
+            else p.delete('minPrice');
+            if (maxPrice < maxLimit) p.set('maxPrice', String(maxPrice));
+            else p.delete('maxPrice');
+            if (discountDraft) p.set('hasDiscount', 'true');
+            else p.delete('hasDiscount');
+            if (sortDraft && sortDraft !== 'latest') p.set('sort', sortDraft);
+            else p.delete('sort');
+            p.delete('page');
+        });
+    };
+
+    const clearFilters = () => {
+        setMinPrice(minLimit);
+        setMaxPrice(maxLimit);
+        setDiscountDraft(false);
+        setSortDraft('latest');
+        updateParams((p) => {
+            p.delete('minPrice');
+            p.delete('maxPrice');
+            p.delete('hasDiscount');
+            p.delete('sort');
+            p.delete('page');
+        });
+    };
+
+    const hasActiveFilters =
+        qMin !== null || qMax !== null || qDiscount || qSort !== 'latest';
 
     const openCreateForm = () => {
         setEditingProduct(null);
@@ -151,7 +294,7 @@ export default function ProductList() {
             } else {
                 await productApi.createProduct(payload);
                 toast.success('Product created successfully');
-                setPage(1);
+                updateParams((p) => p.delete('page'));
             }
             setFormOpen(false);
             setEditingProduct(null);
@@ -184,7 +327,11 @@ export default function ProductList() {
             setShowConfirmModal(false);
             setSelectedProduct(null);
             if (products.length === 1 && page > 1) {
-                setPage(page - 1);
+                updateParams((p) => {
+                    const prev = page - 1;
+                    if (prev <= 1) p.delete('page');
+                    else p.set('page', String(prev));
+                });
             } else {
                 setReloadToken((t) => t + 1);
             }
@@ -198,6 +345,7 @@ export default function ProductList() {
 
     return (
         <section className="flex flex-1 flex-col gap-5">
+            <div className="relative">
             <header className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900 pl-4">Products</h1>
@@ -209,10 +357,23 @@ export default function ProductList() {
                     <input
                         type="text"
                         value={search}
-                        onChange={(e) => setSearch(e.target.value)}
+                        onChange={(e) => onSearchChange(e.target.value)}
                         placeholder="Search by name…"
                         className="w-56 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-slate-900"
                     />
+                    <button
+                        type="button"
+                        onClick={() => setFiltersOpen((o) => !o)}
+                        aria-expanded={filtersOpen}
+                        className={`inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
+                            filtersOpen || hasActiveFilters
+                                ? 'border-slate-900 bg-slate-900 text-white'
+                                : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
+                        }`}
+                    >
+                        Filters
+                        <span className="text-xs">{filtersOpen ? '▲' : '▼'}</span>
+                    </button>
                     <button
                         type="button"
                         onClick={openCreateForm}
@@ -222,6 +383,105 @@ export default function ProductList() {
                     </button>
                 </div>
             </header>
+
+            {filtersOpen && (
+                <div className="absolute right-0 top-full z-[30] -mt-10 flex w-full justify-end">
+                    <div className="filter-card shadow-xl" style={{ width: 340, maxWidth: '100%' }}>
+                        <div className="filter-header">
+                            <h3>Filters</h3>
+                            <img src={filterMenu} alt="" className="filter-main-icon" />
+                        </div>
+
+                        <hr className="filter-divider" />
+
+                        <div className="filter-group">
+                            <div className="filter-group-header" onClick={() => setIsPriceOpen(!isPriceOpen)}>
+                                <span>Price Range</span>
+                                <img src={isPriceOpen ? upArrow : downArrow} alt="toggle" className="filter-arrow-icon" />
+                            </div>
+                            {isPriceOpen && (
+                                <DualPriceRange
+                                    minPrice={minPrice}
+                                    maxPrice={maxPrice}
+                                    minLimit={minLimit}
+                                    maxLimit={maxLimit}
+                                    onMinChange={(val) => { if (val <= maxPrice) setMinPrice(val); }}
+                                    onMaxChange={(val) => { if (val >= minPrice) setMaxPrice(val); }}
+                                />
+                            )}
+                        </div>
+
+                        <hr className="filter-divider" />
+
+                        <div className="filter-group">
+                            <div className="filter-group-header" onClick={() => setIsDiscountOpen(!isDiscountOpen)}>
+                                <span>Only discount</span>
+                                <img src={isDiscountOpen ? upArrow : downArrow} alt="toggle" className="filter-arrow-icon" />
+                            </div>
+                            {isDiscountOpen && (
+                                <label className="filter-switch">
+                                    <input
+                                        type="checkbox"
+                                        checked={discountDraft}
+                                        onChange={(e) => setDiscountDraft(e.target.checked)}
+                                    />
+                                    <span className="filter-slider"></span>
+                                </label>
+                            )}
+                        </div>
+
+                        <hr className="filter-divider" />
+
+                        <div className="filter-group">
+                            <div className="filter-group-header" onClick={() => setIsSortOpen(!isSortOpen)}>
+                                <span>Sort by</span>
+                                <img src={isSortOpen ? upArrow : downArrow} alt="toggle" className="filter-arrow-icon" />
+                            </div>
+                            {isSortOpen && (
+                                <div className="filter-select-wrapper">
+                                    <select
+                                        value={sortDraft}
+                                        onChange={(e) => setSortDraft(e.target.value)}
+                                        className="filter-select"
+                                    >
+                                        <option value="latest">Latest</option>
+                                        <option value="rating-desc">Rating: High → Low</option>
+                                        <option value="rating-asc">Rating: Low → High</option>
+                                        <option value="price-asc">Price: Low → High</option>
+                                        <option value="price-desc">Price: High → Low</option>
+                                        <option value="title-asc">Name: A → Z</option>
+                                        <option value="title-desc">Name: Z → A</option>
+                                    </select>
+                                </div>
+                            )}
+                        </div>
+
+                        <button className="filter-apply-btn" onClick={applyFilters}>
+                            Apply Filter
+                        </button>
+                        {hasActiveFilters && (
+                            <button
+                                type="button"
+                                onClick={clearFilters}
+                                style={{
+                                    width: '100%',
+                                    marginTop: 10,
+                                    background: 'transparent',
+                                    border: '1px solid #d1d1d1',
+                                    borderRadius: 24,
+                                    padding: 10,
+                                    cursor: 'pointer',
+                                    fontSize: 14,
+                                    color: '#555',
+                                }}
+                            >
+                                Clear
+                            </button>
+                        )}
+                    </div>
+                </div>
+            )}
+            </div>
 
             <div className="overflow-hidden rounded-xl bg-white shadow-sm">
                 {error ? (
