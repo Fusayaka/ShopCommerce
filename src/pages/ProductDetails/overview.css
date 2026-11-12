@@ -440,15 +440,35 @@
     font-size: 28px;
   }
   
-  .detail-quantity-selector {
-    width: 20%;
-    padding: 10px 16px;
+  .detail-primary-actions {
+    gap: 12px;
   }
-  
-  .detail-add-to-cart-btn {
-    padding: 16px 0;
-    flex: 1;
+
+  .detail-quantity-selector {
     width: auto;
+    min-width: 0;
+    flex: 0 0 auto;
+    padding: 8px 10px;
+    gap: 2px;
+  }
+
+  .detail-quantity-selector button {
+    width: 26px;
+    height: 26px;
+    font-size: 18px;
+  }
+
+  .detail-quantity-input {
+    width: 30px;
+    font-size: 15px;
+  }
+
+  .detail-add-to-cart-btn {
+    padding: 16px 20px;
+    flex: 1 1 auto;
+    width: auto;
+    white-space: nowrap;
+    font-size: 14px;
   }
 
   .detail-buy-now-btn {

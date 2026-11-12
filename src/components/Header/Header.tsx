@@ -17,6 +17,12 @@ import type { Product } from '@/types';
 
 const DEBOUNCE = 600;
 
+function productMinPrice(p: Product): number | undefined {
+    if (!p.stocks || p.stocks.length === 0) return undefined;
+    const prices = p.stocks.map((s) => Number(s.promotionPrice ?? s.originalPrice));
+    return prices.length ? Math.min(...prices) : undefined;
+}
+
 export default function Header() {
     const { loggedIn, user: currentUser } = useAuth();
     const cartCount = useCartCount();
@@ -178,7 +184,9 @@ export default function Header() {
                                     />
                                     <div className="search-item-info">
                                         <span className="search-item-title">{prod.title}</span>
-                                        {prod.price && <span className="search-item-price">${prod.price}</span>}
+                                        {productMinPrice(prod) != null && (
+                                            <span className="search-item-price">${productMinPrice(prod)}</span>
+                                        )}
                                     </div>
                                 </li>
                             ))}
