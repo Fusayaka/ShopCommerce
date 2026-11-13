@@ -9,7 +9,7 @@ import { GetProductsQueryDto } from './dto/get-product.dto.js';
 import { Prisma } from '@prisma/client';
 import { CloudinaryService, UploadableFile } from '../cloudinary/cloudinary.service.js';
 
-const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
 @Injectable()
 export class ProductsService {
@@ -24,7 +24,7 @@ export class ProductsService {
       throw new BadRequestException('Only image files are allowed');
     }
     if (file.size !== undefined && file.size > MAX_IMAGE_BYTES) {
-      throw new BadRequestException('Image must be 3MB or smaller');
+      throw new BadRequestException('Image must be 5MB or smaller');
     }
     const url = await this.cloudinary.uploadImage(file, 'products');
     return { url };
