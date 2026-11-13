@@ -3,6 +3,8 @@ import Sidebar from './Sidebar';
 import MainContent from './MainContent';
 import { useAuth } from '@/utils/auth';
 import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'
 
 export type DashboardTab = 'product' | 'promotion' | 'order' | 'user';
 
@@ -28,9 +30,19 @@ export default function Dashboard() {
     if (user.role === 'customer') return <Navigate to={from} replace />;
 
     return (
-        <div data-dashboard className="flex min-h-[70vh] w-full gap-6 rounded-xl bg-slate-50 p-6 text-slate-800">
-            <Sidebar activeTab={activeTab} onSelectTab={setActiveTab} user={user}/>
-            <MainContent activeTab={activeTab} />
+        <div>
+            <div data-dashboard className="flex min-h-[70vh] w-full gap-6 rounded-xl bg-slate-50 p-6 text-slate-800">
+                <Sidebar activeTab={activeTab} onSelectTab={setActiveTab} user={user}/>
+                <MainContent activeTab={activeTab} />
+            </div>
+            <ToastContainer
+                position='top-right'
+                autoClose={1000}
+                newestOnTop={true}
+                limit={3}
+                pauseOnHover={false}
+            />
         </div>
+
     );
 }

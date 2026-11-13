@@ -196,7 +196,7 @@ export default function ProductList() {
                 setTotal(res?.meta?.total ?? 0);
                 setError(null);
             } catch (err) {
-                console.error('Failed to load products:', err);
+                toast.error(`Failed to load products: ${err}`);
                 if (!cancelled) setError('Failed to load products. Please try again.');
             } finally {
                 if (!cancelled) setLoading(false);
@@ -256,6 +256,11 @@ export default function ProductList() {
             p.delete('sort');
             p.delete('page');
         });
+
+        if (searchParams.get('search')){
+            searchParams.delete('search');
+            setSearch('');
+        }
     };
 
     const hasActiveFilters =
@@ -299,6 +304,7 @@ export default function ProductList() {
             setFormOpen(false);
             setEditingProduct(null);
             setReloadToken((t) => t + 1);
+            clearFilters();
         } catch (err) {
             // axiosClient already surfaces an error toast.
             console.error('Failed to save product:', err);
