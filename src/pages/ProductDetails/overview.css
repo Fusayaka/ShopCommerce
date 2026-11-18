@@ -150,13 +150,13 @@
 }
 
 .detail-current-price {
-  font-size: 32px;
+  font-size: 51px;
   font-weight: 700;
   text-align: left;
 }
 
 .detail-original-price {
-  font-size: 32px;
+  font-size: 51px;
   font-weight: 700;
   color: #0000004d;
   text-decoration: line-through;
@@ -168,7 +168,7 @@
   padding: 0px 14px;
   border-radius: 42px;
   font-weight: 500;
-  font-size: 15px;
+  font-size: 20px;
 }
 
 .detail-desc {
