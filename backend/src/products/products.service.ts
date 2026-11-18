@@ -122,10 +122,13 @@ export class ProductsService {
       orderBy = { [field]: direction } as Prisma.ProductOrderByWithRelationInput;
     }
 
-    const where: Prisma.ProductWhereInput = conditions.length > 0 ? {AND: conditions}: {}
+    const where: Prisma.ProductWhereInput = {
+      deletedAt: null,
+      ...(conditions.length > 0 && { AND: conditions }),
+    };
 
     const data = await this.prisma.product.findMany({
-      where: where,
+      where,
       skip: skip,
       take: limit,
       orderBy: orderBy,
@@ -145,8 +148,8 @@ export class ProductsService {
   }
 
   async findOne(id: number) {
-    const product = await this.prisma.product.findUnique({
-      where: {id},
+    const product = await this.prisma.product.findFirst({
+      where: { id, deletedAt: null },
       include: { stocks: true },
     });
     if (!product) throw new NotFoundException('Product not found');
@@ -154,7 +157,7 @@ export class ProductsService {
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
-    const existing = await this.prisma.product.findUnique({ where: { id } });
+    const existing = await this.prisma.product.findFirst({ where: { id, deletedAt: null } });
     if (!existing) throw new NotFoundException('Can not update: Product not found');
 
     return this.prisma.product.update({
@@ -170,20 +173,35 @@ export class ProductsService {
   async upsertStock(productId: number, dto: UpsertStockDto) {
     const { size, color, originalPrice, promotionPrice, stock } = dto;
 
-    const product = await this.prisma.product.findUnique({ where: { id: productId } });
+    const product = await this.prisma.product.findFirst({ where: { id: productId, deletedAt: null } });
     if (!product) throw new NotFoundException('Can not upsert: Product not found');
 
     const existing = await this.prisma.productStock.findUnique({
       where: { productId_size_color: { productId, size, color } },
+      omit: { deletedAt: false }
     });
 
-    if (!existing) {
+    // Not exist or being soft deleted
+    if (!existing || existing.deletedAt !== null) {
       if (originalPrice === undefined || stock === undefined) {
         throw new BadRequestException(
           'originalPrice and stock are required to create a new variant',
         );
       }
       this.assertValidPromotion(originalPrice, promotionPrice);
+
+      if (existing){
+        return this.prisma.productStock.update({
+          where: { id: existing.id },
+          data: {
+            originalPrice,
+            promotionPrice: promotionPrice ?? null,
+            stock,
+            deletedAt: null,
+          }
+        })
+      }
+
       return this.prisma.productStock.create({
         data: { productId, size, color, originalPrice, promotionPrice, stock },
       });
@@ -216,7 +234,7 @@ export class ProductsService {
   }
 
   async updateStock(productId: number, stockId: number, dto: UpdateStockDto) {
-    const existing = await this.prisma.productStock.findUnique({ where: { id: stockId } });
+    const existing = await this.prisma.productStock.findFirst({ where: { id: stockId, deletedAt: null } });
     if (!existing || existing.productId !== productId) {
       throw new NotFoundException('Stock variant not found for this product');
     }
@@ -249,8 +267,9 @@ export class ProductsService {
 
   getStock(productId: number, query: GetStockDto) {
     const { size, color } = query;
-    return this.prisma.productStock.findUnique({
+    return this.prisma.productStock.findFirst({
       where: {
+        deletedAt: null,
         productId_size_color: { productId, size, color },
       },
     });
@@ -259,6 +278,7 @@ export class ProductsService {
   async getRelated(productId: number) {
     const ids = (
       await this.prisma.product.findMany({
+        where: { deletedAt: null },
         select: { id: true },
         orderBy: { id: 'asc' },
       })
@@ -281,6 +301,7 @@ export class ProductsService {
 
   async getRoundedPriceRange(){
     const result = await this.prisma.productStock.aggregate({
+      where: { deletedAt: null },
       _min: {
         originalPrice: true,
         promotionPrice: true,
@@ -308,23 +329,33 @@ export class ProductsService {
   }
 
   async removeProduct(id: number) {
-    const existing = await this.prisma.product.findUnique({ where: { id } });
+    const existing = await this.prisma.product.findFirst({ where: { id, deletedAt: null } });
     if (!existing) throw new NotFoundException('Can not remove: Product not found');
 
-    return this.prisma.product.delete({
-      where: {id}
-    });
+    // Soft delete
+    return this.prisma.$transaction([
+      this.prisma.product.update({
+        where: { id },
+        data: { deletedAt: new Date() }
+      }),
+      this.prisma.productStock.updateMany({
+        where: { productId: id },
+        data: { deletedAt: new Date() }
+      })
+    ])
   }
 
   async removeVariant(id: number, stockId: number){
-    const existingProduct = await this.prisma.product.findUnique({ where: { id } });
+    const existingProduct = await this.prisma.product.findFirst({ where: { id, deletedAt: null } });
     if (!existingProduct) throw new NotFoundException('Can not remove: Product not found');
     
-    const existingVariant = await this.prisma.productStock.findUnique({ where: {id: stockId}});
+    const existingVariant = await this.prisma.productStock.findFirst({ where: { id: stockId, deletedAt: null }});
     if (!existingVariant) throw new NotFoundException('Can not remove: Variant not found');
 
-    return this.prisma.productStock.delete({
-      where: {id: stockId}
+    // Soft delete
+    return this.prisma.productStock.update({
+      where: { id: stockId },
+      data: { deletedAt: new Date() }
     })
   }
 

@@ -89,8 +89,8 @@ export class OrdersService {
     let discount = new Prisma.Decimal(0);
 
     if (dto.promoCode) {
-      const promo = await this.prisma.promoCodes.findUnique({
-        where: { code: dto.promoCode },
+      const promo = await this.prisma.promoCodes.findFirst({
+        where: { code: dto.promoCode, deletedAt: null },
       });
 
       if (!promo) {
