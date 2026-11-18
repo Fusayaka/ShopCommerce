@@ -31,28 +31,9 @@ export class ProductsService {
   }
 
   create(createProductDto: CreateProductDto) {
-    const { stocks, ...productData } = createProductDto;
-
-    // A variant created alongside the product needs full data (price + stock).
-    const stockData = stocks?.map((s) => {
-      if (s.originalPrice === undefined || s.stock === undefined) {
-        throw new BadRequestException(
-          'Each stock requires originalPrice and stock',
-        );
-      }
-      return {
-        size: s.size,
-        color: s.color,
-        originalPrice: s.originalPrice,
-        promotionPrice: s.promotionPrice,
-        stock: s.stock,
-      };
-    });
-
     return this.prisma.product.create({
       data: {
-        ...productData,
-        ...(stockData && stockData.length ? { stocks: { create: stockData } } : {}),
+        ...createProductDto,
       },
       include: { stocks: true },
     });
@@ -132,13 +113,13 @@ export class ProductsService {
     }
 
     const sortBy = query.sortBy || 'rating-desc';
-    let orderBy = {};
+    let orderBy: Prisma.ProductOrderByWithRelationInput;
     if (sortBy === "latest"){
-      orderBy = {createdAt: "desc"};
+      orderBy = { createdAt: "desc" };
     }
     else {
       const [field, direction] = sortBy.split("-");
-      orderBy = { [field] : direction};
+      orderBy = { [field]: direction } as Prisma.ProductOrderByWithRelationInput;
     }
 
     const where: Prisma.ProductWhereInput = conditions.length > 0 ? {AND: conditions}: {}
@@ -176,10 +157,9 @@ export class ProductsService {
     const existing = await this.prisma.product.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Can not update: Product not found');
 
-    const { stocks, ...productData } = updateProductDto;
     return this.prisma.product.update({
       where: {id},
-      data: productData,
+      data: updateProductDto,
     });
   }
 
@@ -352,7 +332,7 @@ export class ProductsService {
       if (val <= 0) return 0;
       const magnitude = Math.pow(10, Math.floor(Math.log10(val)));
       const normalized = val / magnitude;
-      let base = 1;
+      let base;
       
       if (normalized >= 5) base = 5;
       else if (normalized >= 2) base = 2;
@@ -365,7 +345,7 @@ export class ProductsService {
       if (val <= 0) return 0;
       const magnitude = Math.pow(10, Math.floor(Math.log10(val)));
       const normalized = val / magnitude;
-      let base = 1;
+      let base;
 
       if (normalized > 5) base = 10;
       else if (normalized > 2) base = 5;
