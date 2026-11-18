@@ -43,9 +43,9 @@ const toRow = (s: ProductStock): Row => ({
 const EMPTY_VARIANT: NewVariant = { size: 'M', color: 'Blue', stock: 0, originalPrice: 0, promotionPrice: '' };
 
 const cellInput =
-    'w-24 rounded border border-slate-300 px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-slate-900';
+    'w-full rounded border border-slate-300 px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-slate-900';
 const cellInputError =
-    'w-24 rounded border border-red-400 bg-red-50 px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-red-500';
+    'w-full rounded border border-red-400 bg-red-50 px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-red-500';
 
 interface VariantInput {
     stock: number;
@@ -226,14 +226,22 @@ export default function StockEditor({ productId, productTitle, onClose, onSaved 
                     ) : loading ? (
                         <p className="py-6 text-center text-sm text-slate-400">Loading…</p>
                     ) : (
-                        <table className="w-full text-left text-sm">
+                        <table className="w-full table-fixed text-left text-sm">
+                            <colgroup>
+                                <col className="w-[80px]" />
+                                <col className="w-[90px]" />
+                                <col className="w-[120px]" />
+                                <col className="w-[140px]" />
+                                <col className="w-[140px]" />
+                                <col />
+                            </colgroup>
                             <thead>
                                 <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
-                                    <th className="py-2 font-semibold">Size</th>
-                                    <th className="py-2 font-semibold">Color</th>
-                                    <th className="py-2 font-semibold pl-2">Stock</th>
-                                    <th className="py-2 font-semibold pl-2">Original Price</th>
-                                    <th className="py-2 font-semibold pl-2">Promo Price</th>
+                                    <th className="py-2 font-semibold pl-1 pr-3">Size</th>
+                                    <th className="py-2 font-semibold pl-1 pr-3">Color</th>
+                                    <th className="py-2 font-semibold pl-3">Stock</th>
+                                    <th className="py-2 font-semibold pl-3">Original Price</th>
+                                    <th className="py-2 font-semibold pl-3">Promo Price</th>
                                     <th className="py-2"></th>
                                 </tr>
                             </thead>
@@ -251,9 +259,9 @@ export default function StockEditor({ productId, productTitle, onClose, onSaved 
                                             : {};
                                         return (
                                         <tr key={row.id} className="border-b border-slate-100 align-center">
-                                            <td className="py-2 font-medium text-slate-800 pl-1">{row.size}</td>
-                                            <td className="py-2 text-slate-700 pl-1">{row.color}</td>
-                                            <td className="py-2">
+                                            <td className="py-2 font-medium text-slate-800 pl-1 pr-3">{row.size}</td>
+                                            <td className="py-2 text-slate-700 pl-1 pr-3">{row.color}</td>
+                                            <td className="py-2 pr-3">
                                                 <input
                                                     type="number"
                                                     min={0}
@@ -264,10 +272,10 @@ export default function StockEditor({ productId, productTitle, onClose, onSaved 
                                                     className={errs.stock ? cellInputError : cellInput}
                                                 />
                                                 {errs.stock && (
-                                                    <p className="mt-1 w-24 text-xs text-red-600">{errs.stock}</p>
+                                                    <p className="mt-1 text-xs text-red-600">{errs.stock}</p>
                                                 )}
                                             </td>
-                                            <td className="py-2">
+                                            <td className="py-2 pr-3">
                                                 <input
                                                     type="number"
                                                     min={0}
@@ -278,10 +286,10 @@ export default function StockEditor({ productId, productTitle, onClose, onSaved 
                                                     className={errs.originalPrice ? cellInputError : cellInput}
                                                 />
                                                 {errs.originalPrice && (
-                                                    <p className="mt-1 w-24 text-xs text-red-600">{errs.originalPrice}</p>
+                                                    <p className="mt-1 text-xs text-red-600">{errs.originalPrice}</p>
                                                 )}
                                             </td>
-                                            <td className="py-2">
+                                            <td className="py-2 pr-3">
                                                 <input
                                                     type="number"
                                                     min={0}
@@ -299,7 +307,7 @@ export default function StockEditor({ productId, productTitle, onClose, onSaved 
                                                     className={errs.promotionPrice ? cellInputError : cellInput}
                                                 />
                                                 {errs.promotionPrice && (
-                                                    <p className="mt-1 w-24 text-xs text-red-600">{errs.promotionPrice}</p>
+                                                    <p className="mt-1 text-xs text-red-600">{errs.promotionPrice}</p>
                                                 )}
                                             </td>
                                             <td className="py-2 text-right">
@@ -331,80 +339,98 @@ export default function StockEditor({ productId, productTitle, onClose, onSaved 
                     )}
                 </div>
 
-                {/* Add variant */}
                 <div className="flex flex-col border-t border-slate-200 bg-slate-50 px-6 py-4 gap-2 mb-2">
                     <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Add variant</p>
-                    <div className="flex flex-wrap items-center gap-2">
-                        <select
-                            value={newVariant.size}
-                            onChange={(e) => setNewVariant({ ...newVariant, size: e.target.value as Size })}
-                            className="rounded border border-slate-300 px-2 py-1 text-sm"
-                        >
-                            {SIZES.map((s) => (
-                                <option key={s} value={s}>{s}</option>
-                            ))}
-                        </select>
-                        <select
-                            value={newVariant.color}
-                            onChange={(e) => setNewVariant({ ...newVariant, color: e.target.value as Color })}
-                            className="rounded border border-slate-300 px-2 py-1 text-sm"
-                        >
-                            {COLORS.map((c) => (
-                                <option key={c} value={c}>{c}</option>
-                            ))}
-                        </select>
-                        <input
-                            type="number"
-                            min={0}
-                            step="1"
-                            placeholder="Stock"
-                            value={newVariant.stock}
-                            aria-invalid={Boolean(newVariantErrors.stock)}
-                            onChange={(e) => setNewVariant({ ...newVariant, stock: Number(e.target.value) })}
-                            className={`w-20 rounded border px-2 py-1 text-sm ${
-                                newVariantErrors.stock ? 'border-red-400 bg-red-50' : 'border-slate-300'
-                            }`}
-                        />
-                        <input
-                            type="number"
-                            min={0}
-                            step="0.01"
-                            placeholder="Original"
-                            value={newVariant.originalPrice}
-                            aria-invalid={Boolean(newVariantErrors.originalPrice)}
-                            onChange={(e) => setNewVariant({ ...newVariant, originalPrice: Number(e.target.value) })}
-                            className={`w-30 rounded border px-2 py-1 text-sm ${
-                                newVariantErrors.originalPrice ? 'border-red-400 bg-red-50' : 'border-slate-300'
-                            }`}
-                        />
-                        <input
-                            type="number"
-                            min={0}
-                            step="0.01"
-                            placeholder="Promo Price"
-                            value={newVariant.promotionPrice}
-                            aria-invalid={Boolean(newVariantErrors.promotionPrice)}
-                            onChange={(e) =>
-                                setNewVariant({
-                                    ...newVariant,
-                                    promotionPrice: e.target.value === '' ? '' : Number(e.target.value),
-                                })
-                            }
-                            className={`w-30 rounded border px-2 py-1 text-sm ${
-                                newVariantErrors.promotionPrice ? 'border-red-400 bg-red-50' : 'border-slate-300'
-                            }`}
-                        />
-                        <button
-                            type="button"
-                            onClick={addVariant}
-                            disabled={adding}
-                            className="cursor-pointer rounded-md border-none bg-slate-900 px-4 py-1.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                            {adding ? 'Adding…' : 'Add'}
-                        </button>
+
+                    <div className="grid w-full grid-cols-[80px_90px_120px_140px_140px_1fr] items-center">
+                        <div className="pl-1 pr-3">
+                            <select
+                                value={newVariant.size}
+                                onChange={(e) => setNewVariant({ ...newVariant, size: e.target.value as Size })}
+                                className="w-full rounded border border-slate-300 bg-white px-2 py-1 text-sm"
+                            >
+                                {SIZES.map((s) => (
+                                    <option key={s} value={s}>{s}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="pl-1 pr-3">
+                            <select
+                                value={newVariant.color}
+                                onChange={(e) => setNewVariant({ ...newVariant, color: e.target.value as Color })}
+                                className="w-full rounded border border-slate-300 bg-white px-2 py-1 text-sm"
+                            >
+                                {COLORS.map((c) => (
+                                    <option key={c} value={c}>{c}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="pl-2 pr-1.5">
+                            <input
+                                type="number"
+                                min={0}
+                                step="1"
+                                placeholder="Stock"
+                                value={newVariant.stock}
+                                aria-invalid={Boolean(newVariantErrors.stock)}
+                                onChange={(e) => setNewVariant({ ...newVariant, stock: Number(e.target.value) })}
+                                className={`w-full rounded border bg-white px-2 py-1 text-sm ${
+                                    newVariantErrors.stock ? 'border-red-400 bg-red-50' : 'border-slate-300'
+                                }`}
+                            />
+                        </div>
+
+                        <div className="pl-2.5 pr-1">
+                            <input
+                                type="number"
+                                min={0}
+                                step="0.01"
+                                placeholder="Original"
+                                value={newVariant.originalPrice}
+                                aria-invalid={Boolean(newVariantErrors.originalPrice)}
+                                onChange={(e) => setNewVariant({ ...newVariant, originalPrice: Number(e.target.value) })}
+                                className={`w-full rounded border bg-white px-2 py-1 text-sm ${
+                                    newVariantErrors.originalPrice ? 'border-red-400 bg-red-50' : 'border-slate-300'
+                                }`}
+                            />
+                        </div>
+
+                        <div className="pl-3">
+                            <input
+                                type="number"
+                                min={0}
+                                step="0.01"
+                                placeholder="Promo Price"
+                                value={newVariant.promotionPrice}
+                                aria-invalid={Boolean(newVariantErrors.promotionPrice)}
+                                onChange={(e) =>
+                                    setNewVariant({
+                                        ...newVariant,
+                                        promotionPrice: e.target.value === '' ? '' : Number(e.target.value),
+                                    })
+                                }
+                                className={`w-full rounded border bg-white px-2 py-1 text-sm ${
+                                    newVariantErrors.promotionPrice ? 'border-red-400 bg-red-50' : 'border-slate-300'
+                                }`}
+                            />
+                        </div>
+
+                        <div className="flex justify-end">
+                            <button
+                                type="button"
+                                onClick={addVariant}
+                                disabled={adding}
+                                className="cursor-pointer rounded-md border-none bg-slate-900 px-4 py-1.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {adding ? 'Adding…' : 'Add'}
+                            </button>
+                        </div>
                     </div>
+
                     {hasErrors(newVariantErrors) && (
-                        <ul className="mt-1 space-y-0.5 text-xs text-red-600 list-none">
+                        <ul className="mt-1 list-none space-y-0.5 pl-0 text-xs text-red-600">
                             {newVariantErrors.stock && <li>{newVariantErrors.stock}</li>}
                             {newVariantErrors.originalPrice && <li>{newVariantErrors.originalPrice}</li>}
                             {newVariantErrors.promotionPrice && <li>{newVariantErrors.promotionPrice}</li>}
