@@ -108,13 +108,25 @@ export interface OrderItem {
     priceAtPurchase: number;
     totalPrice: number;
     updatedAt?: string;
+    stock?: { size: Size; color: Color } | null;
+}
+
+export interface OrderUser {
+    name?: string;
+    avatar?: string;
+    email?: string;
+    contact?: string;
+    address?: string;
 }
 
 export interface Order {
     id: number;
     userId: number;
+    user?: OrderUser;
     items: OrderItem[];
     status: OrderStatus;
+    // Minimal redelivery info included by getAllOrders (id + status).
+    redeliveries?: { id: number; status: OrderStatus }[];
 
     subtotal: number;
     discount: number;
@@ -130,6 +142,21 @@ export interface Order {
     updatedAt?: string;
 }
 
+
+export interface RedeliveryOrder {
+    id: number;
+    orderId: number;
+    address?: string | null;
+    contact?: string | null;
+    total?: number | null;
+    status: OrderStatus;
+    paymentMethod?: PaymentMethod | null;
+    note?: string | null;
+    reason?: string | null;
+    createdById: number;
+    createdAt?: string;
+    updatedAt?: string;
+}
 
 export interface PromoCode{
     code: string;

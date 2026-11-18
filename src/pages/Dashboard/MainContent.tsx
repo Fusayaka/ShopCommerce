@@ -1,4 +1,5 @@
 import ProductList from './ProductList';
+import OrderList from './OrderList';
 import { type DashboardTab } from './Dashboard';
 
 interface MainContentProps {
@@ -21,7 +22,7 @@ export default function MainContent({ activeTab }: MainContentProps) {
         case 'product':
             return <ProductList />;
         case 'order':
-            return <Placeholder title="Orders" />;
+            return <OrderList />;
         case 'promotion':
             return <Placeholder title="Promotions" />;
         case 'user':
