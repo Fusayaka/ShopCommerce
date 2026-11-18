@@ -6,13 +6,6 @@ export interface CardPrice {
     discount?: number;
 }
 
-/**
- * Pricing derived from a product's variants, optionally narrowed by the chosen
- * size / color so the price updates when the selection changes:
- *  - originalPrice  = lowest matching variant originalPrice
- *  - promotionPrice = lowest matching variant promotionPrice
- *  - discount       = percent off, rounded DOWN to a whole number
- */
 export function getCardPrice(
     stocks?: ProductStock[],
     size?: string | null,
@@ -43,4 +36,12 @@ export function getCardPrice(
             : undefined;
 
     return { originalPrice, promotionPrice, discount };
+}
+
+export function formatPrice(value?: number | null): string {
+    if (value === undefined || value === null) return '—';
+    return Number(value).toLocaleString('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    });
 }
