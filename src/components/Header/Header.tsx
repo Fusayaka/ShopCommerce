@@ -342,6 +342,9 @@ export default function Header() {
                                 <Link to='/profile' role='menuitem' onClick={() => setIsAvatarOpen(false)}>
                                     Profile
                                 </Link>
+                                <Link to='/orders' role='menuitem' onClick={() => setIsAvatarOpen(false)}>
+                                    Orders
+                                </Link>
                                 {isAdminOrManager && (<Link to='/dashboard' role='menuitem' onClick={() => setIsAvatarOpen(false)}>
                                     Dashboard
                                 </Link>)}
