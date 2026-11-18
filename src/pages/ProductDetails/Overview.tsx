@@ -34,16 +34,25 @@ export default function Overview() {
     useEffect(() => {
         let active = true;
 
-        setIsLoading(true);
-        setLoadError(null);
-
         const fetchProduct = async () => {
             if (!productId) return;
+
+            setIsLoading(true);
+            setLoadError(null);
+            setQuantity(1);
 
             try {
                 const data = await productApi.getProduct(Number(productId));
                 if (!active) return;
                 setProduct(data);
+
+                const stocks = data.stocks ?? [];
+                const firstColor = COLORS.find((c) => stocks.some((v) => v.color === c)) ?? null;
+                const firstSize = firstColor
+                    ? SIZES.find((s) => stocks.some((v) => v.color === firstColor && v.size === s)) ?? null
+                    : null;
+                setColor(firstColor);
+                setSize(firstSize);
             }
             catch {
                 if (!active) return;
@@ -55,20 +64,8 @@ export default function Overview() {
         }
         fetchProduct();
 
-        setQuantity(1);
-
         return () => { active = false; };
     }, [productId])
-
-    useEffect(() => {
-        const stocks = product?.stocks ?? [];
-        const firstColor = COLORS.find((c) => stocks.some((v) => v.color === c)) ?? null;
-        const firstSize = firstColor
-            ? SIZES.find((s) => stocks.some((v) => v.color === firstColor && v.size === s)) ?? null
-            : null;
-        setColor(firstColor);
-        setSize(firstSize);
-    }, [product])
 
     const handleQuantityChange = (type: 'increase' | 'decrease' | 'input', value? : string) => {
         const curQuantity = Number(quantity) || 0;
@@ -304,7 +301,7 @@ export default function Overview() {
                                             key={s}
                                             disabled={disabled}
                                             className={`detail-size-btn ${size === s ? 'active' : ''} ${disabled ? 'disabled' : ''}`}
-                                            onClick={() => {setSize(s), setQuantity(1)}}
+                                            onClick={() => { setSize(s); setQuantity(1); }}
                                         >
                                             {s}
                                         </button>

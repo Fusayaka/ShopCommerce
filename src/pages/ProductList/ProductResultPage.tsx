@@ -98,9 +98,11 @@ export default function ProductResultPage({ onOpenFilter }: ProductResultPagePro
 
     useEffect(() => {
         if (!isLoading && currentPage > totalPages) {
-            handlePageChange(1);
+            const params = new URLSearchParams(searchParams);
+            params.set('page', '1');
+            setSearchParams(params);
         }
-    }, [isLoading, currentPage, totalPages]);
+    }, [isLoading, currentPage, totalPages, searchParams, setSearchParams]);
 
     const handlePrev = () => {
         if (safeCurrentPage > 1) handlePageChange(safeCurrentPage - 1);
