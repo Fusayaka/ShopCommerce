@@ -1,7 +1,4 @@
-import { Type } from 'class-transformer';
-import { ArrayMinSize, IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, Min, Max, ValidateNested, IsInt } from 'class-validator';
-import { UpsertStockDto } from './upsert-stock.dto.js';
-
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Min, Max, IsInt } from 'class-validator';
 export class CreateProductDto {
     @IsString()
     @IsNotEmpty()
@@ -14,13 +11,6 @@ export class CreateProductDto {
     @IsOptional()
     @IsString()
     image?: string;
-
-    @IsOptional()
-    @IsArray()
-    @ArrayMinSize(1)
-    @ValidateNested({ each: true })
-    @Type(() => UpsertStockDto)
-    stocks?: UpsertStockDto[];
 
     @IsOptional()
     @IsNumber()

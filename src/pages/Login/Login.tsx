@@ -88,7 +88,7 @@ export default function Login(){
         return fields;
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError("");
         setFieldErrors({});
@@ -143,8 +143,9 @@ export default function Login(){
                 navigate(from, {replace: true});
             }
         }
-        catch (err: any) {
-            const raw = err.response?.data?.message;
+        catch (err: unknown) {
+            const apiErr = err as { response?: { data?: { message?: string | string[] } } };
+            const raw = apiErr.response?.data?.message;
             const messages: string[] = Array.isArray(raw) ? raw : raw ? [raw] : [];
 
             if (messages.length === 0) {

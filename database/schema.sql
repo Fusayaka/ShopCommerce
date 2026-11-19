@@ -59,7 +59,8 @@ CREATE TABLE products (
     price DECIMAL(10, 2) NOT NULL DEFAULT 0,
     image VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP
 );
 
 -- 3. Product Stocks
@@ -72,6 +73,7 @@ CREATE TABLE product_stocks (
     promotion_price DECIMAL(10, 2),
     stock INT NOT NULL DEFAULT 0,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP,
     UNIQUE (product_id, size, color)
 );
 
@@ -139,6 +141,7 @@ CREATE TABLE promo_codes (
     max_discount_num DECIMAL(10, 2),
     min_to_apply INT,
     expired_at DATE,
+    deleted_at TIMESTAMP,
 
     CONSTRAINT check_discount_type CHECK (
         (discount_num IS NOT NULL AND discount_per IS NULL) OR

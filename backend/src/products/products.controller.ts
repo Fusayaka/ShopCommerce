@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Body, Delete, Param, Query, Patch, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, Query, Patch, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductsService } from './products.service.js';
+import type { UploadableFile } from '../cloudinary/cloudinary.service.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
 import { UpsertStockDto } from './dto/upsert-stock.dto.js';
+import { UpdateStockDto } from './dto/update-stock.dto.js';
 import { GetStockDto } from './dto/get-stock.dto.js';
 import { GetProductsQueryDto } from './dto/get-product.dto.js';
 import { Public } from '../common/decorators/public.decorator.js';
@@ -45,6 +48,14 @@ export class ProductsController {
     return this.productsService.getRelated(+id);
   }
 
+  @Post('image')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.admin, UserRole.manager)
+  @UseInterceptors(FileInterceptor('file'))
+  uploadImage(@UploadedFile() file?: UploadableFile & { size?: number }) {
+    return this.productsService.uploadImage(file);
+  }
+
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.admin, UserRole.manager)
@@ -62,6 +73,17 @@ export class ProductsController {
     return this.productsService.upsertStock(+id, dto);
   }
 
+  @Patch(':id/stocks/:stockId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.admin, UserRole.manager)
+  updateStock(
+    @Param('id') id: string,
+    @Param('stockId') stockId: string,
+    @Body() dto: UpdateStockDto,
+  ) {
+    return this.productsService.updateStock(+id, +stockId, dto);
+  }
+
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.admin, UserRole.manager)
@@ -72,7 +94,17 @@ export class ProductsController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.admin, UserRole.manager)
-  remove(@Param('id') id: string) {
-    return this.productsService.remove(+id);
+  removeProduct(@Param('id') id: string) {
+    return this.productsService.removeProduct(+id);
+  }
+
+  @Delete(':id/:stockId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.admin, UserRole.manager)
+  removeVariant(
+    @Param('id') id: string,
+    @Param('stockId') stockId: string,
+  ) {
+    return this.productsService.removeVariant(+id, +stockId);
   }
 }

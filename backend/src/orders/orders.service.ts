@@ -89,8 +89,8 @@ export class OrdersService {
     let discount = new Prisma.Decimal(0);
 
     if (dto.promoCode) {
-      const promo = await this.prisma.promoCodes.findUnique({
-        where: { code: dto.promoCode },
+      const promo = await this.prisma.promoCodes.findFirst({
+        where: { code: dto.promoCode, deletedAt: null },
       });
 
       if (!promo) {
@@ -195,7 +195,7 @@ export class OrdersService {
 
   async getAllOrders(){
     return this.prisma.order.findMany({
-      include: { 
+      include: {
         user: {
           select: {
             avatar: true,
@@ -204,8 +204,17 @@ export class OrdersService {
             address: true,      // As delivered based on user's address
             email: true,
           }
-        }, 
-        items: true 
+        },
+        items: {
+          include: {
+            stock: {
+              select: { size: true, color: true },
+            },
+          },
+        },
+        redeliveries: {
+          select: { id: true, status: true },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -277,7 +286,7 @@ export class OrdersService {
       throw new NotFoundException(`Not found Order ID ${orderId}!`);
     }
 
-    if (order.status === 'cancelled') {
+    if (order.status !== 'cancelled') {
       throw new BadRequestException(
         `Cannot create a redelivery for an order with status "${order.status}"!`,
       );

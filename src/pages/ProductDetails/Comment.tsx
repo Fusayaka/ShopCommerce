@@ -287,14 +287,13 @@ export default function Comment() {
   }, [productId]);
 
   useEffect(() => {
-    if (!productId || !loggedIn) {
-      setCanReview(false);
-      return;
-    }
-
     let active = true;
 
     const checkEligibility = async () => {
+      if (!productId || !loggedIn) {
+        if (active) setCanReview(false);
+        return;
+      }
       try {
         const eligibility = await commentApi.checkReviewEligibility(Number(productId));
         if (!active) return;

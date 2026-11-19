@@ -1,5 +1,5 @@
 import axiosClient from "./axiosClient";
-import { type Order, type OrderStatus, type PaymentMethod } from "@/types";
+import { type Order, type OrderStatus, type PaymentMethod, type RedeliveryOrder } from "@/types";
 
 export interface CreateOrderDto {
   paymentMethod: PaymentMethod;
@@ -12,6 +12,29 @@ export interface CreateOrderDto {
 export interface UpdateOrderDto {
   status?: OrderStatus;
   paymentMethod?: PaymentMethod;
+}
+
+export interface CreateRedeliveryDto {
+  reason: string;
+  note?: string;
+  address?: string;
+  contact?: string;
+  paymentMethod?: PaymentMethod;
+}
+
+export interface UpdateRedeliveryDto {
+  status?: OrderStatus;
+  reason?: string;
+  note?: string;
+  address?: string;
+  contact?: string;
+  paymentMethod?: PaymentMethod;
+}
+
+export interface ApiEnvelope<T> {
+  success: boolean;
+  message?: string;
+  data: T;
 }
 
 export const orderApi = {
@@ -33,5 +56,31 @@ export const orderApi = {
 
   updateOrder(orderId: number, data: UpdateOrderDto) {
     return axiosClient.patch<Order, Order>(`/orders/${orderId}`, data);
+  },
+
+  createRedelivery(orderId: number, data: CreateRedeliveryDto) {
+    return axiosClient.post<RedeliveryOrder, RedeliveryOrder>(
+      `/orders/${orderId}/redelivery`,
+      data,
+    );
+  },
+
+  getOrderRedeliveries(orderId: number) {
+    return axiosClient.get<ApiEnvelope<RedeliveryOrder[]>, ApiEnvelope<RedeliveryOrder[]>>(
+      `/orders/${orderId}/redelivery`,
+    );
+  },
+
+  getRedeliveryById(redeliveryId: number) {
+    return axiosClient.get<ApiEnvelope<RedeliveryOrder>, ApiEnvelope<RedeliveryOrder>>(
+      `/orders/redelivery/${redeliveryId}`,
+    );
+  },
+
+  updateRedelivery(redeliveryId: number, data: UpdateRedeliveryDto) {
+    return axiosClient.patch<RedeliveryOrder, RedeliveryOrder>(
+      `/orders/redelivery/${redeliveryId}`,
+      data,
+    );
   },
 };

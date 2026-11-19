@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './filter.css'
 import upArrow from '@/assets/up-arrow.svg'
 import downArrow from '@/assets/down-arrow.svg'
@@ -96,13 +96,16 @@ export default function Filter({isOpen = true, onClose, onApplyFilter}: FilterPr
         Number(searchParams.get("maxPrice")) || 500
     );
 
+    const haveMinPrice = useRef(searchParams.get("minPrice") !== null);
+    const haveMaxPrice = useRef(searchParams.get("maxPrice") !== null);
+
     useEffect(() => {
         productApi.getRoundRange()
             .then(({ min, max }) => {
                 setMinLimit(min);
                 setMaxLimit(max);
-                if (!searchParams.get("minPrice")) setMinPrice(min);
-                if (!searchParams.get("maxPrice")) setMaxPrice(max);
+                if (!haveMinPrice.current) setMinPrice(min);
+                if (!haveMaxPrice.current) setMaxPrice(max);
             })
             .catch((err) => console.error("Error loading price range:", err));
     }, []);

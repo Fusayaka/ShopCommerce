@@ -35,7 +35,7 @@ export class CloudinaryService {
         try {
             await cloudinary.uploader.destroy(publicId);
         }
-        catch (error) {
+        catch {
             throw new InternalServerErrorException('Failed to delete old image from cloud storage.');
         }
     }
