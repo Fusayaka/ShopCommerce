@@ -53,6 +53,29 @@ function StatusBadge({ status }: { status: OrderStatus }) {
     );
 }
 
+type ParsedSearchQuery =
+  | { type: 'empty', value: null }
+  | { type: 'id'; value: number }
+  | { type: 'name'; value: string };
+
+function parseSearchQuery(rawQuery: string): ParsedSearchQuery {
+  const trimmed = rawQuery.trim();
+
+  if (!trimmed) {
+    return { type: 'empty', value: null};
+  }
+
+  const normalized = trimmed.replace(/^#/, '');
+  if (/^\d+$/.test(normalized)) {
+    const value = Number(normalized);
+    if (Number.isSafeInteger(value) && value > 0) {
+      return { type: 'id', value };
+    }
+  }
+
+  return { type: 'name', value: trimmed };
+}
+
 export default function OrderList() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -121,19 +144,34 @@ export default function OrderList() {
     };
 
     const visibleOrders = useMemo(() => {
-        const idQuery = search.trim().replace(/^#/, '');
+        const { type, value } = parseSearchQuery(search);
+
         const filtered = orders.filter((o) => {
             if (statusFilter !== 'all' && o.status !== statusFilter) return false;
-            if (idQuery && !String(o.id).includes(idQuery)) return false;
+
+            
+            if (type === 'id') {
+                return String(o.id).includes(value.toString());
+            }
+
+            if (type === 'name') {
+                const keyword = value.toLowerCase();
+                const name = (o.user?.name ?? '').toLowerCase();
+                const email = (o.user?.email ?? '').toLowerCase();
+                return name.includes(keyword) || email.includes(keyword);
+            }
+
             return true;
         });
+
         const sorted = [...filtered].sort((a, b) => {
             const cmp =
-                sortKey === 'date'
-                    ? new Date(a.createdAt ?? 0).getTime() - new Date(b.createdAt ?? 0).getTime()
-                    : a.status.localeCompare(b.status);
+            sortKey === 'date'
+                ? new Date(a.createdAt ?? 0).getTime() - new Date(b.createdAt ?? 0).getTime()
+                : a.status.localeCompare(b.status);
             return sortDir === 'asc' ? cmp : -cmp;
         });
+
         return sorted;
     }, [orders, search, statusFilter, sortKey, sortDir]);
 
@@ -172,11 +210,10 @@ export default function OrderList() {
                 <div className="flex items-center gap-2">
                     <input
                         type="text"
-                        inputMode="numeric"
                         value={search}
                         onChange={(e) => changeSearch(e.target.value)}
-                        placeholder="Search by order ID"
-                        className="w-44 h-10 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-slate-900"
+                        placeholder="Search by order ID or customer name"
+                        className="w-70 h-10 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-slate-900"
                     />
                     <label className="text-xs font-medium text-slate-500">Status</label>
                     <select

@@ -525,7 +525,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClo
                                         No redeliveries for this order yet.
                                     </p>
                                 ) : (
-                                    <ul className="flex flex-col gap-3 py-0 px-5 m-0">
+                                    <ul className="flex flex-col gap-3 py-0 p-0 m-0">
                                         {redeliveries.map((r) => (
                                             <li
                                                 key={r.id}
@@ -546,25 +546,25 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClo
                                                         <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                                                             Reason
                                                         </dt>
-                                                        <dd className="text-slate-700">{r.reason || '—'}</dd>
+                                                        <dd className="text-slate-700 ml-0">{r.reason || '—'}</dd>
                                                     </div>
                                                     <div>
                                                         <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                                                             Address
                                                         </dt>
-                                                        <dd className="text-slate-700">{r.address || '—'}</dd>
+                                                        <dd className="text-slate-700 ml-0">{r.address || '—'}</dd>
                                                     </div>
                                                     <div>
                                                         <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                                                             Contact
                                                         </dt>
-                                                        <dd className="text-slate-700">{r.contact || '—'}</dd>
+                                                        <dd className="text-slate-700 ml-0">{r.contact || '—'}</dd>
                                                     </div>
                                                     <div className="sm:col-span-2">
                                                         <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                                                             Note
                                                         </dt>
-                                                        <dd className="text-slate-700">{r.note || 'Empty'}</dd>
+                                                        <dd className="text-slate-700 ml-0">{r.note || 'Empty'}</dd>
                                                     </div>
                                                 </dl>
 
