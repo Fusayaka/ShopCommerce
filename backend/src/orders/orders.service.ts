@@ -181,7 +181,13 @@ export class OrdersService {
     const orders = await this.prisma.order.findMany({
       where: { userId },
       include: {
-        items: true,
+        items: {
+          include: {
+            stock: {
+              select: { size: true, color: true },
+            },
+          },
+        },
       },
       orderBy: {
         createdAt: 'desc',
