@@ -149,18 +149,19 @@ export default function OrderCard({ order }: OrderCardProps) {
                             Status
                         </span>
                         <span
-                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold capitalize ring-2 ${statusColor}`}
+                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold capitalize ring-[1px] ${statusColor}`}
                         >
                             {order.status}
                         </span>
                         <span className="group relative inline-flex">
-                            <span
-                                className="flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-slate-200 text-[10px] font-bold text-slate-600"
-                                aria-hidden="true"
+                            <button
+                                type="button"
+                                aria-label={`Status last updated: ${formatDateTime(order.updatedAt ?? order.createdAt)}`}
+                                className="flex h-4 w-4 cursor-help items-center justify-center rounded-full p-0 border-1 bg-slate-100 text-[10px] font-bold text-slate-600 outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
                             >
                                 ?
-                            </span>
-                            <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900 px-2 py-1 text-[11px] font-medium text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100">
+                            </button>
+                            <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900 px-2 py-1 text-[11px] font-medium text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100">
                                 Last updated: {formatDateTime(order.updatedAt ?? order.createdAt)}
                             </span>
                         </span>
