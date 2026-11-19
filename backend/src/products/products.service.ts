@@ -160,9 +160,20 @@ export class ProductsService {
     const existing = await this.prisma.product.findFirst({ where: { id, deletedAt: null } });
     if (!existing) throw new NotFoundException('Can not update: Product not found');
 
-    return this.prisma.product.update({
-      where: {id},
-      data: updateProductDto,
+    return this.prisma.$transaction(async (tx) => {
+      const product = await tx.product.update({
+        where: { id },
+        data: updateProductDto,
+      });
+
+      if (updateProductDto.image !== undefined) {
+        await tx.orderItem.updateMany({
+          where: { stock: { productId: id } },
+          data: { image: updateProductDto.image },
+        });
+      }
+
+      return product;
     });
   }
 
