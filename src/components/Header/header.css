@@ -635,7 +635,6 @@
   .header-actions {
     display: flex;
     flex-wrap: nowrap;
-    overflow-x: auto;
   }
 
   .header-actions > * {
