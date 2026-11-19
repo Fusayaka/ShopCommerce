@@ -34,21 +34,52 @@ export default function Orders() {
     const [visibleOrder, setVisibleOrder] = useState(PAGE_SIZE);
     const sentinelRef = useRef<HTMLDivElement>(null);
 
-    const counts = useMemo(() => {
-        const map: Record<string, number> = { all: orders.length };
-        for (const o of orders) map[o.status] = (map[o.status] ?? 0) + 1;
-        return map;
+    const cards = useMemo(() => {
+        const list: {
+            key: string;
+            kind: 'order' | 'redelivery';
+            order: Order;
+            orderId?: number;
+            reason?: string | null;
+        }[] = [];
+        for (const o of orders) {
+            for (const r of o.redeliveries ?? []) {
+                list.push({
+                    key: `redelivery-${r.id}`,
+                    kind: 'redelivery',
+                    orderId: o.id,
+                    reason: r.reason,
+                    order: {
+                        ...o,
+                        id: r.id,
+                        status: r.status,
+                        total: r.total ?? o.total,
+                        createdAt: r.createdAt,
+                        updatedAt: r.updatedAt,
+                        redeliveries: undefined,
+                    },
+                });
+            }
+            list.push({ key: `order-${o.id}`, kind: 'order', order: o });
+        }
+        return list;
     }, [orders]);
 
-    const filteredOrders = useMemo(() => {
+    const counts = useMemo(() => {
+        const map: Record<string, number> = { all: cards.length };
+        for (const c of cards) map[c.order.status] = (map[c.order.status] ?? 0) + 1;
+        return map;
+    }, [cards]);
+
+    const filteredCards = useMemo(() => {
         const q = search.trim().toLowerCase();
-        return orders.filter((o) => {
-            if (activeTab !== 'all' && o.status !== activeTab) return false;
+        return cards.filter((c) => {
+            if (activeTab !== 'all' && c.order.status !== activeTab) return false;
             if (!q) return true;
-            if (String(o.id).includes(q)) return true;
-            return o.items.some((item) => item.title.toLowerCase().includes(q));
+            if (String(c.order.id).includes(q)) return true;
+            return c.order.items.some((item) => item.title.toLowerCase().includes(q));
         });
-    }, [orders, activeTab, search]);
+    }, [cards, activeTab, search]);
 
     const fetchOrders = useCallback(async () => {
         try {
@@ -60,11 +91,11 @@ export default function Orders() {
         }
     }, []);
 
-    const visibleOrders = useMemo(
-        () => filteredOrders.slice(0, visibleOrder),
-        [filteredOrders, visibleOrder],
+    const visibleCards = useMemo(
+        () => filteredCards.slice(0, visibleOrder),
+        [filteredCards, visibleOrder],
     );
-    const hasMore = visibleOrder < filteredOrders.length;
+    const hasMore = visibleOrder < filteredCards.length;
 
     useEffect(() => {
         if (!hasMore) return;
@@ -78,7 +109,7 @@ export default function Orders() {
         );
         obs.observe(curr);
         return () => obs.disconnect();
-    }, [hasMore, filteredOrders.length]);
+    }, [hasMore, filteredCards.length]);
 
     const changeTab = (key: TabKey) => {
         setActiveTab(key);
@@ -199,7 +230,7 @@ export default function Orders() {
                                     type="search"
                                     value={search}
                                     onChange={(e) => changeSearch(e.target.value)}
-                                    placeholder="Search by order ID or product name…"
+                                    placeholder="Search by order ID, redeliver ID or product name…"
                                     className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-800 outline-none focus:border-slate-400"
                                 />
                             </div>
@@ -265,7 +296,7 @@ export default function Orders() {
                             <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-16 text-center">
                                 <p className="m-0 text-sm font-medium text-slate-700">No orders yet</p>
                             </div>
-                        ) : filteredOrders.length === 0 ? (
+                        ) : filteredCards.length === 0 ? (
                             <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-16 text-center">
                                 <p className="m-0 text-sm font-medium text-slate-700">No matching orders</p>
                                 <p className="m-0 mt-1 text-xs text-slate-500">
@@ -274,15 +305,21 @@ export default function Orders() {
                             </div>
                         ) : (
                             <div className="flex flex-col gap-4">
-                                {visibleOrders.map((order) => (
-                                    <OrderCard key={order.id} order={order} />
+                                {visibleCards.map((c) => (
+                                    <OrderCard
+                                        key={c.key}
+                                        order={c.order}
+                                        kind={c.kind}
+                                        orderId={c.orderId}
+                                        reason={c.reason}
+                                    />
                                 ))}
                                 {hasMore && (
                                     <div
                                         ref={sentinelRef}
                                         className="flex justify-center py-4 text-xs text-slate-400"
                                     >
-                                        Loading more…
+                                        Loading more ...
                                     </div>
                                 )}
                             </div>
