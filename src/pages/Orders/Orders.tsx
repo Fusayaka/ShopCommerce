@@ -122,7 +122,7 @@ export default function Orders() {
                 {/* Order list */}
                 <main className="min-w-0 flex-1">
                     <div className="flex items-center justify-between">
-                        <h1 className="m-0 text-xl font-bold text-slate-900 pl-4">My Orders</h1>
+                        <h1 className="m-0 text-xl font-bold text-slate-900 pl-2 md:pl-4">My Orders</h1>
                         <button
                             type="button"
                             onClick={handleRefresh}

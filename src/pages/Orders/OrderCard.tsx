@@ -101,7 +101,7 @@ export default function OrderCard({ order }: OrderCardProps) {
                         : '';
                     return (
                         <li key={item.id} className="flex items-center gap-4 px-5 py-4">
-                            <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+                            <div className="h-15 w-12 min-[400px]:w-14 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
                                 {item.image ? (
                                     <img
                                         src={item.image}
@@ -170,7 +170,7 @@ export default function OrderCard({ order }: OrderCardProps) {
                     {/* Order total */}
                     <div className="flex items-baseline gap-2">
                         <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                            Order total
+                            <span className='hidden min-[400px]:inline'>Order </span>Total
                         </span>
                         <span className="text-base font-bold text-slate-900">
                             ${formatPrice(order.total)}
