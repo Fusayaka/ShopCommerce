@@ -188,15 +188,36 @@ export class OrdersService {
             },
           },
         },
+        redeliveries: {
+          select: {
+            id: true,
+            status: true,
+            reason: true,
+            note: true,
+            total: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+          orderBy: { updatedAt: 'desc' },
+        },
       },
       orderBy: {
-        createdAt: 'desc',
+        updatedAt: 'desc',
       },
     });
 
+    const lastActivity = (o: (typeof orders)[number]): number => {
+      const times: (Date | null)[] = [o.updatedAt, o.createdAt];
+      for (const r of o.redeliveries) times.push(r.updatedAt, r.createdAt);
+      const ms = times.filter((d): d is Date => d != null).map((d) => d.getTime());
+      return ms.length ? Math.max(...ms) : 0;
+    };
+
+    const sorted = [...orders].sort((a, b) => lastActivity(b) - lastActivity(a));
+
     return {
       success: true,
-      data: orders,
+      data: sorted,
     };
   }
 
