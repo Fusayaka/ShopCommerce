@@ -43,18 +43,21 @@ function formatDate(value?: string): string {
 
 interface OrderCardProps {
     order: Order;
+    kind?: 'order' | 'redelivery';
+    orderId?: number;
+    reason?: string | null;
 }
 
-export default function OrderCard({ order }: OrderCardProps) {
+export default function OrderCard({ order, kind = 'order', orderId, reason }: OrderCardProps) {
     const navigate = useNavigate();
     const [buyingAgain, setBuyingAgain] = useState(false);
 
-    const totalUnits = order.items.reduce((sum, item) => sum + item.quantity, 0);
-
-    const statusColor = STATUS_STYLES[order.status]
-        .split(' ')
-        .filter((cls) => !cls.startsWith('bg-'))
-        .join(' ');
+    const viewParentOrder = () => {
+        if (orderId == null) return;
+        document
+            .getElementById(`order-card-${orderId}`)
+            ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
 
     const handleBuyAgain = async () => {
         const items = order.items.filter((item) => typeof item.stockId === 'number');
@@ -78,11 +81,25 @@ export default function OrderCard({ order }: OrderCardProps) {
         }
     };
 
+    const totalUnits = order.items.reduce((sum, item) => sum + item.quantity, 0);
+
+    const statusColor = STATUS_STYLES[order.status]
+        .split(' ')
+        .filter((cls) => !cls.startsWith('bg-'))
+        .join(' ');
+
+    const label = kind === 'redelivery' ? 'Redelivery' : 'Order';
+
     return (
-        <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <article
+            id={kind === 'order' ? `order-card-${order.id}` : undefined}
+            className="scroll-mt-20 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+        >
             <header className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 bg-slate-50/70 px-5 py-3">
                 <div className="flex items-center gap-3">
-                    <span className="text-sm font-bold text-slate-900">Order #{order.id}</span>
+                    <span className="text-sm font-bold text-slate-900">
+                        {label} #{order.id}
+                    </span>
                     {order.createdAt && (
                         <span className="text-xs text-slate-500">{formatDate(order.createdAt)}</span>
                     )}
@@ -92,7 +109,29 @@ export default function OrderCard({ order }: OrderCardProps) {
                 </span>
             </header>
 
-            {/* Order items */}
+            {kind === 'redelivery' ? (
+                <div className="flex flex-col gap-2 px-5 py-4 text-sm">
+                    {orderId != null && (
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                            <span className="text-slate-600">
+                                <span className="font-semibold text-slate-800">Order ID:</span> #{orderId}
+                            </span>
+                            <button
+                                type="button"
+                                onClick={viewParentOrder}
+                                className="shrink-0 cursor-pointer rounded-md border border-slate-300 bg-white px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                            >
+                                View in Order #{orderId}
+                            </button>
+                        </div>
+                    )}
+                    {reason && (
+                        <p className="text-left m-0 text-slate-600">
+                            <span className="font-semibold text-slate-800">Reason:</span> {reason}
+                        </p>
+                    )}
+                </div>
+            ) : (
             <ul className="m-0 flex list-none flex-col divide-y divide-slate-100 p-0">
                 {order.items.map((item) => {
                     const lineTotal = item.totalPrice ?? item.priceAtPurchase * item.quantity;
@@ -139,6 +178,7 @@ export default function OrderCard({ order }: OrderCardProps) {
                     );
                 })}
             </ul>
+            )}
 
             {/* Footer*/}
             <footer className="flex flex-col gap-3 border-t border-slate-100 bg-slate-50/40 px-5 py-4">
@@ -167,10 +207,10 @@ export default function OrderCard({ order }: OrderCardProps) {
                         </span>
                     </div>
 
-                    {/* Order total */}
+                    {/* Total */}
                     <div className="flex items-baseline gap-2">
                         <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                            <span className='hidden min-[400px]:inline'>Order </span>Total
+                            <span className="hidden min-[400px]:inline">{label} </span>Total
                         </span>
                         <span className="text-base font-bold text-slate-900">
                             ${formatPrice(order.total)}
@@ -180,14 +220,16 @@ export default function OrderCard({ order }: OrderCardProps) {
 
                 {/* Row 2: actions */}
                 <div className="flex flex-wrap items-center justify-end gap-3">
-                    <button
-                        type="button"
-                        onClick={handleBuyAgain}
-                        disabled={buyingAgain}
-                        className="cursor-pointer rounded-lg border border-transparent bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                        {buyingAgain ? 'Adding…' : 'Buy again'}
-                    </button>
+                    {kind === 'order' && (
+                        <button
+                            type="button"
+                            onClick={handleBuyAgain}
+                            disabled={buyingAgain}
+                            className="cursor-pointer rounded-lg border border-transparent bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            {buyingAgain ? 'Adding…' : 'Buy again'}
+                        </button>
+                    )}
 
                     <button
                         type="button"
