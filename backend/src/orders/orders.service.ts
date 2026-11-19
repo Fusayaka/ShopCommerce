@@ -197,6 +197,7 @@ export class OrdersService {
             createdAt: true,
             updatedAt: true,
           },
+          take: 1,
           orderBy: { updatedAt: 'desc' },
         },
       },
