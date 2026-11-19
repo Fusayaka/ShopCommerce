@@ -1,5 +1,5 @@
 import './tailwind.css';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import avatarPlaceholder from '@/assets/avatar-placeholder.svg';
 import { orderApi } from '@/api/orderApi';
@@ -19,6 +19,8 @@ const TABS: { key: TabKey; label: string }[] = [
     { key: 'redelivery', label: 'Redelivery' },
 ];
 
+const PAGE_SIZE = 10;
+
 export default function Orders() {
     const { loggedIn, user } = useAuth();
 
@@ -28,6 +30,9 @@ export default function Orders() {
 
     const [activeTab, setActiveTab] = useState<TabKey>('all');
     const [search, setSearch] = useState('');
+
+    const [visibleOrder, setVisibleOrder] = useState(PAGE_SIZE);
+    const sentinelRef = useRef<HTMLDivElement>(null);
 
     const counts = useMemo(() => {
         const map: Record<string, number> = { all: orders.length };
@@ -54,6 +59,36 @@ export default function Orders() {
             setError(true);
         }
     }, []);
+
+    const visibleOrders = useMemo(
+        () => filteredOrders.slice(0, visibleOrder),
+        [filteredOrders, visibleOrder],
+    );
+    const hasMore = visibleOrder < filteredOrders.length;
+
+    useEffect(() => {
+        if (!hasMore) return;
+        const curr = sentinelRef.current;
+        if (!curr) return;
+        const obs = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) setVisibleOrder((c) => c + PAGE_SIZE);
+            },
+            { rootMargin: '200px' },
+        );
+        obs.observe(curr);
+        return () => obs.disconnect();
+    }, [hasMore, filteredOrders.length]);
+
+    const changeTab = (key: TabKey) => {
+        setActiveTab(key);
+        setVisibleOrder(PAGE_SIZE);
+    };
+
+    const changeSearch = (value: string) => {
+        setSearch(value);
+        setVisibleOrder(PAGE_SIZE);
+    };
 
     useEffect(() => {
         if (!loggedIn) return;
@@ -163,7 +198,7 @@ export default function Orders() {
                                 <input
                                     type="search"
                                     value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
+                                    onChange={(e) => changeSearch(e.target.value)}
                                     placeholder="Search by order ID or product name…"
                                     className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-800 outline-none focus:border-slate-400"
                                 />
@@ -181,7 +216,7 @@ export default function Orders() {
                                         <button
                                             key={tab.key}
                                             type="button"
-                                            onClick={() => setActiveTab(tab.key)}
+                                            onClick={() => changeTab(tab.key)}
                                             className={`inline-flex shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
                                                 active
                                                     ? 'bg-slate-900 text-white'
@@ -239,9 +274,17 @@ export default function Orders() {
                             </div>
                         ) : (
                             <div className="flex flex-col gap-4">
-                                {filteredOrders.map((order) => (
+                                {visibleOrders.map((order) => (
                                     <OrderCard key={order.id} order={order} />
                                 ))}
+                                {hasMore && (
+                                    <div
+                                        ref={sentinelRef}
+                                        className="flex justify-center py-4 text-xs text-slate-400"
+                                    >
+                                        Loading more…
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
