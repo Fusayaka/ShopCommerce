@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { cartApi } from '@/api/cartApi';
 import { isLoggedIn, onAuthChange } from '@/utils/auth';
+import { APP_EVENTS } from '@/constants/storage';
 
-const CART_EVENT = 'cart-changed';
+const CART_EVENT = APP_EVENTS.cart;
 
 export function notifyCartChanged() {
     window.dispatchEvent(new Event(CART_EVENT));

@@ -2,6 +2,9 @@ import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import { CONFIG } from '../config';
 import { toast } from 'react-toastify';
 import { setToken, clearAuth } from '@/utils/auth';
+import { STORAGE_KEYS } from '@/constants/storage';
+
+const TOKEN_KEY = STORAGE_KEYS.token;
 
 const axiosClient = axios.create({
     baseURL: CONFIG.API_URL,
@@ -85,7 +88,7 @@ function getRetryDelay(error: AxiosError, attempt: number): number {
 
 axiosClient.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('accessToken');
+        const token = localStorage.getItem(TOKEN_KEY);
         if (token && config.headers){
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -111,7 +114,7 @@ axiosClient.interceptors.response.use(
             config &&
             !config._retriedAuth &&
             !isAuthEndpoint(config.url) &&
-            localStorage.getItem('accessToken')
+            localStorage.getItem(TOKEN_KEY)
         ) {
             config._retriedAuth = true;
             try {

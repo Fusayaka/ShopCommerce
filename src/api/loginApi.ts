@@ -1,6 +1,8 @@
 import type { User } from "@/types";
 import axiosClient from "./axiosClient";
+import { STORAGE_KEYS } from "@/constants/storage";
 
+const TOKEN_KEY = STORAGE_KEYS.token;
 export interface AuthMessage {
     message: string;
 }
@@ -13,7 +15,7 @@ export interface LoginResponse {
 const withCookie = { withCredentials: true };
 
 const authHeader = () => {
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem(TOKEN_KEY);
     return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
 };
 

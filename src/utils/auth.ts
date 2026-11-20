@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import type { User } from '@/types';
+import { STORAGE_KEYS, APP_EVENTS } from '@/constants/storage';
 
-const TOKEN_KEY = 'accessToken';
-const USER_KEY = 'user';
-const AUTH_EVENT = 'auth-changed';
+const TOKEN_KEY = STORAGE_KEYS.token;
+const USER_KEY = STORAGE_KEYS.user;
+const AUTH_EVENT = APP_EVENTS.auth;
 
 export function getToken(): string | null {
     try {

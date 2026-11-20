@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './login.css'
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { setAuth, useAuth } from '@/utils/auth';
+import { setAuth, setToken, useAuth } from '@/utils/auth';
 import { loginApi } from '@/api/loginApi';
 
 const GoogleIcon = () => (
@@ -111,7 +111,7 @@ export default function Login(){
                 
                 const token = response.data.accessToken;
                 // Lưu token trước để axiosClient đính kèm cho /auth/me.
-                localStorage.setItem('accessToken', token);
+                setToken(token);
 
                 // Lấy thông tin người dùng để hiển thị (tên/email/avatar).
                 // Nếu lỗi vẫn coi là đã đăng nhập, chỉ thiếu thông tin hiển thị.
@@ -131,7 +131,7 @@ export default function Login(){
                 );
 
                 const token = response.data.accessToken;
-                localStorage.setItem('accessToken', token);
+                setToken(token);
 
                 const me = await loginApi.getMe().catch(() => null);
                 setAuth(token, me);
