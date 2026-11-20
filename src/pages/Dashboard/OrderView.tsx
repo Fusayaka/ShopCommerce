@@ -1,39 +1,16 @@
-import type { Order, OrderStatus, PaymentMethod, RedeliveryOrder } from '@/types';
+import type { Order, OrderStatus, RedeliveryOrder } from '@/types';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { orderApi } from '@/api/orderApi';
 import { RedeliveryForm, type RedeliveryFormData } from './Form';
 import { formatPrice, formatDate } from '@/utils/format';
+import { NEXT_STATUS, PAYMENT_LABELS, STATUS_STYLES } from '@/constants/order';
 
 interface OrderDetailModalProps {
     order: Order | null;
     onClose: () => void;
     onChanged?: () => void;
 }
-
-const STATUS_STYLES: Record<OrderStatus, string> = {
-    pending: 'bg-amber-50 text-amber-700',
-    processing: 'bg-violet-100 text-violet-500',
-    shipping: 'bg-indigo-50 text-indigo-700',
-    delivered: 'bg-green-50 text-green-700',
-    cancelled: 'bg-red-50 text-red-700',
-    redelivery: 'bg-purple-50 text-purple-700',
-};
-
-const PAYMENT_LABELS: Record<PaymentMethod, string> = {
-    delivery: 'Cash on delivery',
-    bank: 'Bank transfer',
-    card: 'Credit / debit card',
-};
-
-const NEXT_STATUS: Record<OrderStatus, OrderStatus[]> = {
-    pending: ['processing', 'cancelled'],
-    redelivery: ['processing', 'cancelled'],
-    processing: ['shipping', 'cancelled'],
-    shipping: ['delivered', 'cancelled'],
-    delivered: [],
-    cancelled: [],
-};
 
 function getTotalItems(order: Order) {
     return order.items.reduce((count, item) => count + item.quantity, 0);

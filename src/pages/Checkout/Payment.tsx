@@ -9,17 +9,12 @@ import { notifyCartChanged } from '@/utils/cartCount';
 import promoIcon from '@/assets/promo-code.svg';
 import { formatPrice } from '@/utils/format';
 import './payment.css';
+import { PAYMENT_METHODS } from '@/constants/order';
 
 interface PaymentProps {
   subtotal: number;
   itemCount: number;
 }
-
-const PAYMENT_METHODS: { id: PaymentMethod; label: string; description: string }[] = [
-  { id: 'delivery', label: 'Cash on Delivery (COD)', description: 'Pay with cash upon delivery' },
-  { id: 'bank', label: 'Bank Transfer', description: 'Direct bank transfer to our store account' },
-  { id: 'card', label: 'Credit / Debit Card', description: 'Pay securely using Visa, Mastercard, etc.' },
-];
 
 export default function Payment({ subtotal, itemCount }: PaymentProps) {
   const navigate = useNavigate();

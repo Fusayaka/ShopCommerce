@@ -4,20 +4,9 @@ import { Navigate } from 'react-router-dom';
 import avatarPlaceholder from '@/assets/avatar-placeholder.svg';
 import { orderApi } from '@/api/orderApi';
 import { useAuth } from '@/utils/auth';
-import type { Order, OrderStatus } from '@/types';
+import type { Order } from '@/types';
 import OrderCard from './OrderCard';
-
-type TabKey = OrderStatus | 'all';
-
-const TABS: { key: TabKey; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'pending', label: 'Pending' },
-    { key: 'processing', label: 'Processing' },
-    { key: 'shipping', label: 'Shipping' },
-    { key: 'delivered', label: 'Delivered' },
-    { key: 'cancelled', label: 'Cancelled' },
-    { key: 'redelivery', label: 'Redelivery' },
-];
+import { TABS, type TabKey } from '@/constants/order';
 
 const PAGE_SIZE = 10;
 

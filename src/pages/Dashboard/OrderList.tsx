@@ -5,24 +5,7 @@ import { Pagination } from '@/components';
 import { OrderDetailModal } from './OrderView';
 import { useSearchParams } from 'react-router-dom';
 import { formatPrice, formatDate } from '@/utils/format';
-
-const STATUS_STYLES: Record<OrderStatus, string> = {
-    pending: 'bg-amber-50 text-amber-700',
-    processing: 'bg-violet-100 text-violet-500',
-    shipping: 'bg-indigo-50 text-indigo-700',
-    delivered: 'bg-green-50 text-green-700',
-    cancelled: 'bg-red-50 text-red-700',
-    redelivery: 'bg-purple-50 text-purple-700',
-};
-
-const ALL_STATUSES: OrderStatus[] = [
-    'pending',
-    'processing',
-    'shipping',
-    'delivered',
-    'cancelled',
-    'redelivery',
-];
+import { STATUS_STYLES, ALL_STATUSES } from '@/constants/order';
 
 type SortKey = 'date' | 'status';
 type SortDir = 'asc' | 'desc';

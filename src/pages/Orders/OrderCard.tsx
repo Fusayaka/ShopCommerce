@@ -1,18 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import type { Order, OrderStatus } from '@/types';
+import type { Order } from '@/types';
 import { cartApi } from '@/api/cartApi';
 import { formatPrice, formatDate, formatDateTime } from '@/utils/format';
-
-const STATUS_STYLES: Record<OrderStatus, string> = {
-    pending: 'bg-amber-50 text-amber-700 ring-amber-200',
-    processing: 'bg-violet-100 text-violet-600 ring-violet-200',
-    shipping: 'bg-indigo-50 text-indigo-700 ring-indigo-200',
-    delivered: 'bg-green-50 text-green-700 ring-green-200',
-    cancelled: 'bg-red-50 text-red-700 ring-red-200',
-    redelivery: 'bg-purple-50 text-purple-700 ring-purple-200',
-};
+import { STATUS_STYLES } from '@/constants/order';
 
 interface OrderCardProps {
     order: Order;
@@ -73,10 +65,6 @@ export default function OrderCard({ order, kind = 'order', orderId, reason, onVi
 
     const totalUnits = order.items.reduce((sum, item) => sum + item.quantity, 0);
 
-    const statusColor = STATUS_STYLES[order.status]
-        .split(' ')
-        .filter((cls) => !cls.startsWith('bg-'))
-        .join(' ');
 
     const label = kind === 'redelivery' ? 'Redelivery' : 'Order';
 
@@ -179,7 +167,7 @@ export default function OrderCard({ order, kind = 'order', orderId, reason, onVi
                             Status
                         </span>
                         <span
-                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold capitalize ring-[1px] ${statusColor}`}
+                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold capitalize ring-[1px] ${STATUS_STYLES[order.status]}`}
                         >
                             {order.status}
                         </span>
