@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import './filter.css'
 import upArrow from '@/assets/up-arrow.svg'
 import downArrow from '@/assets/down-arrow.svg'
 import filterMenu from '@/assets/filter.svg'
 import { useSearchParams } from 'react-router-dom';
 import { productApi } from '@/api/productApi';
+import * as fs from './filterStyles';
 
 interface FilterProps{
     isOpen?: boolean;
@@ -44,41 +44,41 @@ const DualPriceRange = ({
     const maxPos = `calc(${maxPercent}% + ${9 - maxPercent * 0.18}px)`;
 
     return (
-        <div className="dual-range-container">
-            <div className="price-range-values">
+        <div className={fs.dualRangeContainer}>
+            <div className={fs.priceRangeValues}>
                 <span style={{ left: minPos }}>${minPrice}</span>
                 <span style={{ left: maxPos }}>${maxPrice}</span>
             </div>
-            <div 
-                className="price-slider-track-wrapper"
+            <div
+                className={fs.priceSliderTrackWrapper}
                 style={{
                     '--min-pos': minPos,
                     '--max-pos': maxPos
                 } as React.CSSProperties}
             >
-                <div className="price-slider-active-range"></div>
-                <input 
-                    type="range" 
-                    min={minLimit} 
-                    max={maxLimit} 
+                <div className={fs.priceSliderActiveRange}></div>
+                <input
+                    type="range"
+                    min={minLimit}
+                    max={maxLimit}
                     value={minPrice}
                     onChange={(e) => onMinChange(Number(e.target.value))}
-                    className="price-range-input min-input"
+                    className={fs.priceRangeInput}
                 />
-                <input 
-                    type="range" 
-                    min={minLimit} 
-                    max={maxLimit} 
+                <input
+                    type="range"
+                    min={minLimit}
+                    max={maxLimit}
                     value={maxPrice}
                     onChange={(e) => onMaxChange(Number(e.target.value))}
-                    className="price-range-input max-input"
+                    className={fs.priceRangeInput}
                 />
             </div>
         </div>
     );
 };
 
-export default function Filter({isOpen = true, onClose, onApplyFilter}: FilterProps){
+export default function Filter({onClose, onApplyFilter}: FilterProps){
     const [searchParams] = useSearchParams();
     const [isDiscountOnly, setIsDiscountOnly] = useState<boolean>(
         searchParams.get("discount") === "true"
@@ -126,25 +126,25 @@ export default function Filter({isOpen = true, onClose, onApplyFilter}: FilterPr
     };
 
     return(
-        <div className={`filter-card ${isOpen ? 'mobile-open' : ''}`}>
-            <div className="filter-header">
+        <div className={`${fs.filterCard} w-4/5 max-w-[80%] max-md:w-full max-md:max-w-full`}>
+            <div className={fs.filterHeader}>
                 <h3>Filters</h3>
-                <button className="filter-toggle-btn pc-toggle-btn" onClick={() => setIsFilterBodyOpen(!isFilterBodyOpen)}>
-                    <img src={filterMenu} alt="filter" className="filter-main-icon" />
+                <button className={fs.pcToggleBtn} onClick={() => setIsFilterBodyOpen(!isFilterBodyOpen)}>
+                    <img src={filterMenu} alt="filter" className={fs.filterMainIcon} />
                 </button>
 
-                <button 
-                    className="filter-toggle-btn mobile-close-btn" 
+                <button
+                    className={fs.mobileCloseBtn}
                     onClick={onClose}
                 >
-                    <svg 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        className="icon-close-mobile"
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className={fs.iconCloseMobile}
                     >
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -154,26 +154,26 @@ export default function Filter({isOpen = true, onClose, onApplyFilter}: FilterPr
 
             {isFilterBodyOpen && (
                 <>
-                    <hr className="filter-divider" />
+                    <hr className={fs.filterDivider} />
 
-                    <div className="filter-group">
-                        <div 
-                            className="filter-group-header" 
+                    <div className={fs.filterGroup}>
+                        <div
+                            className={fs.filterGroupHeader}
                             onClick={() => setIsRatingOpen(!isRatingOpen)}
                         >
                             <span>Rating range</span>
-                            <img 
-                                src={isRatingOpen ? upArrow : downArrow} 
-                                alt="toggle" 
-                                className="filter-arrow-icon" 
+                            <img
+                                src={isRatingOpen ? upArrow : downArrow}
+                                alt="toggle"
+                                className={fs.filterArrowIcon}
                             />
                         </div>
                         {isRatingOpen && (
-                            <div className="filter-select-wrapper">
-                                <select 
-                                    value={rating} 
+                            <div className={fs.filterSelectWrapper}>
+                                <select
+                                    value={rating}
                                     onChange={(e) => setRating(e.target.value)}
-                                    className="filter-select"
+                                    className={fs.filterSelect}
                                 >
                                     <option value="0">All Ratings</option>
                                     <option value="5">5 Stars</option>
@@ -188,48 +188,49 @@ export default function Filter({isOpen = true, onClose, onApplyFilter}: FilterPr
                         )}
                     </div>
 
-                    <hr className="filter-divider" />
+                    <hr className={fs.filterDivider} />
 
-                    <div className="filter-group">
-                        <div 
-                            className="filter-group-header" 
+                    <div className={fs.filterGroup}>
+                        <div
+                            className={fs.filterGroupHeader}
                             onClick={() => setIsDiscountOpen(!isDiscountOpen)}
                         >
                             <span>Only discount</span>
-                            <img 
-                                src={isDiscountOpen ? upArrow : downArrow} 
-                                alt="toggle" 
-                                className="filter-arrow-icon" 
+                            <img
+                                src={isDiscountOpen ? upArrow : downArrow}
+                                alt="toggle"
+                                className={fs.filterArrowIcon}
                             />
                         </div>
                         {isDiscountOpen && (
-                            <label className="filter-switch">
-                                <input 
-                                    type="checkbox" 
+                            <label className={fs.filterSwitch}>
+                                <input
+                                    type="checkbox"
                                     checked={isDiscountOnly}
                                     onChange={(e) => setIsDiscountOnly(e.target.checked)}
+                                    className={fs.filterSwitchInput}
                                 />
-                                <span className="filter-slider"></span>
+                                <span className={fs.filterSlider}></span>
                             </label>
                         )}
                     </div>
 
-                    <hr className="filter-divider" />
+                    <hr className={fs.filterDivider} />
 
-                    <div className="filter-group">
-                        <div 
-                            className="filter-group-header" 
+                    <div className={fs.filterGroup}>
+                        <div
+                            className={fs.filterGroupHeader}
                             onClick={() => setIsPriceOpen(!isPriceOpen)}
                         >
                             <span>Price Range</span>
-                            <img 
-                                src={isPriceOpen ? upArrow : downArrow} 
-                                alt="toggle" 
-                                className="filter-arrow-icon" 
+                            <img
+                                src={isPriceOpen ? upArrow : downArrow}
+                                alt="toggle"
+                                className={fs.filterArrowIcon}
                             />
                         </div>
                         {isPriceOpen && (
-                            <DualPriceRange 
+                            <DualPriceRange
                                 minPrice={minPrice}
                                 maxPrice={maxPrice}
                                 minLimit={minLimit}
@@ -246,7 +247,7 @@ export default function Filter({isOpen = true, onClose, onApplyFilter}: FilterPr
                         )}
                     </div>
 
-                    <button className="filter-apply-btn" onClick={handleApply}>
+                    <button className={fs.filterApplyBtn} onClick={handleApply}>
                         Apply Filter
                     </button>
                 </>

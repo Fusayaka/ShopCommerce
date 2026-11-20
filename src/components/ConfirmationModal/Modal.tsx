@@ -1,5 +1,4 @@
 import React from 'react';
-import './modal.css';
 
 export interface ConfirmModalProps {
   isOpen: boolean;
@@ -26,18 +25,31 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  return (
-    <div className="confirm-modal-overlay" onClick={onClose}>
-      <div className="confirm-modal-card" onClick={e => e.stopPropagation()}>
-        <h3 className="confirm-modal-title">{title}</h3>
-        <div className="confirm-modal-content">{content}</div>
+  const btnBase =
+    'px-[18px] py-2 text-[15px] font-medium rounded-full cursor-pointer transition-all disabled:opacity-60 disabled:cursor-not-allowed';
+  const confirmClass =
+    variant === 'primary'
+      ? 'bg-black text-white border-none enabled:hover:shadow-[0_0_10px_rgba(0,0,0,0.25)]'
+      : 'bg-red-600 text-white border-none enabled:hover:shadow-[0_0_10px_rgba(220,38,38,0.4)]';
 
-        <div className="confirm-modal-actions">
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-[400px] rounded-xl border border-gray-200 bg-white p-6 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08)]"
+        onClick={e => e.stopPropagation()}
+      >
+        <h3 className="mb-2 text-lg font-semibold text-gray-900">{title}</h3>
+        <div className="text-sm leading-normal text-gray-500">{content}</div>
+
+        <div className="mt-5 flex justify-end gap-2.5">
           <button
             type="button"
             disabled={isLoading}
             onClick={onClose}
-            className="confirm-modal-btn confirm-modal-btn-cancel"
+            className={`${btnBase} border border-gray-300 bg-white text-gray-700 enabled:hover:shadow-[0_0_10px_rgba(0,0,0,0.12)]`}
           >
             {cancelText}
           </button>
@@ -45,9 +57,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
             type="button"
             disabled={isLoading}
             onClick={onConfirm}
-            className={`confirm-modal-btn ${
-              variant === 'primary' ? 'confirm-modal-btn-primary' : 'confirm-modal-btn-danger'
-            }`}
+            className={`${btnBase} ${confirmClass}`}
           >
             {isLoading ? "Processing..." : confirmText}
           </button>

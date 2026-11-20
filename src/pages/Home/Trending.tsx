@@ -1,6 +1,5 @@
 import type { Product } from "@/types";
 import { ProductCard } from "@/components";
-import './trending.css'
 import { useEffect, useState } from "react";
 import { productApi } from "@/api/productApi";
 
@@ -48,17 +47,17 @@ export default function Trending(){
     },[])
 
     return (
-        <section className="trending-section">
-            <h2 className="trending-title">TRENDING</h2>
-            <div className="trending-grid">
+        <section className="bg-white px-[5%] py-[60px] text-black max-md:px-[30px] max-md:py-10">
+            <h2 className="m-0 mb-[50px] text-center text-5xl font-black tracking-[1px] max-md:mb-[30px] max-md:text-[32px]">TRENDING</h2>
+            <div className="mx-auto mb-10 grid max-w-[1040px] grid-cols-4 gap-5 max-md:grid-cols-2 max-md:gap-x-[10%] max-md:gap-y-4">
                 {products.slice(0, visibleCount).map((prod: Product) => (
                     <ProductCard key={prod.id} {...prod} />
                 ))}
             </div>
             {
                 visibleCount < productsLength && (
-                    <div className="view-all-container">
-                        <button className="view-all-btn" onClick={handleLoadMore}>View More</button>
+                    <div className="flex justify-center">
+                        <button className="cursor-pointer rounded-[62px] border border-[#00000033] bg-transparent px-10 py-3 text-base font-medium text-black transition-all duration-200 hover:border-black hover:bg-black hover:text-white" onClick={handleLoadMore}>View More</button>
                     </div>
                 )
             }

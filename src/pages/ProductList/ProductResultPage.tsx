@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import './productResultPage.css'
 import { ProductCard } from "@/components";
 import { type Product } from '@/types';
 import filterMenu from '@/assets/filter.svg'
@@ -145,29 +144,34 @@ export default function ProductResultPage({ onOpenFilter }: ProductResultPagePro
 
     const paginationItems= getPaginationItems(safeCurrentPage, totalPages);
 
-    return (
-        <div className="product-result-container">
-            <div className="product-result-header">
-                <h2>Trending</h2>
+    const navBtn = "flex flex-none items-center justify-center gap-2 rounded-lg border border-[#eaeaea] bg-white px-[18px] py-2.5 text-sm font-medium text-black transition-all cursor-pointer enabled:hover:border-black enabled:hover:bg-[#fafafa] disabled:cursor-not-allowed disabled:border-[#f5f5f5] disabled:text-[#b3b3b3] max-[576px]:p-3";
+    const pageCell = "flex h-[38px] w-[38px] items-center justify-center max-[576px]:h-9 max-[576px]:w-9";
+    const statusCls = "py-[60px] text-center text-base text-[#00000099]";
 
-                <div className="product-result-meta">
-                    <span className="total-products">Total: {total} Products</span>
+    return (
+        <div className="flex w-full min-w-0 flex-1 flex-col">
+            <div className="mb-6 flex items-center justify-between">
+                <h2 className="m-0 text-[28px] font-bold text-black max-[576px]:text-2xl">Trending</h2>
+
+                <div className="flex items-center gap-3">
+                    <span className="text-sm font-normal text-[#666]">Total: {total} Products</span>
 
                     <button
-                        className="mobile-filter-btn"
+                        className="hidden h-9 w-9 cursor-pointer items-center justify-center rounded-[25%] border border-[#eaeaea] bg-[#f2f0f1] text-black transition-all hover:bg-[#e0e0e0] max-md:flex [&_img]:h-[85%] [&_img]:w-full"
                         onClick={onOpenFilter}
                     >
                         <img src={filterMenu} alt="filter" />
                     </button>
                 </div>
             </div>
-            <div className="product-sort">
-                <label htmlFor="product-sort-select">Sort by</label>
+            <div className="mb-5 flex items-center justify-end gap-2">
+                <label htmlFor="product-sort-select" className="text-sm font-medium text-[#666]">Sort by</label>
                 <select
                     id="product-sort-select"
                     value={sort}
                     onChange={(e) => handleSortChange(e.target.value)}
-                    className="sort-select"
+                    className="cursor-pointer appearance-none rounded-lg border border-[#eaeaea] bg-white bg-no-repeat py-[9px] pr-9 pl-3.5 text-sm font-medium text-black transition-colors [background-position:right_12px_center] hover:border-black focus:border-black focus:outline-none"
+                    style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E\")" }}
                 >
                     <option value="latest">Latest</option>
                     <option value="rating-asc">Rating &#8593;</option>
@@ -180,13 +184,13 @@ export default function ProductResultPage({ onOpenFilter }: ProductResultPagePro
             </div>
 
             {isLoading ? (
-                <div className="product-result-status">Loading...</div>
+                <div className={statusCls}>Loading...</div>
             ) : error ? (
-                <div className="product-result-status">{error}</div>
+                <div className={statusCls}>{error}</div>
             ) : products.length === 0 ? (
-                <div className="product-result-status">No products found.</div>
+                <div className={statusCls}>No products found.</div>
             ) : (
-                <div className="product-grid">
+                <div className="grid grid-cols-3 gap-x-5 gap-y-8 max-md:grid-cols-2 max-md:gap-x-[10%] max-md:gap-y-6">
                     {products.map((product) => (
                         <ProductCard key={product.id} {...product} />
                     ))}
@@ -194,25 +198,29 @@ export default function ProductResultPage({ onOpenFilter }: ProductResultPagePro
             )}
 
             {totalPages > 1 && (
-                <div className="pagination-container">
+                <div className="mt-12 flex w-full items-center justify-between border-t border-[#f0f0f0] pt-6 max-[576px]:mt-8 max-[576px]:flex-nowrap max-[576px]:gap-1">
                     <button
-                        className="page-nav-btn"
+                        className={navBtn}
                         onClick={handlePrev}
                         disabled={safeCurrentPage === 1}
                     >
-                        &larr; <span className="nav-text">Prev</span>
+                        &larr; <span className="max-md:hidden">Prev</span>
                     </button>
 
-                    <div className="page-numbers">
+                    <div className="flex items-center gap-1 max-[576px]:gap-1">
                         {paginationItems.map((item, index) => (
                             item === "..." ? (
-                                <span key={`ellipsis-${index}`} className='page-ellipsis'>
+                                <span key={`ellipsis-${index}`} className={`${pageCell} text-base font-bold text-[#666] select-none max-[576px]:text-[13px]`}>
                                     ...
                                 </span>
                             ): (
                                 <button
                                     key={item}
-                                    className={`page-number-btn ${safeCurrentPage === item ? 'active' : ''}`}
+                                    className={`${pageCell} cursor-pointer rounded-lg border-none text-sm font-medium transition-all max-[576px]:text-[13px] ${
+                                        safeCurrentPage === item
+                                            ? 'bg-black font-semibold text-white shadow-[0_4px_10px_rgba(0,0,0,0.15)]'
+                                            : 'bg-transparent text-[#666] hover:bg-[#f2f0f1] hover:text-black'
+                                    }`}
                                     onClick={() => handlePageChange(item as number)}
                                 >
                                     {item}
@@ -222,11 +230,11 @@ export default function ProductResultPage({ onOpenFilter }: ProductResultPagePro
                     </div>
 
                     <button
-                        className="page-nav-btn"
+                        className={navBtn}
                         onClick={handleNext}
                         disabled={safeCurrentPage === totalPages}
                     >
-                        <span className="nav-text">Next</span> &rarr;
+                        <span className="max-md:hidden">Next</span> &rarr;
                     </button>
                 </div>
             )}

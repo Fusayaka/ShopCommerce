@@ -1,11 +1,31 @@
 import { useEffect, useMemo, useState } from 'react';
-import './comment.css';
 import { StarRating, ConfirmModal } from '@/components';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { type Comment as CommentType } from '@/types';
 import { commentApi } from '@/api/commentApi';
 import { toast } from 'react-toastify';
 import { useAuth } from '@/utils/auth';
+
+const FORM_RATING_ROW = "ml-[15px] flex items-center gap-2.5";
+const FORM_LABEL = "text-[15px] font-semibold text-black";
+const FORM_INPUT = "box-border h-[150px] w-full resize-y rounded-xl border border-[#e0e0e0] px-4 py-3 text-[15px] text-black focus:border-black focus:outline-none max-md:h-[100px]";
+const FORM_SUBMIT = "cursor-pointer self-end rounded-full border-none bg-black px-6 py-2.5 text-[15px] font-semibold text-white transition-opacity hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-50";
+
+const StarInput = ({ value, onChange }: { value: number; onChange: (n: number) => void }) => (
+  <div className="flex gap-1">
+    {[1, 2, 3, 4, 5].map(n => (
+      <button
+        key={n}
+        type="button"
+        className={`cursor-pointer border-none bg-none p-0 text-2xl leading-none transition-colors ${n <= value ? 'text-[#ffc107]' : 'text-[#d9d9d9]'}`}
+        onClick={() => onChange(n)}
+        aria-label={`${n} star${n > 1 ? 's' : ''}`}
+      >
+        ★
+      </button>
+    ))}
+  </div>
+);
 
 interface CommentCardProps {
   comment: CommentType;
@@ -73,10 +93,12 @@ const CommentCard = ({
     onCancelEdit?.();
   };
 
+  const dropdownItem = "w-full cursor-pointer rounded-md border-none bg-none px-2 py-[3px] text-left text-[13px] font-medium transition-colors";
+
 return (
-    <div className="comment-card">
-      <div className="comment-user-header">
-        <div className="comment-avatar">
+    <div className="mb-5 flex flex-col gap-[5px] rounded-[20px] border-2 border-[#f0f0f0] bg-white px-6 pt-[15px] pb-2.5 text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] max-md:rounded-2xl max-md:px-[18px] max-md:py-3">
+      <div className="flex items-center gap-3 border-b border-[#f0f0f0] pb-4">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#f2f0f1] font-bold text-[#666] max-md:h-10 max-md:w-10 [&_img]:h-full [&_img]:w-full [&_img]:object-cover">
           {avatar ? (
             <img src={avatar} alt={displayName} />
           ) : (
@@ -84,20 +106,20 @@ return (
           )}
         </div>
 
-        <h4 className="comment-username">{displayName}</h4>
+        <h4 className="m-0 text-lg font-bold text-black max-md:text-base">{displayName}</h4>
 
         {(isOwner || isAdmin) && !isEditing && (
-          <div className="comment-menu-container">
+          <div className="relative ml-auto">
             <button
               type="button"
-              className="comment-menu-trigger"
+              className="cursor-pointer rounded-md border-none bg-none px-2 py-1 text-lg leading-none font-bold text-[#6b7280] transition-colors hover:bg-[#f3f4f6] hover:text-[#111827]"
               onClick={() => setShowMenu(prev => !prev)}
               aria-label="More options"
             >
-              <svg 
-                width="20" 
-                height="20" 
-                viewBox="0 0 24 24" 
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
                 fill="currentColor"
               >
                 <circle cx="5" cy="12" r="2" />
@@ -109,14 +131,14 @@ return (
             {showMenu && (
               <>
                 <div
-                  className="comment-menu-backdrop"
+                  className="fixed inset-0 z-10"
                   onClick={() => setShowMenu(false)}
                 />
 
-                <div className="comment-dropdown">
+                <div className="absolute top-full right-0 z-20 mt-1 flex w-auto flex-col rounded-lg border border-[#e5e7eb] bg-white p-1 shadow-[0_4px_12px_rgba(0,0,0,0.08)]">
                   {(!isAdmin || isOwner) && (<button
                     type="button"
-                    className="comment-dropdown-item"
+                    className={`${dropdownItem} text-[#374151] hover:bg-[#f3f4f6]`}
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowMenu(false);
@@ -129,7 +151,7 @@ return (
 
                   <button
                     type="button"
-                    className="comment-dropdown-item comment-dropdown-delete"
+                    className={`${dropdownItem} text-[#dc2626] hover:bg-[#fef2f2]`}
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowMenu(false);
@@ -146,44 +168,32 @@ return (
       </div>
 
       {!isEditing && (
-        <div className="comment-sub-header">
-          <div className="comment-stars">
+        <div className="mt-1 mb-2 flex items-center justify-start gap-3">
+          <div className="flex items-center gap-1">
             <StarRating rating={comment.rating} />
           </div>
-          {date && <span className="comment-date">{date}</span>}
+          {date && <span className="translate-y-[1px] text-xs leading-none text-[#666]">{date}</span>}
         </div>
       )}
 
       {isEditing ? (
-        <div className="comment-edit-form">
-          <div className="comment-form-rating">
-            <span className="comment-form-label">Your rating</span>
-            <div className="comment-form-stars">
-              {[1, 2, 3, 4, 5].map(n => (
-                <button
-                  key={n}
-                  type="button"
-                  className={`comment-form-star ${n <= editRating ? 'active' : ''}`}
-                  onClick={() => setEditRating(n)}
-                  aria-label={`${n} star${n > 1 ? 's' : ''}`}
-                >
-                  ★
-                </button>
-              ))}
-            </div>
+        <div className="mt-3 flex flex-col gap-3">
+          <div className={FORM_RATING_ROW}>
+            <span className={FORM_LABEL}>Your rating</span>
+            <StarInput value={editRating} onChange={setEditRating} />
           </div>
 
           <textarea
-            className="comment-form-input"
+            className={FORM_INPUT}
             rows={3}
             value={editContent}
             onChange={e => setEditContent(e.target.value)}
           />
 
-          <div className="comment-edit-actions">
+          <div className="flex items-center justify-end gap-2.5">
             <button
               type="button"
-              className="comment-edit-cancel-btn"
+              className="cursor-pointer rounded-full border border-[#d1d5db] bg-transparent px-4 py-2 text-[15px] font-medium text-[#374151] transition-all enabled:hover:shadow-[0_0_8px_rgba(0,0,0,0.06)]"
               onClick={handleCancel}
               disabled={isUpdating}
             >
@@ -192,7 +202,7 @@ return (
 
             <button
               type="button"
-              className="comment-form-submit"
+              className={FORM_SUBMIT}
               onClick={handleSave}
               disabled={isUpdating}
             >
@@ -202,12 +212,12 @@ return (
         </div>
       ) : (
         <>
-          <p className="comment-content">{content}</p>
+          <p className="m-0 pt-0.5 text-[15px] leading-normal text-black max-md:text-sm">{content}</p>
 
           {isLongContent && (
             <button
               type="button"
-              className="comment-toggle-btn"
+              className="w-fit cursor-pointer border-none bg-none p-0 text-sm font-semibold text-[#007bff] hover:underline"
               onClick={() => setIsExpanded(prev => !prev)}
             >
               {isExpanded ? 'Show less' : 'Show more'}
@@ -392,31 +402,21 @@ export default function Comment() {
     }
   };
 
+  const statusCls = "px-[15px]";
+
   return (
-    <section className="comment-section">
-      <h2 className="comment-section-title">Reviews</h2>
+    <section className="px-[5%] pt-2.5 pb-5 text-left max-md:px-[30px]">
+      <h2 className="m-0 mb-2.5 pb-4 text-center text-[36px] font-bold text-black">Reviews</h2>
 
       {loggedIn && canReview && (
-        <form className="comment-form" onSubmit={e => { e.preventDefault(); handleSubmit(); }}>
-          <div className="comment-form-rating">
-            <span className="comment-form-label">Your rating</span>
-            <div className="comment-form-stars">
-              {[1, 2, 3, 4, 5].map(n => (
-                <button
-                  key={n}
-                  type="button"
-                  className={`comment-form-star ${n <= newRating ? 'active' : ''}`}
-                  onClick={() => setNewRating(n)}
-                  aria-label={`${n} star${n > 1 ? 's' : ''}`}
-                >
-                  ★
-                </button>
-              ))}
-            </div>
+        <form className="mb-3 flex flex-col gap-2.5 rounded-[20px] border-2 border-[#f0f0f0] bg-white px-6 pt-[15px] pb-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]" onSubmit={e => { e.preventDefault(); handleSubmit(); }}>
+          <div className={FORM_RATING_ROW}>
+            <span className={FORM_LABEL}>Your rating</span>
+            <StarInput value={newRating} onChange={setNewRating} />
           </div>
 
           <textarea
-            className="comment-form-input"
+            className={FORM_INPUT}
             placeholder="Share your thoughts about this product..."
             value={newContent}
             onChange={e => setNewContent(e.target.value)}
@@ -429,11 +429,11 @@ export default function Comment() {
             rows={3}
           />
 
-          {submitError && <p className="comment-form-error">{submitError}</p>}
+          {submitError && <p className="m-0 text-sm text-[#ff3333]">{submitError}</p>}
 
           <button
             type="submit"
-            className="comment-form-submit"
+            className={FORM_SUBMIT}
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Posting...' : 'Post'}
@@ -442,12 +442,14 @@ export default function Comment() {
       )}
 
       {sortedComments.length > 0 && (
-        <div className="comment-sort">
+        <div className="mb-5 flex items-center justify-end gap-2 [&_label]:text-sm [&_label]:font-medium [&_label]:text-[#666]">
           <label htmlFor="comment-sort-select">Sort by</label>
           <select
             id="comment-sort-select"
             value={sort}
             onChange={e => handleSortChange(e.target.value)}
+            className="cursor-pointer appearance-none rounded-lg border border-[#eaeaea] bg-white bg-no-repeat py-[9px] pr-9 pl-3.5 text-sm font-medium text-black transition-colors [background-position:right_12px_center] hover:border-black focus:border-black focus:outline-none"
+            style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E\")" }}
           >
             <option value="date">Newest</option>
             <option value="rating">Rating</option>
@@ -455,13 +457,13 @@ export default function Comment() {
         </div>
       )}
 
-      <div className="comment-list">
+      <div>
         {isLoading ? (
-          <div className="comment-status">Loading comments...</div>
+          <div className={statusCls}>Loading comments...</div>
         ) : error ? (
-          <div className="comment-status">{error}</div>
+          <div className={statusCls}>{error}</div>
         ) : sortedComments.length === 0 ? (
-          <div className="comment-status">No comments yet.</div>
+          <div className={statusCls}>No comments yet.</div>
         ) : (
           <>
             {visibleComments.map(comment => (
@@ -481,7 +483,7 @@ export default function Comment() {
             {hasMore && (
               <button
                 type="button"
-                className="comment-view-more-btn"
+                className="mx-auto mt-1 block w-fit cursor-pointer self-center rounded-full border-2 border-black bg-none px-7 py-2.5 text-[15px] font-semibold text-black transition-colors hover:bg-black hover:text-white"
                 onClick={() => setVisibleCount(prev => prev + REVIEW_STEP)}
               >
                 View more reviews

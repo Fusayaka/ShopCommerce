@@ -10,7 +10,7 @@ import { ConfirmModal, Pagination } from '@/components';
 import { toast } from 'react-toastify';
 import { ProductForm, type ProductFormData } from './Form';
 import StockEditor from './StockEditor';
-import '../ProductList/filter.css';
+import * as fs from '../ProductList/filterStyles';
 import { useSearchParams } from 'react-router-dom';
 import { formatPrice } from '@/utils/format';
 import { CONFIG } from '@/config';
@@ -32,23 +32,23 @@ function DualPriceRange({ minPrice, maxPrice, minLimit, maxLimit, onMinChange, o
     const maxPos = `calc(${maxPercent}% + ${9 - maxPercent * 0.18}px)`;
 
     return (
-        <div className="dual-range-container">
-            <div className="price-range-values">
+        <div className={fs.dualRangeContainer}>
+            <div className={fs.priceRangeValues}>
                 <span style={{ left: minPos }}>${minPrice}</span>
                 <span style={{ left: maxPos }}>${maxPrice}</span>
             </div>
             <div
-                className="price-slider-track-wrapper"
+                className={fs.priceSliderTrackWrapper}
                 style={{ '--min-pos': minPos, '--max-pos': maxPos } as React.CSSProperties}
             >
-                <div className="price-slider-active-range"></div>
+                <div className={fs.priceSliderActiveRange}></div>
                 <input
                     type="range"
                     min={minLimit}
                     max={maxLimit}
                     value={minPrice}
                     onChange={(e) => onMinChange(Number(e.target.value))}
-                    className="price-range-input min-input"
+                    className={fs.priceRangeInput}
                 />
                 <input
                     type="range"
@@ -56,7 +56,7 @@ function DualPriceRange({ minPrice, maxPrice, minLimit, maxLimit, onMinChange, o
                     max={maxLimit}
                     value={maxPrice}
                     onChange={(e) => onMaxChange(Number(e.target.value))}
-                    className="price-range-input max-input"
+                    className={fs.priceRangeInput}
                 />
             </div>
         </div>
@@ -386,18 +386,18 @@ export default function ProductList() {
 
             {filtersOpen && (
                 <div className="absolute right-0 top-full z-[30] -mt-10 flex w-full justify-end">
-                    <div className="filter-card shadow-xl" style={{ width: 340, maxWidth: '100%' }}>
-                        <div className="filter-header">
+                    <div className={`${fs.filterCard} shadow-xl`} style={{ width: 340, maxWidth: '100%' }}>
+                        <div className={fs.filterHeader}>
                             <h3>Filters</h3>
-                            <img src={filterMenu} alt="" className="filter-main-icon" />
+                            <img src={filterMenu} alt="" className={fs.filterMainIcon} />
                         </div>
 
-                        <hr className="filter-divider" />
+                        <hr className={fs.filterDivider} />
 
-                        <div className="filter-group">
-                            <div className="filter-group-header" onClick={() => setIsPriceOpen(!isPriceOpen)}>
+                        <div className={fs.filterGroup}>
+                            <div className={fs.filterGroupHeader} onClick={() => setIsPriceOpen(!isPriceOpen)}>
                                 <span>Price Range</span>
-                                <img src={isPriceOpen ? upArrow : downArrow} alt="toggle" className="filter-arrow-icon" />
+                                <img src={isPriceOpen ? upArrow : downArrow} alt="toggle" className={fs.filterArrowIcon} />
                             </div>
                             {isPriceOpen && (
                                 <DualPriceRange
@@ -411,38 +411,39 @@ export default function ProductList() {
                             )}
                         </div>
 
-                        <hr className="filter-divider" />
+                        <hr className={fs.filterDivider} />
 
-                        <div className="filter-group">
-                            <div className="filter-group-header" onClick={() => setIsDiscountOpen(!isDiscountOpen)}>
+                        <div className={fs.filterGroup}>
+                            <div className={fs.filterGroupHeader} onClick={() => setIsDiscountOpen(!isDiscountOpen)}>
                                 <span>Only discount</span>
-                                <img src={isDiscountOpen ? upArrow : downArrow} alt="toggle" className="filter-arrow-icon" />
+                                <img src={isDiscountOpen ? upArrow : downArrow} alt="toggle" className={fs.filterArrowIcon} />
                             </div>
                             {isDiscountOpen && (
-                                <label className="filter-switch">
+                                <label className={fs.filterSwitch}>
                                     <input
                                         type="checkbox"
                                         checked={discountDraft}
                                         onChange={(e) => setDiscountDraft(e.target.checked)}
+                                        className={fs.filterSwitchInput}
                                     />
-                                    <span className="filter-slider"></span>
+                                    <span className={fs.filterSlider}></span>
                                 </label>
                             )}
                         </div>
 
-                        <hr className="filter-divider" />
+                        <hr className={fs.filterDivider} />
 
-                        <div className="filter-group">
-                            <div className="filter-group-header" onClick={() => setIsSortOpen(!isSortOpen)}>
+                        <div className={fs.filterGroup}>
+                            <div className={fs.filterGroupHeader} onClick={() => setIsSortOpen(!isSortOpen)}>
                                 <span>Sort by</span>
-                                <img src={isSortOpen ? upArrow : downArrow} alt="toggle" className="filter-arrow-icon" />
+                                <img src={isSortOpen ? upArrow : downArrow} alt="toggle" className={fs.filterArrowIcon} />
                             </div>
                             {isSortOpen && (
-                                <div className="filter-select-wrapper">
+                                <div className={fs.filterSelectWrapper}>
                                     <select
                                         value={sortDraft}
                                         onChange={(e) => setSortDraft(e.target.value)}
-                                        className="filter-select"
+                                        className={fs.filterSelect}
                                     >
                                         <option value="latest">Latest</option>
                                         <option value="rating-desc">Rating: High → Low</option>
@@ -456,7 +457,7 @@ export default function ProductList() {
                             )}
                         </div>
 
-                        <button className="filter-apply-btn" onClick={applyFilters}>
+                        <button className={fs.filterApplyBtn} onClick={applyFilters}>
                             Apply Filter
                         </button>
                         {hasActiveFilters && (

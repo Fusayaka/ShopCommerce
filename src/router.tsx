@@ -39,7 +39,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: "download",
-                element:<h2> This is Download Page</h2>
+                element:<h2 className="py-20 text-center text-2xl font-medium text-black">This is Download Page</h2>
             },
             {
                 path: "profile",
@@ -61,7 +61,7 @@ export const router = createBrowserRouter([
     },
     {
         path: "*",
-        element: <h2>Page Not Found</h2> 
+        element: <h2 className="py-20 text-center text-2xl font-medium text-black">Page Not Found</h2>
     },
     {
         path: "dashboard",

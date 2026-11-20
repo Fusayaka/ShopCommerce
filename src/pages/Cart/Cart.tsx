@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import OrderBill from "./OrderBill";
 import OrderList from "./OrderList";
-import './cart.css';
 import { useEffect, useState } from 'react';
 import type { CartLineItem } from "@/types";
 import { cartApi } from "@/api/cartApi";
@@ -54,20 +53,25 @@ export default function Cart() {
         return () => { active = false; };
     }, [user])
 
+    const sectionCls = "mx-auto max-w-full px-[5%] py-6 max-md:px-[30px] max-md:py-5";
+    const breadcrumbCls = "mb-6 flex items-center gap-2 text-sm text-[#606060] [&_a]:text-[#606060] [&_a]:no-underline [&_a:hover]:text-black max-[500px]:mb-4 max-[500px]:text-xs";
+    const titleCls = "mb-6 overflow-hidden text-left text-[40px] leading-none font-black text-black uppercase max-md:mb-5 max-md:text-center max-md:text-[32px] max-[500px]:mb-4 max-[500px]:text-[26px]";
+    const statusCls = "py-10 text-center text-base text-[#606060]";
+
     if (!loggedIn) {
         return (
-            <section className="cart-section">
-                <nav className="detail-breadcrumb">
+            <section className={sectionCls}>
+                <nav className={breadcrumbCls}>
                     <Link to="/">Home</Link>
-                    <span className="breadcrumb-separator">{'>'}</span>
+                    <span className="text-xs">{'>'}</span>
                     <span>Cart</span>
                 </nav>
 
-                <h1 className="cart-title">SHOPPING CART</h1>
+                <h1 className={titleCls}>SHOPPING CART</h1>
 
-                <div className="cart-login-prompt">
+                <div className="flex flex-col items-center gap-5 py-[60px] text-center [&_p]:m-0 [&_p]:text-base [&_p]:text-[#606060]">
                     <p>Please log in to view your cart.</p>
-                    <Link to="/login" className="cart-login-btn">Login</Link>
+                    <Link to="/login" className="rounded-full bg-black px-10 py-3 text-[15px] font-semibold text-white no-underline transition-opacity hover:opacity-85">Login</Link>
                 </div>
             </section>
         );
@@ -111,31 +115,31 @@ export default function Cart() {
     };
 
     return (
-        <section className="cart-section">
-            <nav className="detail-breadcrumb">
+        <section className={sectionCls}>
+            <nav className={breadcrumbCls}>
                 <Link to="/">Home</Link>
-                <span className="breadcrumb-separator">{'>'}</span>
+                <span className="text-xs">{'>'}</span>
                 <span>Cart</span>
             </nav>
-            
-            <h1 className="cart-title">SHOPPING CART</h1>
+
+            <h1 className={titleCls}>SHOPPING CART</h1>
 
             {loading ? (
-                <div className="cart-status">Loading...</div>
+                <div className={statusCls}>Loading...</div>
             ) : items.length === 0 ? (
-                <div className="cart-status">{error ?? "Your cart is empty."}</div>
+                <div className={statusCls}>{error ?? "Your cart is empty."}</div>
             ) : (
                 <>
-                    {error && <div className="cart-status cart-status-error">{error}</div>}
-                    <div className="cart-container">
-                        <div className="cart-list-wrapper">
+                    {error && <div className="py-3 text-center text-base text-[#ff3333]">{error}</div>}
+                    <div className="flex items-start gap-6 max-md:flex-col max-md:gap-5">
+                        <div className="min-w-0 flex-1 max-md:mx-auto max-md:w-full max-md:flex-none max-md:items-center">
                             <OrderList
                                 items={items}
                                 onUpdateQuantity={handleUpdateQuantity}
                                 onRemoveItem={handleRemoveItem}
                             />
                         </div>
-                        <div className="cart-bill-wrapper">
+                        <div className="w-auto max-[992px]:w-[350px] max-md:w-full max-[500px]:mx-auto max-[500px]:w-[90%]">
                             <OrderBill
                                 items={items}
                             />

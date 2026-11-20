@@ -1,4 +1,3 @@
-import './tailwind.css';
 import Sidebar from './Sidebar';
 import MainContent from './MainContent';
 import { useAuth } from '@/utils/auth';

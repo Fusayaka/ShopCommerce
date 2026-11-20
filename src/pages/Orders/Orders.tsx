@@ -1,4 +1,3 @@
-import './tailwind.css';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import avatarPlaceholder from '@/assets/avatar-placeholder.svg';
@@ -8,6 +7,7 @@ import type { Order } from '@/types';
 import OrderCard from './OrderCard';
 import { TABS, type TabKey } from '@/constants/order';
 import { CONFIG } from '@/config';
+import { Link } from 'react-router-dom';
 
 const PAGE_SIZE = CONFIG.DEFAULT_PAGE_SIZE;
 
@@ -179,6 +179,10 @@ export default function Orders() {
 
     return (
         <div data-orders className="min-h-[70vh] w-full bg-slate-50 py-6 text-slate-800">
+            <nav className='mb-6 px-7.5 text-left text-sm text-[#666] md:px-[5%] [&_a]:text-[#666] [&_a]:no-underline [&_a]:transition-colors [&_a:hover]:text-black [&_a:hover]:underline'>
+                <Link to='/'>Home</Link> {' > '}
+                <span className="font-medium text-black">My Orders</span>
+            </nav>
             <div className="mx-auto flex w-full flex-col gap-6 px-7.5 md:px-[5%] lg:flex-row">
                 {/* User info sidebar*/}
                 <aside className="w-full shrink-0 lg:w-1/5 lg:max-w-[20%] mt-20">

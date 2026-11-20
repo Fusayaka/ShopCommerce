@@ -5,8 +5,6 @@ import type { CartLineItem } from '@/types';
 import { Link } from 'react-router-dom';
 import { ConfirmModal } from '@/components';
 
-import './cartItemCard.css';
-
 interface CartItemCardProps {
   item: CartLineItem;
   onUpdateQuantity: (item: CartLineItem, newQuantity: number) => void;
@@ -39,29 +37,36 @@ export default function CartItemCard({
 
   return (
     <>
-      <div className="cart-item">
-        <Link to={`/product/${item.productId}`} className="cart-item-image">
+      <div className="flex gap-4 border-b border-[#e0e0e0] py-6 first:pt-0 last:border-b-0 last:pb-0">
+        <Link
+          to={`/product/${item.productId}`}
+          className="block h-[130px] w-[120px] shrink-0 overflow-hidden rounded-[8.6px] bg-[#f2f2f2] max-md:h-[90px] max-md:w-[75px]"
+        >
           <img
             src={item.image}
             alt={item.title}
             onError={(e) => (e.currentTarget.src = plhImg)}
+            className="h-full w-full object-cover"
           />
         </Link>
 
-        <div className="cart-item-info">
-          <div className="cart-item-header">
-            <Link to={`/product/${item.productId}`} className="cart-item-title">
+        <div className="flex flex-1 flex-col text-left max-md:min-w-0">
+          <div className="flex items-start justify-between">
+            <Link
+              to={`/product/${item.productId}`}
+              className="m-0 block overflow-hidden text-xl font-bold text-ellipsis whitespace-nowrap text-black no-underline hover:text-[#d31b1b] max-md:text-base"
+            >
               {item.title}
             </Link>
             <button
-              className="cart-item-delete"
+              className="flex cursor-pointer items-center justify-center border-none bg-none p-0 hover:opacity-70"
               onClick={() => setShowConfirmModal(true)}
             >
-              <img src={trashIcon} alt="Delete item" />
+              <img src={trashIcon} alt="Delete item" className="h-6 w-6 object-contain" />
             </button>
           </div>
 
-          <div className="cart-item-meta">
+          <div className="mt-1.5 [&_p]:my-0.5 [&_p]:text-sm [&_p]:leading-[1.4] [&_p]:text-black [&_span]:text-[#888]">
             <p>
               Size: <span>{item.size}</span>
             </p>
@@ -73,12 +78,12 @@ export default function CartItemCard({
             </p>
           </div>
 
-          <div className="cart-item-bottom">
-            <p className="cart-item-total">
-              Total Price <span>${currentTotalPrice}</span>
+          <div className="mt-auto flex items-center justify-between pt-3 max-md:mt-3">
+            <p className="m-0 flex items-center pr-2.5 text-base font-medium text-black max-md:text-[13px]">
+              Total Price <span className="ml-1.5 text-xl font-bold text-[#ff3333] max-md:text-base">${currentTotalPrice}</span>
             </p>
 
-            <div className="quantity-control">
+            <div className="flex h-[30px] w-1/5 min-w-[60px] items-center justify-between rounded-3xl bg-[#f0f0f0] px-2 py-1 max-md:h-auto [&_button]:flex [&_button]:cursor-pointer [&_button]:items-center [&_button]:justify-center [&_button]:border-none [&_button]:bg-none [&_button]:p-0 [&_button]:text-lg [&_button]:font-medium [&_button]:text-black [&_span]:text-center [&_span]:text-[15px] [&_span]:font-medium max-md:[&_span]:text-sm">
               <button onClick={decrease}>-</button>
               <span>{item.quantity}</span>
               <button onClick={increase}>+</button>
