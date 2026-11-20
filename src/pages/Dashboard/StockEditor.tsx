@@ -3,9 +3,7 @@ import { toast } from 'react-toastify';
 import { productApi, type UpdateStockDto } from '@/api/productApi';
 import type { ProductStock, Size, Color } from '@/types';
 import { ConfirmModal } from '@/components';
-
-const SIZES: Size[] = ['S', 'M', 'L', 'XL', 'XXL'];
-const COLORS: Color[] = ['Red', 'Green', 'Blue'];
+import { SIZES, COLORS } from '@/constants/catalog';
 
 interface StockEditorProps {
     productId: number;

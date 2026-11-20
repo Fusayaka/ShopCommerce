@@ -11,9 +11,7 @@ import { productApi } from '@/api/productApi';
 import { toast } from 'react-toastify';
 import { useAuth } from '@/utils/auth';
 import { ConfirmModal } from '@/components';
-
-const COLORS = ['Red', 'Blue', 'Green'];
-const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
+import { SIZES, COLORS } from '@/constants/catalog';
 
 export default function Overview() {
     const {productId} = useParams<{ productId: string }>();
