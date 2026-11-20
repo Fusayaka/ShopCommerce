@@ -5,7 +5,9 @@ export const CONFIG = {
 
     API_TIMEOUT: Number(env.VITE_API_TIMEOUT) || 10000,
 
-    DEFAULT_PAGE_SIZE: Number(env.VITE_DEFAULT_PAGE_SIZE) || 6,
-
     APP_NAME: env.VITE_APP_NAME || 'ShopCommerce',
+
+    DEFAULT_PAGE_SIZE: Number(env.VITE_DEFAULT_PAGE_SIZE) || 10,
+    
+    SEARCH_LIMIT:     Number(env.VITE_SEARCH_LIMIT) || 10,
 } as const;

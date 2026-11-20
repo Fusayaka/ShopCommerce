@@ -13,6 +13,7 @@ import StockEditor from './StockEditor';
 import '../ProductList/filter.css';
 import { useSearchParams } from 'react-router-dom';
 import { formatPrice } from '@/utils/format';
+import { CONFIG } from '@/config';
 
 interface DualPriceRangeProps {
     minPrice: number;
@@ -102,7 +103,7 @@ function BoxIcon() {
     );
 }
 
-const LIMIT = 10;
+const LIMIT = CONFIG.DEFAULT_PAGE_SIZE;
 
 export default function ProductList() {
     const [searchParams, setSearchParams] = useSearchParams();

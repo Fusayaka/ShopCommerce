@@ -5,13 +5,10 @@ import { promoApi } from '@/api/promoApi';
 import type { CartLineItem } from '@/types';
 import { formatPrice } from '@/utils/format';
 import './orderBill.css';
+import { DELIVERY_FEE } from '@/constants/commerce';
 
 interface OrderBillProps {
   items: CartLineItem[];
-}
-
-function getDeliveryFee() {
-  return 15;
 }
 
 export default function OrderBill({ items }: OrderBillProps) {
@@ -28,7 +25,7 @@ export default function OrderBill({ items }: OrderBillProps) {
   const [validatingPromo, setValidatingPromo] = useState<boolean>(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
-  const deliveryFee = subtotal > 0 ? getDeliveryFee() : 0;
+  const deliveryFee = subtotal > 0 ? DELIVERY_FEE : 0;
   const total = Math.max(0, subtotal - discount + deliveryFee);
 
   useEffect(() => {

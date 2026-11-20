@@ -14,6 +14,7 @@ import plhImg from '/images/cloth-placeholder.jpeg';
 import { loginApi } from '@/api/loginApi';
 import { productApi } from '@/api/productApi';
 import type { Product } from '@/types';
+import { CONFIG } from '@/config';
 
 const DEBOUNCE = 600;
 
@@ -99,7 +100,7 @@ export default function Header() {
 
             setIsSearching(true);
             try {
-                const res = await productApi.getProducts({ search: query, limit: 10 });
+                const res = await productApi.getProducts({ search: query, limit: CONFIG.SEARCH_LIMIT });
                 const list = res?.data || [];
                 setSearchProducts(Array.isArray(list) ? list : []);
                 setShowSuggestions(true);

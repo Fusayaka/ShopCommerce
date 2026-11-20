@@ -10,6 +10,7 @@ import promoIcon from '@/assets/promo-code.svg';
 import { formatPrice } from '@/utils/format';
 import './payment.css';
 import { PAYMENT_METHODS } from '@/constants/order';
+import { DELIVERY_FEE, FIELD_LIMITS } from '@/constants/commerce';
 
 interface PaymentProps {
   subtotal: number;
@@ -31,7 +32,7 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
   const [submitting, setSubmitting] = useState<boolean>(false);
 
   const safeSubtotal = Number(subtotal) || 0;
-  const deliveryFee = safeSubtotal > 0 ? 15 : 0;
+  const deliveryFee = safeSubtotal > 0 ? DELIVERY_FEE : 0;
   const totalPayment = Math.max(1, safeSubtotal + deliveryFee - discount);
 
   const validateAndApplyPromo = useCallback(async (codeToValidate: string, currentSubtotal: number, isAutoRevalidate = true) => {
@@ -156,7 +157,7 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
             type="text"
             placeholder="Enter delivery address"
             value={address}
-            maxLength={255}
+            maxLength={FIELD_LIMITS.address}
             onChange={(e) => setAddress(e.target.value)}
           />
         </div>
@@ -168,7 +169,7 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
             type="text"
             placeholder="Enter contact number"
             value={contact}
-            maxLength={20}
+            maxLength={FIELD_LIMITS.contact}
             onChange={(e) => setContact(e.target.value)}
           />
         </div>

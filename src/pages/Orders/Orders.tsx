@@ -7,8 +7,9 @@ import { useAuth } from '@/utils/auth';
 import type { Order } from '@/types';
 import OrderCard from './OrderCard';
 import { TABS, type TabKey } from '@/constants/order';
+import { CONFIG } from '@/config';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = CONFIG.DEFAULT_PAGE_SIZE;
 
 const matchesTab = (c: { kind: 'order' | 'redelivery'; order: Order }, tab: TabKey) =>
     tab === 'all'

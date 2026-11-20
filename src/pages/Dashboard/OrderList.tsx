@@ -6,11 +6,12 @@ import { OrderDetailModal } from './OrderView';
 import { useSearchParams } from 'react-router-dom';
 import { formatPrice, formatDate } from '@/utils/format';
 import { STATUS_STYLES, ALL_STATUSES } from '@/constants/order';
+import { CONFIG } from '@/config';
 
 type SortKey = 'date' | 'status';
 type SortDir = 'asc' | 'desc';
 
-const LIMIT = 10;
+const LIMIT = CONFIG.DEFAULT_PAGE_SIZE;
 
 const SORT_COLUMN: Record<SortKey, 'createdAt' | 'status'> = {
     date: 'createdAt',

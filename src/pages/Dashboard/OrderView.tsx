@@ -5,6 +5,7 @@ import { orderApi } from '@/api/orderApi';
 import { RedeliveryForm, type RedeliveryFormData } from './Form';
 import { formatPrice, formatDate } from '@/utils/format';
 import { NEXT_STATUS, PAYMENT_LABELS, STATUS_STYLES } from '@/constants/order';
+import { FIELD_LIMITS } from '@/constants/commerce';
 
 interface OrderDetailModalProps {
     order: Order | null;
@@ -604,7 +605,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClo
                             value={reasonDraft}
                             onChange={(e) => setReasonDraft(e.target.value)}
                             disabled={savingNote}
-                            maxLength={100}
+                            maxLength={FIELD_LIMITS.redeliveryReason}
                             placeholder="Reason for this redelivery…"
                             className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-slate-900 disabled:opacity-50"
                         />
@@ -618,7 +619,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClo
                             onChange={(e) => setNoteDraft(e.target.value)}
                             disabled={savingNote}
                             rows={4}
-                            maxLength={255}
+                            maxLength={FIELD_LIMITS.redeliveryNote}
                             placeholder="Add a note for this redelivery…"
                             className="mt-1.5 w-full resize-none rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-slate-900 disabled:opacity-50"
                         />
