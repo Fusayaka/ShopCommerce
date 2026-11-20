@@ -4,7 +4,7 @@ import type { Order, OrderStatus } from '@/types';
 import { Pagination } from '@/components';
 import { OrderDetailModal } from './OrderView';
 import { useSearchParams } from 'react-router-dom';
-import { formatPrice } from '@/utils/format';
+import { formatPrice, formatDate } from '@/utils/format';
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
     pending: 'bg-amber-50 text-amber-700',

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import type { Order, OrderStatus } from '@/types';
 import { cartApi } from '@/api/cartApi';
-import { formatPrice } from '@/utils/format';
+import { formatPrice, formatDate, formatDateTime } from '@/utils/format';
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
     pending: 'bg-amber-50 text-amber-700 ring-amber-200',
@@ -13,26 +13,6 @@ const STATUS_STYLES: Record<OrderStatus, string> = {
     cancelled: 'bg-red-50 text-red-700 ring-red-200',
     redelivery: 'bg-purple-50 text-purple-700 ring-purple-200',
 };
-
-function formatDateTime(value?: string): string {
-    if (!value) return '—';
-    const d = new Date(value);
-    if (Number.isNaN(d.getTime())) return '—';
-    return d.toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-    });
-}
-
-function formatDate(value?: string): string {
-    if (!value) return '';
-    const d = new Date(value);
-    if (Number.isNaN(d.getTime())) return '';
-    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-}
 
 interface OrderCardProps {
     order: Order;
@@ -111,7 +91,7 @@ export default function OrderCard({ order, kind = 'order', orderId, reason, onVi
                         {label} #{order.id}
                     </span>
                     {order.createdAt && (
-                        <span className="text-xs text-slate-500">{formatDate(order.createdAt)}</span>
+                        <span className="text-xs text-slate-500">{formatDate(order.createdAt, '')}</span>
                     )}
                 </div>
                 <span className="text-xs text-slate-500">

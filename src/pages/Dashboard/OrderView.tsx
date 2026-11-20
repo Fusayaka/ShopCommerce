@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { orderApi } from '@/api/orderApi';
 import { RedeliveryForm, type RedeliveryFormData } from './Form';
-import { formatPrice } from '@/utils/format';
+import { formatPrice, formatDate } from '@/utils/format';
 
 interface OrderDetailModalProps {
     order: Order | null;
@@ -34,13 +34,6 @@ const NEXT_STATUS: Record<OrderStatus, OrderStatus[]> = {
     delivered: [],
     cancelled: [],
 };
-
-function formatDate(value?: string) {
-    if (!value) return '';
-    const d = new Date(value);
-    if (Number.isNaN(d.getTime())) return '';
-    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-}
 
 function getTotalItems(order: Order) {
     return order.items.reduce((count, item) => count + item.quantity, 0);
