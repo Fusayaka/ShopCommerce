@@ -12,6 +12,7 @@ import { ProductForm, type ProductFormData } from './Form';
 import StockEditor from './StockEditor';
 import '../ProductList/filter.css';
 import { useSearchParams } from 'react-router-dom';
+import { formatPrice } from '@/utils/format';
 
 interface DualPriceRangeProps {
     minPrice: number;
@@ -64,14 +65,6 @@ function DualPriceRange({ minPrice, maxPrice, minLimit, maxLimit, onMinChange, o
 interface PriceRange {
     minPrice: number;
     maxPrice: number;
-}
-
-function formatPrice(value?: number) {
-    if (value === undefined || value === null) return '—';
-    return `${Number(value).toLocaleString('en-US', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    })}`;
 }
 
 function displayPrice(product: Product): PriceRange | undefined {

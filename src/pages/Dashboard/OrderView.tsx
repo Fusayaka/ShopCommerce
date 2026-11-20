@@ -3,11 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { orderApi } from '@/api/orderApi';
 import { RedeliveryForm, type RedeliveryFormData } from './Form';
+import { formatPrice } from '@/utils/format';
 
 interface OrderDetailModalProps {
     order: Order | null;
     onClose: () => void;
-    /** Called after a status change or redelivery create/update so the list can refresh. */
     onChanged?: () => void;
 }
 
@@ -34,14 +34,6 @@ const NEXT_STATUS: Record<OrderStatus, OrderStatus[]> = {
     delivered: [],
     cancelled: [],
 };
-
-function formatPrice(value?: number | null) {
-    if (value === undefined || value === null) return '—';
-    return `${Number(value).toLocaleString('en-US', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    })}`;
-}
 
 function formatDate(value?: string) {
     if (!value) return '';

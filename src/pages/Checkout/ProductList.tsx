@@ -4,6 +4,7 @@ import { cartApi, type CartItemResponse } from '@/api/cartApi';
 import { notifyCartChanged } from '@/utils/cartCount';
 import { ConfirmModal } from '@/components';
 import plhImg from '/images/cloth-placeholder.jpeg';
+import { formatPrice } from '@/utils/format';
 import './productList.css';
 
 export interface CheckoutLineItem {
@@ -92,13 +93,6 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
       onDataLoaded(sumOfSubtotal, totalQuantity);
     }
   }, [sumOfSubtotal, totalQuantity, onDataLoaded, loading]);
-
-  const formatPrice = (price: number): string => {
-    return `$${price.toLocaleString('en-US', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    })}`;
-  };
 
   const handleQuantityChange = async (stockId: number, nextQty: number) => {
     if (nextQty < 0) return;
@@ -220,7 +214,7 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
                   </td>
 
                   <td className="checkout-td checkout-td-price">
-                    <span className="price-text">{formatPrice(item.unitPrice)}</span>
+                    <span className="price-text">${formatPrice(item.unitPrice)}</span>
                   </td>
 
                   <td className="checkout-td checkout-td-amount">
@@ -251,7 +245,7 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
 
                   <td className="checkout-td checkout-td-subtotal">
                     <div className="subtotal-cell-content">
-                      <span className="subtotal-text">{formatPrice(itemTotal)}</span>
+                      <span className="subtotal-text">${formatPrice(itemTotal)}</span>
                       {editable && (
                         <button
                           type="button"
@@ -309,7 +303,7 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
                 </div>
 
                 <div className="mobile-card-bottom-row">
-                  <div className="mobile-unit-price">{formatPrice(item.unitPrice)}</div>
+                  <div className="mobile-unit-price">${formatPrice(item.unitPrice)}</div>
 
                   <div className="mobile-quantity-container">
                     {editable ? (
@@ -351,7 +345,7 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
             Total: <span className="highlight-total">{totalQuantity} item{totalQuantity > 1 && "s"}</span>
           </div>
           <div className="order-sum-subtotal">
-            Sum of subtotal: <span className="highlight-price">{formatPrice(sumOfSubtotal)}</span>
+            Sum of subtotal: <span className="highlight-price">${formatPrice(sumOfSubtotal)}</span>
           </div>
         </div>
       </div>

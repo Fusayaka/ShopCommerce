@@ -7,6 +7,7 @@ import type { PaymentMethod } from '@/types';
 import { useAuth } from '@/utils/auth';
 import { notifyCartChanged } from '@/utils/cartCount';
 import promoIcon from '@/assets/promo-code.svg';
+import { formatPrice } from '@/utils/format';
 import './payment.css';
 
 interface PaymentProps {
@@ -38,13 +39,6 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
   const deliveryFee = safeSubtotal > 0 ? 15 : 0;
   const totalPayment = Math.max(1, safeSubtotal + deliveryFee - discount);
 
-  const formatPrice = (val: number): string => {
-    return `$${val.toLocaleString('en-US', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    })}`;
-  };
-
   const validateAndApplyPromo = useCallback(async (codeToValidate: string, currentSubtotal: number, isAutoRevalidate = true) => {
     if (!codeToValidate) return;
 
@@ -59,7 +53,7 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
         setdiscount(discountVal);
         setAppliedPromo(codeToValidate);
         setPromoMessage({
-          text: `Applied successfully! Saved ${formatPrice(discountVal)}`,
+          text: `Applied successfully! Saved $${formatPrice(discountVal)}`,
           type: 'success',
         });
       } else {
@@ -265,18 +259,18 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
         <div className="checkout-summary-details">
           <div className="summary-row">
             <span className="summary-label">Subtotal</span>
-            <span className="summary-val">{formatPrice(safeSubtotal)}</span>
+            <span className="summary-val">${formatPrice(safeSubtotal)}</span>
           </div>
 
           <div className="summary-row">
             <span className="summary-label">Shipping</span>
-            <span className="summary-val">{formatPrice(deliveryFee)}</span>
+            <span className="summary-val">${formatPrice(deliveryFee)}</span>
           </div>
 
           {discount > 0 && (
             <div className="summary-row discount">
               <span className="summary-label">Discount</span>
-              <span className="summary-val">-{formatPrice(discount)}</span>
+              <span className="summary-val">-${formatPrice(discount)}</span>
             </div>
           )}
 
@@ -284,7 +278,7 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
 
           <div className="summary-row total-row">
             <span className="summary-label total-label">Total payment</span>
-            <span className="summary-val total-val">{formatPrice(totalPayment)}</span>
+            <span className="summary-val total-val">${formatPrice(totalPayment)}</span>
           </div>
 
           <div className="place-order-wrapper">

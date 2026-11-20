@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import promo from '@/assets/promo-code.svg';
 import { promoApi } from '@/api/promoApi';
 import type { CartLineItem } from '@/types';
+import { formatPrice } from '@/utils/format';
 import './orderBill.css';
 
 interface OrderBillProps {
@@ -29,12 +30,6 @@ export default function OrderBill({ items }: OrderBillProps) {
 
   const deliveryFee = subtotal > 0 ? getDeliveryFee() : 0;
   const total = Math.max(0, subtotal - discount + deliveryFee);
-
-  const formatPrice = (price: number) =>
-    price.toLocaleString('en-US', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    });
 
   useEffect(() => {
     if (!appliedCode) return;

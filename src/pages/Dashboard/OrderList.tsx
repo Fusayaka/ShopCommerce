@@ -4,6 +4,7 @@ import type { Order, OrderStatus } from '@/types';
 import { Pagination } from '@/components';
 import { OrderDetailModal } from './OrderView';
 import { useSearchParams } from 'react-router-dom';
+import { formatPrice } from '@/utils/format';
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
     pending: 'bg-amber-50 text-amber-700',
@@ -32,14 +33,6 @@ const SORT_COLUMN: Record<SortKey, 'createdAt' | 'status'> = {
     date: 'createdAt',
     status: 'status',
 };
-
-function formatPrice(value?: number | null) {
-    if (value === undefined || value === null) return '—';
-    return `${Number(value).toLocaleString('en-US', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    })}`;
-}
 
 function formatDate(value?: string) {
     if (!value) return '—';

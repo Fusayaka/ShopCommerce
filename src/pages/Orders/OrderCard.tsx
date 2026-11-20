@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import type { Order, OrderStatus } from '@/types';
 import { cartApi } from '@/api/cartApi';
+import { formatPrice } from '@/utils/format';
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
     pending: 'bg-amber-50 text-amber-700 ring-amber-200',
@@ -12,14 +13,6 @@ const STATUS_STYLES: Record<OrderStatus, string> = {
     cancelled: 'bg-red-50 text-red-700 ring-red-200',
     redelivery: 'bg-purple-50 text-purple-700 ring-purple-200',
 };
-
-function formatPrice(value?: number | null): string {
-    if (value === undefined || value === null) return '—';
-    return Number(value).toLocaleString('en-US', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    });
-}
 
 function formatDateTime(value?: string): string {
     if (!value) return '—';
