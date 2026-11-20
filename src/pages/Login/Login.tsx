@@ -46,6 +46,11 @@ export default function Login(){
         setError('');
         setFieldErrors({});
         setIsLogin(toLogin);
+
+        setName('');
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
     };
 
     const validate = () => {
