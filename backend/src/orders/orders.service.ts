@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, ForbiddenException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { UpdateOrderDto } from './dto/update-order.dto.js';
@@ -273,36 +273,41 @@ export class OrdersService {
   }
 
   async createRedelivery(user: User, orderId: number, dto: CreateRedeliveryOrderDto) {
-    const order = await this.prisma.order.findUnique({
-      where: { id: orderId },
-      include: {
-        user: {
-          select: { address: true, contact: true },
+    const redelivery = await this.prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { id: orderId },
+        include: {
+          user: {
+            select: { address: true, contact: true },
+          },
         },
-      },
-    });
+      });
+      
+      if (!order) throw new NotFoundException(`Not found Order ID ${orderId}!`);
 
-    if (!order) {
-      throw new NotFoundException(`Not found Order ID ${orderId}!`);
-    }
+      if (order.status !== 'cancelled') throw new BadRequestException(`Cannot create a redelivery for an order with status "${order.status}"!`);
 
-    if (order.status !== 'cancelled') {
-      throw new BadRequestException(
-        `Cannot create a redelivery for an order with status "${order.status}"!`,
-      );
-    }
+      const existingRedelivery = await tx.redeliveryOrder.findFirst({
+        where: { 
+          orderId, 
+          status: { not: 'cancelled' }
+        },
+      })
 
-    const redelivery = await this.prisma.redeliveryOrder.create({
-      data: {
-        order: { connect: { id: orderId } },
-        createdBy: { connect: { id: user.id } },
-        reason: dto.reason,
-        note: dto.note ?? null,
-        address: dto.address ?? order.address ?? order.user.address,
-        contact: dto.contact ?? order.contact ?? order.user.contact,
-        total: order.total,
-        paymentMethod: dto.paymentMethod ?? order.paymentMethod ?? 'delivery',
-      },
+      if (existingRedelivery) throw new ConflictException(`Order #${orderId} already has an active redelivery request`);
+
+      return tx.redeliveryOrder.create({
+        data: {
+          order: { connect: { id: orderId } },
+          createdBy: { connect: { id: user.id } },
+          reason: dto.reason,
+          note: dto.note ?? null,
+          address: dto.address ?? order.address ?? order.user.address,
+          contact: dto.contact ?? order.contact ?? order.user.contact,
+          total: order.total,
+          paymentMethod: dto.paymentMethod ?? order.paymentMethod ?? 'delivery',
+        },
+      });
     });
 
     return {
