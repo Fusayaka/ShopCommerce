@@ -10,9 +10,22 @@ export class PromosService {
 
   async create(dto: CreatePromoDto) {
     const promo = await this.prisma.promoCodes.findUnique({
-      where: {code: dto.code, deletedAt: null}
+      where: {code: dto.code}
     });
-    if (promo) throw new ConflictException(`Code ${dto.code} already exists`);
+    if (promo){
+      if (!promo.deletedAt) throw new ConflictException(`Code ${dto.code} already exists`);
+      return this.prisma.promoCodes.update({
+        where: { code: dto.code},
+        data: {
+          discountNum: dto.discountNum,
+          discountPer: dto.discountPer,
+          maxDiscountNum: dto.maxDiscountNum,
+          minToApply: dto.minToApply,
+          expiredAt: dto.expiredAt,
+          deletedAt: null
+        }
+      })
+    }
 
     return this.prisma.promoCodes.create({
       data: {
