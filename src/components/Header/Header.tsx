@@ -74,7 +74,7 @@ export default function Header() {
 
     const handleSearchSubmit = () => {
         if (searchTerm.trim() !== "") {
-            navigate(`/products?search=${encodeURIComponent(searchTerm.trim())}`);
+            navigate(`${ROUTES.PRODUCTS}?search=${encodeURIComponent(searchTerm.trim())}`);
         }
         setIsSearchOpen(false);
         setShowSuggestions(false);
@@ -155,7 +155,7 @@ export default function Header() {
         setIsAvatarOpen(false);
         await loginApi.logout();
         clearAuth();
-        navigate('/', {replace: true});
+        navigate(ROUTES.HOME, {replace: true});
     };
 
     const searchIcon = "h-5 w-5 cursor-pointer object-contain";
@@ -177,7 +177,7 @@ export default function Header() {
                                     key={prod.id}
                                     className="flex cursor-pointer items-center gap-2.5 border-b border-[#f3f4f6] px-2.5 py-2 transition-colors duration-200 last:border-b-0 hover:bg-[#f9fafb]"
                                     onMouseDown={() => {
-                                        navigate(`/product/${prod.id}`);
+                                        navigate(ROUTES.PRODUCT_DETAILS(prod.id));
                                         setShowSuggestions(false);
                                         setIsSearchOpen(false);
                                     }}
@@ -294,7 +294,7 @@ export default function Header() {
                                                     src={item.image || plhImg}
                                                     alt={item.title}
                                                     onError={(e) => { e.currentTarget.src = plhImg; }}
-                                                    onClick={() => navigate(`/product/${item.id}`)}
+                                                    onClick={() => navigate(ROUTES.PRODUCT_DETAILS(item.id))}
                                                     className='h-[50px] w-10 shrink-0 cursor-pointer rounded-md bg-[#f3f4f6] object-cover'
                                                 />
                                                 <div className='flex min-w-0 flex-1 flex-col gap-0.5'>

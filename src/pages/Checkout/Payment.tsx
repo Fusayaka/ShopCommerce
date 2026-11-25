@@ -10,6 +10,7 @@ import promoIcon from '@/assets/promo-code.svg';
 import { formatPrice } from '@/utils/format';
 import { PAYMENT_METHODS } from '@/constants/order';
 import { DELIVERY_FEE, FIELD_LIMITS } from '@/constants/commerce';
+import { ROUTES } from '@/constants/routes';
 
 interface PaymentProps {
   subtotal: number;
@@ -131,7 +132,7 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
 
       notifyCartChanged();
       toast.success('Order placed successfully!');
-      navigate('/orders');
+      navigate(ROUTES.ORDERS);
     } catch (err: unknown) {
       console.error('Failed to place order:', err);
       const apiErr = err as { response?: { data?: { message?: string } }; message?: string };

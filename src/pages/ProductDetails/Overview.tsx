@@ -106,7 +106,7 @@ export default function Overview() {
     const addSelectionToCart = async (): Promise<boolean> => {
         if (!user) {
             toast.error("Please log in to add items to your cart.");
-            navigate("/login");
+            navigate(ROUTES.LOGIN);
             return false;
         }
 
@@ -154,7 +154,7 @@ export default function Overview() {
     const executeBuyNow = async () => {
         const added = await buyProducts();
         if (added) {
-            navigate("/checkout");
+            navigate(ROUTES.CHECKOUT);
         }
     };
 
@@ -178,7 +178,7 @@ export default function Overview() {
         const isBuyNow = pendingAction === 'buy';
         setPendingAction(null);
 
-        navigate('/login', {
+        navigate(ROUTES.LOGIN, {
             state: { 
                 from: isBuyNow ? '/checkout' : location.pathname 
             }

@@ -5,6 +5,7 @@ import { promoApi } from '@/api/promoApi';
 import type { CartLineItem } from '@/types';
 import { formatPrice } from '@/utils/format';
 import { DELIVERY_FEE } from '@/constants/commerce';
+import { ROUTES } from '@/constants/routes';
 
 interface OrderBillProps {
   items: CartLineItem[];
@@ -176,7 +177,7 @@ export default function OrderBill({ items }: OrderBillProps) {
         </p>
       )}
 
-      <button className="flex w-full cursor-pointer items-center justify-center rounded-3xl border-none bg-black px-4 py-2 text-base font-medium text-white transition-opacity hover:opacity-80 hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)]" onClick={() => navigate('/checkout')}>
+      <button className="flex w-full cursor-pointer items-center justify-center rounded-3xl border-none bg-black px-4 py-2 text-base font-medium text-white transition-opacity hover:opacity-80 hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)]" onClick={() => navigate(ROUTES.CHECKOUT)}>
         Go to Checkout <span className="ml-2 text-lg">→</span>
       </button>
     </div>

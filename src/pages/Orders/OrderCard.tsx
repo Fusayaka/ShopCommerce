@@ -5,6 +5,7 @@ import type { Order } from '@/types';
 import { cartApi } from '@/api/cartApi';
 import { formatPrice, formatDate, formatDateTime } from '@/utils/format';
 import { STATUS_STYLES } from '@/constants/order';
+import { ROUTES } from '@/constants/routes';
 
 interface OrderCardProps {
     order: Order;
@@ -49,11 +50,11 @@ export default function OrderCard({ order, kind = 'order', orderId, reason, onVi
 
             if (addedCount > 0 && failedList.length === 0){
                 toast.success('Items added to your cart.');
-                navigate('/cart');
+                navigate(ROUTES.CART);
             }
             else if (addedCount > 0){
                 toast.warning(`Add ${addedCount} item${addedCount > 1 && 's'} to your cart. ${failedList.length} unavailable item${failedList.length > 1 ? 's were': ' was'} skipped.`);
-                navigate('/cart');
+                navigate(ROUTES.CART);
             }
             else toast.error('None of the items from this order are available anymore.');
         } catch {
