@@ -14,6 +14,7 @@ import { loginApi } from '@/api/loginApi';
 import { productApi } from '@/api/productApi';
 import type { Product } from '@/types';
 import { CONFIG } from '@/config';
+import { ROUTES } from '@/constants/routes';
 
 const DEBOUNCE = 600;
 
@@ -214,15 +215,15 @@ export default function Header() {
             </button>
 
             <div className='max-md:flex max-md:flex-1 max-md:justify-start max-md:pl-2.5 max-md:text-left'>
-                <Link to="/" className='mr-2.5 block h-8'>
+                <Link to={ROUTES.HOME} className='mr-2.5 block h-8'>
                     <img src={logo} alt='Shop Logo' className='h-8 w-auto object-contain'/>
                 </Link>
             </div>
 
             <nav className='flex gap-[27px] max-md:hidden [&_a]:text-[13px] [&_a]:font-medium [&_a]:text-[#08060d] [&_a]:no-underline [&_a]:transition-opacity [&_a]:duration-200 [&_a:hover]:text-[deepskyblue]'>
-                <Link to='/products'>Products</Link>
+                <Link to={ROUTES.PRODUCTS}>Products</Link>
                 <Link to='/download'>Download</Link>
-                {isAdminOrManager && <Link to='/dashboard'>Dashboard</Link>}
+                {isAdminOrManager && <Link to={ROUTES.DASHBOARD}>Dashboard</Link>}
             </nav>
 
             <div className='relative mx-[15px] flex w-[400px] max-w-[25%] items-center rounded-full bg-[#f4f3ec] py-2.5 px-5 max-md:hidden' ref={searchContainerRef}>
@@ -266,7 +267,7 @@ export default function Header() {
                     onMouseEnter={openMiniCart}
                     onMouseLeave={() => setIsCartOpen(false)}
                 >
-                    <Link to="/cart" className='group/cart relative inline-flex' aria-label='Cart'>
+                    <Link to={ROUTES.CART} className='group/cart relative inline-flex' aria-label='Cart'>
                         <img src={cart} alt='Cart' className='h-6 w-6 translate-y-1 object-contain transition-transform duration-200 group-hover/cart:scale-[1.35]'></img>
                         {cartCount > 0 && (
                             <span className='pointer-events-none absolute top-[-2px] right-[-8px] h-4 min-w-4 origin-center rounded-[100px] bg-[#e02424] px-[5px] text-center text-[11px] leading-4 font-bold text-white transition-transform duration-200 group-hover/cart:-translate-y-1 group-hover/cart:scale-[1.35]'>{cartCount > 99 ? '99+' : cartCount}</span>
@@ -297,7 +298,7 @@ export default function Header() {
                                                     className='h-[50px] w-10 shrink-0 cursor-pointer rounded-md bg-[#f3f4f6] object-cover'
                                                 />
                                                 <div className='flex min-w-0 flex-1 flex-col gap-0.5'>
-                                                    <Link to={`/product/${item.id}`} className='mb-px overflow-hidden text-left text-sm leading-[1.25] font-semibold text-ellipsis whitespace-nowrap text-[#111827] no-underline hover:underline'>
+                                                    <Link to={ROUTES.PRODUCT_DETAILS(item.id)} className='mb-px overflow-hidden text-left text-sm leading-[1.25] font-semibold text-ellipsis whitespace-nowrap text-[#111827] no-underline hover:underline'>
                                                         {item.title}
                                                     </Link>
                                                     <span className='block pb-[3px] text-left text-xs leading-[1.2] whitespace-nowrap text-[#6b7280]'>Size: {item.size}</span>
@@ -307,7 +308,7 @@ export default function Header() {
                                             </li>
                                         ))}
                                     </ul>
-                                    <Link to="/cart" className='mt-2.5 block rounded-lg bg-[#08060d] p-[9px] text-center text-sm font-semibold text-white no-underline hover:opacity-90'>View cart</Link>
+                                    <Link to={ROUTES.CART} className='mt-2.5 block rounded-lg bg-[#08060d] p-[9px] text-center text-sm font-semibold text-white no-underline hover:opacity-90'>View cart</Link>
                                 </>
                             )}
                         </div>
@@ -315,7 +316,7 @@ export default function Header() {
                 </div>
 
                 {isGuest ? (
-                    <Link to="login" className='flex items-center gap-2 rounded-full bg-[#08060d] px-[15px] py-[7px] text-[13px] font-semibold text-white no-underline transition-[opacity,transform] duration-200 hover:-translate-y-px hover:text-red-500 max-md:hidden'>
+                    <Link to={ROUTES.LOGIN} className='flex items-center gap-2 rounded-full bg-[#08060d] px-[15px] py-[7px] text-[13px] font-semibold text-white no-underline transition-[opacity,transform] duration-200 hover:-translate-y-px hover:text-red-500 max-md:hidden'>
                         Login
                     </Link>
                 ) : (
@@ -349,13 +350,13 @@ export default function Header() {
                                         )}
                                     </div>
                                 </div>
-                                <Link to='/profile' role='menuitem' className={avatarItem} onClick={() => setIsAvatarOpen(false)}>
+                                <Link to={ROUTES.PROFILE} role='menuitem' className={avatarItem} onClick={() => setIsAvatarOpen(false)}>
                                     Profile
                                 </Link>
-                                <Link to='/orders' role='menuitem' className={avatarItem} onClick={() => setIsAvatarOpen(false)}>
+                                <Link to={ROUTES.ORDERS} role='menuitem' className={avatarItem} onClick={() => setIsAvatarOpen(false)}>
                                     My Orders
                                 </Link>
-                                {isAdminOrManager && (<Link to='/dashboard' role='menuitem' className={avatarItem} onClick={() => setIsAvatarOpen(false)}>
+                                {isAdminOrManager && (<Link to={ROUTES.DASHBOARD} role='menuitem' className={avatarItem} onClick={() => setIsAvatarOpen(false)}>
                                     Dashboard
                                 </Link>)}
                                 <button
@@ -404,11 +405,11 @@ export default function Header() {
                     </button>
 
                     <nav className='flex flex-col gap-5 [&_a]:text-base [&_a]:font-medium [&_a]:text-[#08060d] [&_a]:no-underline'>
-                        <Link to={'/'} onClick={toggleMenu}>Home</Link>
-                        <Link to={'/products'} onClick={toggleMenu}>Products</Link>
+                        <Link to={ROUTES.HOME} onClick={toggleMenu}>Home</Link>
+                        <Link to={ROUTES.PRODUCTS} onClick={toggleMenu}>Products</Link>
                         <Link to={'/download'} onClick={toggleMenu}>Download</Link>
-                        {isAdminOrManager && <Link to='/dashboard' onClick={toggleMenu}>Dashboard</Link>}
-                        {isGuest && <Link to={'/login'} onClick={toggleMenu}>Login</Link>}
+                        {isAdminOrManager && <Link to={ROUTES.DASHBOARD} onClick={toggleMenu}>Dashboard</Link>}
+                        {isGuest && <Link to={ROUTES.LOGIN} onClick={toggleMenu}>Login</Link>}
                     </nav>
                 </div>
             </div>

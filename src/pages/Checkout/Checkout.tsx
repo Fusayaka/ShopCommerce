@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/utils/auth';
 import ProductList from './ProductList';
 import Payment from './Payment';
+import { ROUTES } from '@/constants/routes';
 
 export default function Checkout() {
   const { loggedIn } = useAuth();
@@ -20,9 +21,9 @@ export default function Checkout() {
     return (
       <section className={sectionCls}>
         <nav className={breadcrumbCls}>
-          <Link to="/">Home</Link>
+          <Link to={ROUTES.HOME}>Home</Link>
           <span className="text-xs">{'>'}</span>
-          <Link to="/cart">Cart</Link>
+          <Link to={ROUTES.CART}>Cart</Link>
           <span className="text-xs">{'>'}</span>
           <span>Checkout</span>
         </nav>
@@ -31,7 +32,7 @@ export default function Checkout() {
 
         <div className="mx-auto my-10 flex max-w-[480px] flex-col items-center justify-center gap-4 rounded-2xl border border-[#e5e7eb] bg-white px-6 py-16 text-center shadow-[0_4px_20px_rgba(0,0,0,0.03)] [&_p]:m-0 [&_p]:text-[15px] [&_p]:leading-normal [&_p]:text-[#4b5563]">
           <p>Please log in to proceed with your checkout.</p>
-          <Link to="/login" className="inline-flex items-center justify-center rounded-xl bg-[#111827] px-9 py-3 text-sm font-semibold text-white no-underline shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all hover:-translate-y-px hover:bg-[#1f2937] hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)]">
+          <Link to={ROUTES.LOGIN} className="inline-flex items-center justify-center rounded-xl bg-[#111827] px-9 py-3 text-sm font-semibold text-white no-underline shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all hover:-translate-y-px hover:bg-[#1f2937] hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)]">
             Login
           </Link>
         </div>
@@ -42,9 +43,9 @@ export default function Checkout() {
   return (
     <section className={sectionCls}>
       <nav className={breadcrumbCls}>
-        <Link to="/">Home</Link>
+        <Link to={ROUTES.HOME}>Home</Link>
         <span className="text-xs">{'>'}</span>
-        <Link to="/cart">Cart</Link>
+        <Link to={ROUTES.CART}>Cart</Link>
         <span className="text-xs">{'>'}</span>
         <span>Checkout</span>
       </nav>

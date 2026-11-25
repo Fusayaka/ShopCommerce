@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import bannerpc from './home-banner-pc.webp'
 import bannermb from './home-banner.webp'
+import { ROUTES } from '@/constants/routes';
 
 export default function Banner() {
     return (
@@ -8,7 +9,7 @@ export default function Banner() {
             <div className='max-w-[450px] shrink-0 grow-0 basis-[55%] pb-[60px] max-md:max-w-full max-md:grow max-md:basis-auto max-md:pb-0'>
                 <h1 className='m-0 mb-6 text-[clamp(2.5rem,5vw,50px)] leading-[1.1] font-black tracking-tight [text-wrap:balance] text-black max-md:text-[clamp(1.75rem,7.5vw,38px)] max-md:tracking-normal'>FIND WHAT MAKES YOU COMFORTABLE</h1>
                 <p className='m-0 mb-6 text-base leading-[1.6] text-[#666] max-md:px-[3%] max-md:text-justify max-md:text-sm max-md:font-semibold'>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Autem quasi adipisci iusto, voluptatem maxime nam! Harum praesentium eveniet omnis porro recusandae pariatur rerum?</p>
-                <Link to="/products" className="mb-10 inline-block cursor-pointer rounded-full border-none bg-black px-10 py-3 text-base font-medium text-white no-underline transition-[transform,opacity] duration-200 hover:-translate-y-0.5 hover:opacity-75 max-md:w-full max-md:px-0">
+                <Link to={ROUTES.PRODUCTS} className="mb-10 inline-block cursor-pointer rounded-full border-none bg-black px-10 py-3 text-base font-medium text-white no-underline transition-[transform,opacity] duration-200 hover:-translate-y-0.5 hover:opacity-75 max-md:w-full max-md:px-0">
                     Shop Now
                 </Link>
 

@@ -7,6 +7,7 @@ import { cartApi } from "@/api/cartApi";
 import { notifyCartChanged } from "@/utils/cartCount";
 import { toast } from "react-toastify";
 import { useAuth } from "@/utils/auth";
+import { ROUTES } from "@/constants/routes";
 
 export default function Cart() {
     const { loggedIn, user } = useAuth();
@@ -62,7 +63,7 @@ export default function Cart() {
         return (
             <section className={sectionCls}>
                 <nav className={breadcrumbCls}>
-                    <Link to="/">Home</Link>
+                    <Link to={ROUTES.HOME}>Home</Link>
                     <span className="text-xs">{'>'}</span>
                     <span>Cart</span>
                 </nav>
@@ -71,7 +72,7 @@ export default function Cart() {
 
                 <div className="flex flex-col items-center gap-5 py-[60px] text-center [&_p]:m-0 [&_p]:text-base [&_p]:text-[#606060]">
                     <p>Please log in to view your cart.</p>
-                    <Link to="/login" className="rounded-full bg-black px-10 py-3 text-[15px] font-semibold text-white no-underline transition-opacity hover:opacity-85">Login</Link>
+                    <Link to={ROUTES.LOGIN} className="rounded-full bg-black px-10 py-3 text-[15px] font-semibold text-white no-underline transition-opacity hover:opacity-85">Login</Link>
                 </div>
             </section>
         );
@@ -117,7 +118,7 @@ export default function Cart() {
     return (
         <section className={sectionCls}>
             <nav className={breadcrumbCls}>
-                <Link to="/">Home</Link>
+                <Link to={ROUTES.HOME}>Home</Link>
                 <span className="text-xs">{'>'}</span>
                 <span>Cart</span>
             </nav>

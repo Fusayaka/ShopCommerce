@@ -5,6 +5,7 @@ import { notifyCartChanged } from '@/utils/cartCount';
 import { ConfirmModal } from '@/components';
 import plhImg from '/images/cloth-placeholder.jpeg';
 import { formatPrice } from '@/utils/format';
+import { ROUTES } from '@/constants/routes';
 
 const QTY_STEPPER = "inline-flex items-center rounded-full bg-[#f0f0f0] px-2 py-1";
 const QTY_BTN = "flex h-6 w-6 cursor-pointer items-center justify-center border-none bg-transparent text-[15px] font-semibold text-[#111827] select-none enabled:hover:text-black enabled:hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-30";
@@ -36,7 +37,6 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
   const [removingStockId, setRemovingStockId] = useState<number | null>(null);
   const [isRemoving, setIsRemoving] = useState<boolean>(false);
 
-  // Tìm sản phẩm đang chờ xóa để lấy thông tin hiển thị lên Modal
   const removingItem = useMemo(() => {
     if (removingStockId === null) return null;
     return items.find((item) => item.stockId === removingStockId) || null;
@@ -158,7 +158,7 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
       <div className="flex flex-col items-center justify-center rounded-xl border border-[#e5e7eb] bg-white px-5 py-10 text-center">
         <h3 className="m-0 mb-1.5 text-base font-bold text-[#111827]">No products in checkout</h3>
         <p className="m-0 mb-4 text-[13px] text-[#6b7280]">Your shopping cart is currently empty. Please add items before checkout.</p>
-        <Link to="/products" className="inline-flex items-center rounded-lg bg-[#111827] px-5 py-2 text-[13px] font-semibold text-white no-underline transition-colors hover:bg-[#1f2937]">
+        <Link to={ROUTES.PRODUCTS} className="inline-flex items-center rounded-lg bg-[#111827] px-5 py-2 text-[13px] font-semibold text-white no-underline transition-colors hover:bg-[#1f2937]">
           Explore Products
         </Link>
       </div>
@@ -196,7 +196,7 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
                         />
                       </div>
                       <div className="flex min-w-0 flex-col gap-0.5">
-                        <Link to={`/product/${item.productId}`} className="block w-full overflow-hidden text-[15px] leading-[1.25] font-semibold text-ellipsis whitespace-nowrap text-[#111827] no-underline hover:text-[#2563eb]">
+                        <Link to={ROUTES.PRODUCT_DETAILS(item.productId)} className="block w-full overflow-hidden text-[15px] leading-[1.25] font-semibold text-ellipsis whitespace-nowrap text-[#111827] no-underline hover:text-[#2563eb]">
                           {item.title}
                         </Link>
                         <div className="flex flex-wrap gap-1.5 text-[11.5px] text-[#6b7280]">
@@ -287,7 +287,7 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
 
               <div className="flex min-w-0 flex-1 flex-col justify-between">
                 <div className="flex items-start justify-between gap-2">
-                  <Link to={`/product/${item.productId}`} className="block max-w-full overflow-hidden text-base leading-[1.25] font-semibold text-ellipsis whitespace-nowrap text-[#111827] no-underline">
+                  <Link to={ROUTES.PRODUCT_DETAILS(item.productId)} className="block max-w-full overflow-hidden text-base leading-[1.25] font-semibold text-ellipsis whitespace-nowrap text-[#111827] no-underline">
                     {item.title}
                   </Link>
                   {editable && (

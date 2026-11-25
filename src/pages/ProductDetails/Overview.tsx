@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 import { useAuth } from '@/utils/auth';
 import { ConfirmModal } from '@/components';
 import { SIZES, COLORS } from '@/constants/catalog';
+import { ROUTES } from '@/constants/routes';
 
 export default function Overview() {
     const {productId} = useParams<{ productId: string }>();
@@ -238,8 +239,8 @@ export default function Overview() {
     return (
             <section className='px-[5%] py-6 text-left text-black max-md:px-[30px] max-md:pt-5 max-md:pb-0'>
                 <nav className='mb-6 text-sm text-[#666] [&_a]:text-[#666] [&_a]:no-underline [&_a]:transition-colors [&_a:hover]:text-black [&_a:hover]:underline'>
-                    <Link to='/'>Home</Link> {' > '}
-                    <Link to='/products'>Product</Link> {' > '}
+                    <Link to={ROUTES.HOME}>Home</Link> {' > '}
+                    <Link to={ROUTES.PRODUCTS}>Product</Link> {' > '}
                     <span className="font-medium text-black">{product.title}</span>
                 </nav>
 

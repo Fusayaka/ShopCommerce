@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Filter from "./Filter";
 import ProductResultPage from "./ProductResultPage";
 import { Link, useSearchParams } from "react-router-dom";
-
+import { ROUTES } from "@/constants/routes";
 
 export default function ProductList(){
     const [isDesktop, setIsDesktop] = useState(true);
@@ -64,7 +64,7 @@ export default function ProductList(){
     return (
         <section className="px-[5%] py-6 max-md:px-[30px] max-md:py-5">
             <nav className='mx-auto mb-6 w-full p-0 text-left text-sm text-[#666] [&_a]:text-[#666] [&_a]:no-underline [&_a:hover]:text-black [&_a:hover]:underline'>
-                <Link to='/'>Home</Link>
+                <Link to={ROUTES.HOME}>Home</Link>
                 {'  >  '}
                 <span>Product</span>
             </nav>

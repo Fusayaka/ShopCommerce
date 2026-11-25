@@ -8,6 +8,7 @@ import OrderCard from './OrderCard';
 import { TABS, type TabKey } from '@/constants/order';
 import { CONFIG } from '@/config';
 import { Link } from 'react-router-dom';
+import { ROUTES } from '@/constants/routes';
 
 const PAGE_SIZE = CONFIG.DEFAULT_PAGE_SIZE;
 
@@ -180,7 +181,7 @@ export default function Orders() {
     return (
         <div data-orders className="min-h-[70vh] w-full bg-slate-50 py-6 text-slate-800">
             <nav className='mb-6 px-7.5 text-left text-sm text-[#666] md:px-[5%] [&_a]:text-[#666] [&_a]:no-underline [&_a]:transition-colors [&_a:hover]:text-black [&_a:hover]:underline'>
-                <Link to='/'>Home</Link> {' > '}
+                <Link to={ROUTES.HOME}>Home</Link> {' > '}
                 <span className="font-medium text-black">My Orders</span>
             </nav>
             <div className="mx-auto flex w-full flex-col gap-6 px-7.5 md:px-[5%] lg:flex-row">
