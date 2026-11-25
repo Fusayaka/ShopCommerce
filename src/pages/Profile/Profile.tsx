@@ -4,7 +4,7 @@ import avatarPlaceholder from '@/assets/avatar-placeholder.svg';
 import cameraIcon from '@/assets/camera.svg';
 import { userApi } from '@/api/userApi';
 import { useAuth, setAuth, getToken } from '@/utils/auth';
-import { EyeToggle, ImageUploader } from '@/components';
+import { ImageUploader, FormField } from '@/components';
 
 type Tab = 'profile' | 'password';
 
@@ -28,11 +28,6 @@ export default function Profile() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [savingPassword, setSavingPassword] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [showPasswords, setShowPasswords] = useState({
-        current: false,
-        new: false,
-        confirm: false,
-    });
 
     // Load the current profile once.
     useEffect(() => {
@@ -118,9 +113,6 @@ export default function Profile() {
         }
     };
 
-    const FIELD = "relative flex flex-col gap-1.5";
-    const LABEL = "ml-[15px] text-left text-sm font-semibold text-[#374151]";
-    const INPUT = "w-full rounded-lg border border-[#d1d5db] px-3.5 py-3 pr-[42px] text-[15px] text-[#111827] outline-none transition-[border-color,box-shadow] focus:border-[#08060d] focus:shadow-[0_0_0_3px_rgba(0,0,0,0.06)] [&::-ms-reveal]:hidden [&::-ms-clear]:hidden";
     const SAVE = "mt-2 cursor-pointer self-end rounded-lg border-none bg-[#08060d] px-6 py-2 text-[15px] font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 max-sm:self-stretch";
 
     const tabCls = (active: boolean) =>
@@ -156,59 +148,46 @@ export default function Profile() {
                     </div>
 
                     <div className="flex min-w-0 flex-1 flex-col gap-3 max-sm:w-full">
-                        <label className={FIELD}>
-                            <span className={LABEL}>Name</span>
-                            <input
-                                type="text"
-                                className={INPUT}
-                                value={name}
-                                onChange={(ev) => setName(ev.target.value)}
-                                required
-                            />
-                        </label>
+                        <FormField
+                            label="Name"
+                            type="text"
+                            value={name}
+                            onChange={(ev) => setName(ev.target.value)}
+                            required
+                        />
 
-                        <label className={FIELD}>
-                            <span className={LABEL}>Email</span>
-                            <input
-                                type="email"
-                                className={INPUT}
-                                value={email}
-                                onChange={(ev) => setEmail(ev.target.value)}
-                                required
-                            />
-                        </label>
+                        <FormField
+                            label="Email"
+                            type="email"
+                            value={email}
+                            onChange={(ev) => setEmail(ev.target.value)}
+                            required
+                        />
 
-                        <label className={FIELD}>
-                            <span className={LABEL}>Contact</span>
-                            <input
-                                type="tel"
-                                className={INPUT}
-                                value={contact}
-                                onChange={(ev) => setContact(ev.target.value)}
-                                placeholder='123-456-7890'
-                            />
-                        </label>
+                        <FormField
+                            label="Contact"
+                            type="tel"
+                            value={contact}
+                            onChange={(ev) => setContact(ev.target.value)}
+                            placeholder="123-456-7890"
+                        />
 
-                        <label className={FIELD}>
-                            <span className={LABEL}>Address</span>
-                            <input
-                                type="text"
-                                className={INPUT}
-                                value={address}
-                                onChange={(ev) => setAddress(ev.target.value)}
-                            />
-                        </label>
+                        <FormField
+                            label="Address"
+                            type="text"
+                            value={address}
+                            onChange={(ev) => setAddress(ev.target.value)}
+                        />
 
-                        <label className={FIELD}>
-                            <span className={LABEL}>Description</span>
-                            <textarea
-                                className={`${INPUT} min-h-[96px] resize-y leading-normal`}
-                                rows={4}
-                                placeholder="Tell us a little about yourself"
-                                value={description}
-                                onChange={(ev) => setDescription(ev.target.value)}
-                            />
-                        </label>
+                        <FormField
+                            as="textarea"
+                            label="Description"
+                            rows={4}
+                            placeholder="Tell us a little about yourself"
+                            value={description}
+                            onChange={(ev) => setDescription(ev.target.value)}
+                            inputClassName="min-h-[96px] leading-normal"
+                        />
 
                         <button type="submit" className={SAVE} disabled={savingProfile}>
                             {savingProfile ? 'Saving…' : 'Save'}
@@ -218,50 +197,32 @@ export default function Profile() {
             ) : (
                 <form className="flex gap-7 rounded-xl border border-[#e5e7eb] bg-white p-7 shadow-[0_6px_20px_rgba(0,0,0,0.05)] max-sm:flex-col max-sm:items-center" onSubmit={handleChangePassword}>
                     <div className="flex min-w-0 flex-1 flex-col gap-3 max-sm:w-full">
-                        <label className={FIELD}>
-                            <span className={LABEL}>Current Password</span>
-                            <div className="relative">
-                                <input
-                                    type={showPasswords.current? "text" : "password"}
-                                    className={INPUT}
-                                    value={currentPassword}
-                                    onChange={(ev) => setCurrentPassword(ev.target.value)}
-                                    autoComplete="current-password"
-                                    required
-                                />
-                                <EyeToggle shown={showPasswords.current} onToggle={() => setShowPasswords((prev) => ({...prev, current: !prev.current}))} className="absolute right-3 top-1/2 -translate-y-1/2" />
-                            </div>
-                        </label>
+                        <FormField
+                            label="Current Password"
+                            type="password"
+                            value={currentPassword}
+                            onChange={(ev) => setCurrentPassword(ev.target.value)}
+                            autoComplete="current-password"
+                            required
+                        />
 
-                        <label className={FIELD}>
-                            <span className={LABEL}>New Password</span>
-                            <div className="relative">
-                                <input
-                                    type={showPasswords.new? "text" : "password"}
-                                    className={INPUT}
-                                    value={newPassword}
-                                    onChange={(ev) => setNewPassword(ev.target.value)}
-                                    autoComplete="new-password"
-                                    required
-                                />
-                                <EyeToggle shown={showPasswords.new} onToggle={() => setShowPasswords((prev) => ({...prev, new: !prev.new}))} className="absolute right-3 top-1/2 -translate-y-1/2" />
-                            </div>
-                        </label>
+                        <FormField
+                            label="New Password"
+                            type="password"
+                            value={newPassword}
+                            onChange={(ev) => setNewPassword(ev.target.value)}
+                            autoComplete="new-password"
+                            required
+                        />
 
-                        <label className={FIELD}>
-                            <span className={LABEL}>Confirm New Password</span>
-                            <div className="relative">
-                                <input
-                                    type={showPasswords.confirm? "text" : "password"}
-                                    className={INPUT}
-                                    value={confirmPassword}
-                                    onChange={(ev) => setConfirmPassword(ev.target.value)}
-                                    autoComplete="new-password"
-                                    required
-                                />
-                                <EyeToggle shown={showPasswords.confirm} onToggle={() => setShowPasswords((prev) => ({...prev, confirm: !prev.confirm}))} className="absolute right-3 top-1/2 -translate-y-1/2" />
-                            </div>
-                        </label>
+                        <FormField
+                            label="Confirm New Password"
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(ev) => setConfirmPassword(ev.target.value)}
+                            autoComplete="new-password"
+                            required
+                        />
 
                         <button type="submit" className={SAVE} disabled={savingPassword}>
                             {savingPassword ? 'Saving…' : 'Change Password'}

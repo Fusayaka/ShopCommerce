@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { setAuth, setToken, useAuth } from '@/utils/auth';
 import { loginApi } from '@/api/loginApi';
-import { EyeToggle } from '@/components';
+import { FormField } from '@/components';
 
 const SOCIAL_ICON = "h-[18px] w-[18px] shrink-0";
 const CARD = "flex max-h-full w-[90%] max-w-[420px] flex-col overflow-y-auto p-8 max-md:px-[1.3rem] max-md:py-[1.5rem] md:p-10";
@@ -12,16 +12,9 @@ const SWITCH_TOP = "mb-[0.9rem] text-center text-[0.9rem] text-[#555]";
 const SWITCH_LINK = "cursor-pointer border-none bg-none p-0 font-semibold text-black underline";
 const ERROR_BOX = "mb-[0.8rem] rounded-md border border-[#ffa39e] bg-[#fff1f0] px-2.5 py-2 text-[0.85rem] text-[#cf1322]";
 const GROUP = "mb-[0.7rem]";
-const INPUT = "w-full border-none bg-transparent px-3.5 py-[11px] text-[0.95rem] text-[#111] outline-none [&::-ms-reveal]:hidden [&::-ms-clear]:hidden";
-const ERROR_TEXT = "mt-[3px] text-[0.75rem] text-[#ff4d4f]";
 const BUTTON = "mt-[0.4rem] w-full cursor-pointer rounded-lg border-none bg-black py-[11px] text-base font-semibold text-white transition-colors hover:bg-[#333] disabled:cursor-not-allowed disabled:bg-[#888]";
 const DIVIDER = "my-[0.9rem] flex items-center text-center text-[0.85rem] text-[#555] before:mr-3 before:flex-1 before:border-b before:border-[#e0e0e0] before:content-[''] after:ml-3 after:flex-1 after:border-b after:border-[#e0e0e0] after:content-['']";
 const SOCIAL_BTN = "flex min-w-0 flex-1 cursor-pointer items-center justify-center gap-2 rounded-[20px] border border-[#ddd] bg-white px-4 py-[9px] text-[0.9rem] font-medium text-[#333] transition-colors hover:border-[#ffa39e] hover:bg-[#f8f9fa]";
-
-const fieldCls = (hasError?: string) =>
-    `relative flex items-center rounded-lg border bg-white transition-colors focus-within:border-black max-md:bg-white/50 ${
-        hasError ? "border-[#ff4d4f]" : "border-[#ccc] max-md:border-white/60"
-    }`;
 
 const panelCls = (active: boolean, side: "in" | "up") => {
     const base = "inset-0 flex items-center justify-center transition-[transform,opacity,visibility] duration-1000 ease-in-out md:transform-none";
@@ -61,8 +54,6 @@ export default function Login(){
     const [error, setError] = useState("");
     const [fieldErrors, setFieldErrors] = useState<{ name?: string; email?: string; password?: string; confirmPassword?: string }>({});
     const [isLoading, setIsLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     
     const navigate = useNavigate();
     const location = useLocation();
@@ -236,32 +227,25 @@ export default function Login(){
                         {error && isLogin && <div className={ERROR_BOX}>{error}</div>}
 
                         <form onSubmit={handleSubmit} noValidate>
-                            <div className={GROUP}>
-                                <div className={fieldCls(fieldErrors.email)}>
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        className={INPUT}
-                                        placeholder="Email"
-                                    />
-                                </div>
-                                {fieldErrors.email && <p className={ERROR_TEXT}>{fieldErrors.email}</p>}
-                            </div>
+                            <FormField
+                                variant="filled"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Email"
+                                error={fieldErrors.email}
+                                wrapperClassName={GROUP}
+                            />
 
-                            <div className={GROUP}>
-                                <div className={fieldCls(fieldErrors.password)}>
-                                    <input
-                                        type={showPassword ? 'text' : 'password'}
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        className={INPUT}
-                                        placeholder="Password"
-                                    />
-                                    <EyeToggle shown={showPassword} onToggle={() => setShowPassword((prev) => !prev)} />
-                                </div>
-                                {fieldErrors.password && <p className={ERROR_TEXT}>{fieldErrors.password}</p>}
-                            </div>
+                            <FormField
+                                variant="filled"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Password"
+                                error={fieldErrors.password}
+                                wrapperClassName={GROUP}
+                            />
 
                             <button type="submit" disabled={isLoading} className={BUTTON}>
                                 {isLoading ? 'Processing...' : 'Sign In'}
@@ -289,59 +273,45 @@ export default function Login(){
                         {error && !isLogin && <div className={ERROR_BOX}>{error}</div>}
 
                         <form onSubmit={handleSubmit} noValidate>
-                            <div className={GROUP}>
-                                <div className={fieldCls(fieldErrors.name)}>
-                                    <input
-                                        type="text"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        className={INPUT}
-                                        placeholder="Name"
-                                    />
-                                </div>
-                                {fieldErrors.name && <p className={ERROR_TEXT}>{fieldErrors.name}</p>}
-                            </div>
+                            <FormField
+                                variant="filled"
+                                type="text"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                placeholder="Name"
+                                error={fieldErrors.name}
+                                wrapperClassName={GROUP}
+                            />
 
-                            <div className={GROUP}>
-                                <div className={fieldCls(fieldErrors.email)}>
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        className={INPUT}
-                                        placeholder="Email"
-                                    />
-                                </div>
-                                {fieldErrors.email && <p className={ERROR_TEXT}>{fieldErrors.email}</p>}
-                            </div>
+                            <FormField
+                                variant="filled"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Email"
+                                error={fieldErrors.email}
+                                wrapperClassName={GROUP}
+                            />
 
-                            <div className={GROUP}>
-                                <div className={fieldCls(fieldErrors.password)}>
-                                    <input
-                                        type={showPassword ? 'text' : 'password'}
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        className={INPUT}
-                                        placeholder="Password"
-                                    />
-                                    <EyeToggle shown={showPassword} onToggle={() => setShowPassword((prev) => !prev)} />
-                                </div>
-                                {fieldErrors.password && <p className={ERROR_TEXT}>{fieldErrors.password}</p>}
-                            </div>
+                            <FormField
+                                variant="filled"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Password"
+                                error={fieldErrors.password}
+                                wrapperClassName={GROUP}
+                            />
 
-                            <div className={GROUP}>
-                                <div className={fieldCls(fieldErrors.confirmPassword)}>
-                                    <input
-                                        type={showConfirmPassword ? 'text' : 'password'}
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                        className={INPUT}
-                                        placeholder="Confirm Password"
-                                    />
-                                    <EyeToggle shown={showConfirmPassword} onToggle={() => setShowConfirmPassword((prev) => !prev)} />
-                                </div>
-                                {fieldErrors.confirmPassword && <p className={ERROR_TEXT}>{fieldErrors.confirmPassword}</p>}
-                            </div>
+                            <FormField
+                                variant="filled"
+                                type="password"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                placeholder="Confirm Password"
+                                error={fieldErrors.confirmPassword}
+                                wrapperClassName={GROUP}
+                            />
 
                             <button type="submit" disabled={isLoading} className={BUTTON}>
                                 {isLoading ? 'Processing...' : 'Register'}

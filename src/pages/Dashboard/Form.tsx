@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { productApi } from '@/api/productApi';
-import { ImageUploader } from '@/components';
+import { ImageUploader, FormField } from '@/components';
 import plhImg from '/images/cloth-placeholder.jpeg';
 
 export interface ProductFormData {
@@ -52,9 +52,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     });
   };
 
-  const inputClass =
-    'w-full rounded-md border border-slate-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-900';
-
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <h2 className="text-xl font-bold text-slate-900">
@@ -77,29 +74,23 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
         {/* Right: fields */}
         <div className="flex flex-1 flex-col gap-3">
-          <div>
-            <label className="mb-1 block pl-2 text-left text-sm font-medium text-slate-700">Title <span className='text-red-500'>*</span></label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className={inputClass}
-              placeholder="Product name"
-              required
-            />
-          </div>
+          <FormField
+            label="Title"
+            required
+            type="text"
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            placeholder="Product name"
+          />
 
-          <div>
-            <label className="mb-1 block pl-2 text-left font-medium text-slate-700">Description</label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={4}
-              className={`${inputClass}`}
-              placeholder="Short description"
-            />
-          </div>
-
+          <FormField
+            as="textarea"
+            label="Description"
+            rows={4}
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            placeholder="Short description"
+          />
         </div>
       </div>
 
@@ -156,6 +147,8 @@ export const RedeliveryForm: React.FC<RedeliveryFormProps> = ({
 
   const reasonMissing = !reason.trim();
 
+  const LABEL = 'block pl-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500';
+
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (reasonMissing) {
@@ -176,60 +169,45 @@ export const RedeliveryForm: React.FC<RedeliveryFormProps> = ({
       <h3 className="text-base font-bold text-slate-900">Redeliver for Order #{orderId}</h3>
       <p className="mt-1 text-sm text-slate-500">Create a redelivery for this cancelled order.</p>
 
-      <label className="mt-4 text-left pl-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-        Reason <span className="text-red-500">*</span>
-      </label>
-      <input
+      <FormField
+        label={<>Reason <span className="text-red-500">*</span></>}
         type="text"
         value={reason}
         onChange={(e) => setReason(e.target.value)}
         placeholder="e.g. Customer requested re-delivery"
-        className={`mt-1 w-full rounded border px-3 py-2 text-sm outline-none ${
-          attempted && reasonMissing
-            ? 'border-red-400 bg-red-50'
-            : 'border-slate-300 focus:border-slate-900'
-        }`}
+        error={attempted && reasonMissing ? 'Reason is required' : undefined}
+        wrapperClassName="mt-4"
+        labelClassName={LABEL}
       />
-      {attempted && reasonMissing && (
-        <p className="mt-1 text-xs text-red-600">Reason is required</p>
-      )}
 
-      <label className="mt-4 text-left pl-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-        Note
-      </label>
-      <textarea
+      <FormField
+        as="textarea"
+        label="Note"
+        rows={3}
         value={note}
         onChange={(e) => setNote(e.target.value)}
         placeholder="Optional note"
-        rows={3}
-        className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-900"
+        wrapperClassName="mt-4"
+        labelClassName={LABEL}
       />
 
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div>
-          <label className="block text-left pl-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-            New address
-          </label>
-          <input
-            type="text"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder={currentAddress || 'Keep current address'}
-            className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-900"
-          />
-        </div>
-        <div>
-          <label className="block text-left pl-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-            New contact
-          </label>
-          <input
-            type="text"
-            value={contact}
-            onChange={(e) => setContact(e.target.value)}
-            placeholder={currentContact || 'Keep current contact'}
-            className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-900"
-          />
-        </div>
+        <FormField
+          label="New address"
+          type="text"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          placeholder={currentAddress || 'Keep current address'}
+          labelClassName={LABEL}
+        />
+        <FormField
+          label="New contact"
+          type="text"
+          value={contact}
+          onChange={(e) => setContact(e.target.value)}
+          placeholder={currentContact || 'Keep current contact'}
+          labelClassName={LABEL}
+        />
       </div>
       <p className="mt-1 text-xs text-slate-400">
         Fill these only if the customer requested a different location or phone number.
