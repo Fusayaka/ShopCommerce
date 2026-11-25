@@ -1,22 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import avatarPlaceholder from '@/assets/avatar-placeholder.svg';
 import cameraIcon from '@/assets/camera.svg';
 import { userApi } from '@/api/userApi';
 import { useAuth, setAuth, getToken } from '@/utils/auth';
+import { EyeToggle, ImageUploader } from '@/components';
 
 type Tab = 'profile' | 'password';
-
-
-const EyeToggle = ({ shown, onToggle }: { shown: boolean; onToggle: () => void }) => (
-    <button type="button" className="absolute right-3 top-1/2 flex -translate-y-1/2 cursor-pointer items-center border-none bg-transparent p-0 text-[#666] [&_svg]:h-5 [&_svg]:w-5" onClick={onToggle}>
-        {shown ? (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
-        ) : (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-        )}
-    </button>
-);
 
 export default function Profile() {
     const { user: currentUser } = useAuth();
@@ -31,7 +21,6 @@ export default function Profile() {
     const [address, setAddress] = useState('');
     const [description, setDescription] = useState('');
     const [savingProfile, setSavingProfile] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Password form
     const [currentPassword, setCurrentPassword] = useState('');
@@ -73,20 +62,9 @@ export default function Profile() {
         };
     }, [currentUser]);
 
-    const handleAvatarSelect = async (ev: React.ChangeEvent<HTMLInputElement>) => {
-        const file = ev.target.files?.[0];
-        if (!file) return;
-        if (!file.type.startsWith('image/')) {
-            toast.error('Please select an image file.');
-            ev.target.value = '';
-            return;
-        }
+    const handleAvatarSelect = (file: File) => {
         setSelectedFile(file);
-
-        const previewUrl = URL.createObjectURL(file);
-        setAvatar(previewUrl);
-
-        ev.target.value = '';
+        setAvatar(URL.createObjectURL(file));
     };
 
     const handleSaveProfile = async (e: React.SyntheticEvent) => {
@@ -164,28 +142,16 @@ export default function Profile() {
             {activeTab === 'profile' ? (
                 <form className="flex gap-7 rounded-xl border border-[#e5e7eb] bg-white p-7 shadow-[0_6px_20px_rgba(0,0,0,0.05)] max-sm:flex-col max-sm:items-center" onSubmit={handleSaveProfile}>
                     <div className="flex w-[35%] shrink-0 flex-col items-center gap-3 max-sm:w-full max-sm:max-w-[320px]">
-                        <button
-                            type="button"
-                            className="group/avatar relative aspect-square w-full cursor-pointer overflow-hidden rounded-full border-none bg-none p-0"
-                            onClick={() => fileInputRef.current?.click()}
-                            aria-label="Upload avatar"
-                        >
-                            <img
-                                className="block h-full w-full rounded-full border border-[#e5e7eb] bg-[#f3f4f6] object-cover"
-                                src={avatar || avatarPlaceholder}
-                                alt={name || 'User'}
-                                onError={(ev) => { ev.currentTarget.src = avatarPlaceholder; }}
-                            />
-                            <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/45 text-[15px] font-semibold text-white opacity-0 transition-opacity group-hover/avatar:opacity-100 group-focus-visible/avatar:opacity-100">
-                                <img src={cameraIcon} alt="" className="h-8 w-8" />
-                            </span>
-                        </button>
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            hidden
-                            onChange={handleAvatarSelect}
+                        <ImageUploader
+                            className="w-full"
+                            shape="circle"
+                            appearance="bare"
+                            imageUrl={avatar || avatarPlaceholder}
+                            fallbackSrc={avatarPlaceholder}
+                            imgClassName="border border-[#e5e7eb] bg-[#f3f4f6]"
+                            onSelect={handleAvatarSelect}
+                            ariaLabel="Upload avatar"
+                            overlay={<img src={cameraIcon} alt="" className="h-8 w-8" />}
                         />
                     </div>
 
@@ -263,7 +229,7 @@ export default function Profile() {
                                     autoComplete="current-password"
                                     required
                                 />
-                                <EyeToggle shown={showPasswords.current} onToggle={() => setShowPasswords((prev) => ({...prev, current: !prev.current}))} />
+                                <EyeToggle shown={showPasswords.current} onToggle={() => setShowPasswords((prev) => ({...prev, current: !prev.current}))} className="absolute right-3 top-1/2 -translate-y-1/2" />
                             </div>
                         </label>
 
@@ -278,7 +244,7 @@ export default function Profile() {
                                     autoComplete="new-password"
                                     required
                                 />
-                                <EyeToggle shown={showPasswords.new} onToggle={() => setShowPasswords((prev) => ({...prev, new: !prev.new}))} />
+                                <EyeToggle shown={showPasswords.new} onToggle={() => setShowPasswords((prev) => ({...prev, new: !prev.new}))} className="absolute right-3 top-1/2 -translate-y-1/2" />
                             </div>
                         </label>
 
@@ -293,7 +259,7 @@ export default function Profile() {
                                     autoComplete="new-password"
                                     required
                                 />
-                                <EyeToggle shown={showPasswords.confirm} onToggle={() => setShowPasswords((prev) => ({...prev, confirm: !prev.confirm}))} />
+                                <EyeToggle shown={showPasswords.confirm} onToggle={() => setShowPasswords((prev) => ({...prev, confirm: !prev.confirm}))} className="absolute right-3 top-1/2 -translate-y-1/2" />
                             </div>
                         </label>
 

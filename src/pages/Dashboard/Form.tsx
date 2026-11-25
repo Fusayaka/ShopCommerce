@@ -1,6 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { productApi } from '@/api/productApi';
+import { ImageUploader } from '@/components';
 import plhImg from '/images/cloth-placeholder.jpeg';
 
 export interface ProductFormData {
@@ -17,8 +18,6 @@ interface ProductFormProps {
   isSubmitting?: boolean;
 }
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
-
 export const ProductForm: React.FC<ProductFormProps> = ({
   initialValues,
   onSubmit,
@@ -30,27 +29,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     () => initialValues ?? { title: '', description: '', image: '' }
   );
   const [uploading, setUploading] = useState(false);
-  const [exceedFileSize, setExceedFileSize] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > MAX_FILE_SIZE){
-      toast.error('Image size must not exceed 5MB');
-      e.target.value = '';
-      setExceedFileSize(true);
-      return;
-    }
-
-    setExceedFileSize(false);
-    e.target.value = '';
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
-      return;
-    }
+  const handleImageSelect = async (file: File) => {
     setUploading(true);
     try {
       const { url } = await productApi.uploadImage(file);
@@ -83,58 +63,17 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
       <div className="flex flex-col gap-5 sm:flex-row">
         {/* Left: image upload + preview */}
-        <div className="shrink-0 sm:w-48">
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-            className={`
-              group relative flex aspect-[3/4] w-full cursor-pointer 
-              items-center justify-center overflow-hidden rounded-lg 
-              ${exceedFileSize ? 'border-2.5 border-red-400' :'border border-slate-200'} border-solid bg-slate-50 p-0
-            `}
-          >
-            {formData.image ? (
-              <img
-                src={formData.image}
-                alt="Preview"
-                onError={(e) => {
-                  e.currentTarget.src = plhImg;
-                }}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <span className="px-2 text-center text-xs text-slate-400">No image</span>
-            )}
-
-            <span className="absolute inset-0 flex items-center justify-center bg-black/40 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
-              {formData.image ? 'Change image' : 'Upload image'}
-            </span>
-
-            {uploading && (
-              <span className="absolute inset-0 flex items-center justify-center bg-white/70 text-xs font-medium text-slate-700">
-                Uploading…
-              </span>
-            )}
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="hidden"
-          />
-          <p
-            className={`mt-1 text-center text-xs ${
-                exceedFileSize ? 'font-medium text-rose-500 px-2' : 'text-slate-400'
-            }`}
-          >
-            {exceedFileSize
-                ? 'File is too large. Maximum size is 5MB.'
-                : 'Click to upload (max 5MB)'}
-          </p>
-          
-        </div>
+        <ImageUploader
+          className="shrink-0 sm:w-48"
+          imageUrl={formData.image}
+          onSelect={handleImageSelect}
+          uploading={uploading}
+          maxSizeMB={5}
+          fallbackSrc={plhImg}
+          ariaLabel="Upload product image"
+          helperText="Click to upload (max 5MB)"
+          errorText="File is too large. Maximum size is 5MB."
+        />
 
         {/* Right: fields */}
         <div className="flex flex-1 flex-col gap-3">

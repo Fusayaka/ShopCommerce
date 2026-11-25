@@ -8,3 +8,5 @@ export { default as Pagination } from './Pagination';
 export { default as StatusBadge } from './StatusBadge';
 export { default as QuantityStepper } from './QuantityStepper';
 export { default as DropDownSelector } from './DropDownSelector';
+export { default as EyeToggle } from './EyeToggle';
+export { default as ImageUploader } from './ImageUploader';

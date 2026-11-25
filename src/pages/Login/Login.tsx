@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { setAuth, setToken, useAuth } from '@/utils/auth';
 import { loginApi } from '@/api/loginApi';
+import { EyeToggle } from '@/components';
 
 const SOCIAL_ICON = "h-[18px] w-[18px] shrink-0";
 const CARD = "flex max-h-full w-[90%] max-w-[420px] flex-col overflow-y-auto p-8 max-md:px-[1.3rem] max-md:py-[1.5rem] md:p-10";
@@ -27,16 +28,6 @@ const panelCls = (active: boolean, side: "in" | "up") => {
     if (active) return `${base} relative translate-x-0 visible opacity-100 pointer-events-auto`;
     return `${base} absolute invisible opacity-0 pointer-events-none ${side === "in" ? "-translate-x-full" : "translate-x-full"}`;
 };
-
-const EyeToggle = ({ shown, onToggle }: { shown: boolean; onToggle: () => void }) => (
-    <button type="button" className="flex cursor-pointer items-center border-none bg-none px-3 text-[#666] [&_svg]:h-5 [&_svg]:w-5" onClick={onToggle}>
-        {shown ? (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
-        ) : (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-        )}
-    </button>
-);
 
 const SocialRow = ({ onSocial }: { onSocial: (provider: string) => void }) => (
     <div className="mx-auto mt-[0.2rem] flex max-w-[80%] justify-center gap-2.5">
