@@ -1,0 +1,24 @@
+/*
+ * Tailwind v4 — scoped to the Dashboard page only.
+ *
+ * - Preflight (Tailwind's global CSS reset) is intentionally NOT imported,
+ *   so loading this file does not restyle the rest of the app.
+ * - `source("./")` limits automatic class detection to this Dashboard folder,
+ *   so only classes actually used here are generated.
+ * - A minimal box-sizing rule is scoped under [data-dashboard] so spacing,
+ *   border and sizing utilities behave as expected inside the dashboard,
+ *   without touching any other page.
+ */
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@layer base {
+  [data-dashboard],
+  [data-dashboard] *,
+  [data-dashboard] *::before,
+  [data-dashboard] *::after {
+    box-sizing: border-box;
+  }
+}

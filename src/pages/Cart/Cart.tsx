@@ -17,10 +17,7 @@ export default function Cart() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!user) {
-            setIsLoading(false);
-            return;
-        }
+        if (!user) return;
 
         let active = true;
         const fetchItems = async () => {

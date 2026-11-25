@@ -631,6 +631,21 @@
     appearance: none;
     font-size: 16px;
   }
+
+  .header-actions {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .header-actions > * {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .header-container{
+    flex-wrap: nowrap;
+  }
 }
 
 .mobile-menu-overlay {

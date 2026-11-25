@@ -1,10 +1,11 @@
-import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, ForbiddenException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { UpdateOrderDto } from './dto/update-order.dto.js';
 import { CreateRedeliveryOrderDto } from './dto/create-redelivery-order.dto.js';
 import { UpdateRedeliveryOrderDto } from './dto/update-redelivery-order.dto.js';
 import { Prisma, OrderStatus, type User } from '@prisma/client';
+import { GetAllOrderDto } from './dto/get-all-order.dto.js';
 
 interface OrderItemInput {
   stock: {
@@ -89,8 +90,8 @@ export class OrdersService {
     let discount = new Prisma.Decimal(0);
 
     if (dto.promoCode) {
-      const promo = await this.prisma.promoCodes.findUnique({
-        where: { code: dto.promoCode },
+      const promo = await this.prisma.promoCodes.findFirst({
+        where: { code: dto.promoCode, deletedAt: null },
       });
 
       if (!promo) {
@@ -193,22 +194,61 @@ export class OrdersService {
     };
   }
 
-  async getAllOrders(){
-    return this.prisma.order.findMany({
-      include: { 
-        user: {
-          select: {
-            avatar: true,
-            name: true,
-            contact: true,
-            address: true,      // As delivered based on user's address
-            email: true,
-          }
-        }, 
-        items: true 
+  async getAllOrders(dto: GetAllOrderDto){
+    const {page, limit, status, search, sortBy, sortOrder} = dto;
+
+    const skip = (page - 1) * limit;
+
+    const where: Prisma.OrderWhereInput = {
+      ...(status && { status }),
+      ...(search && {
+        OR:  [
+          ...(/^\d+$/.test(search) ? [{ id: Number(search) }] : []),
+          { user: { name: { contains: search, mode: 'insensitive'}}},
+          { user: { email: { contains: search, mode: 'insensitive'}}},
+        ],
+      }),
+    };
+
+    const [orders, total] = await this.prisma.$transaction([
+      this.prisma.order.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          user: {
+            select: {
+              avatar: true,
+              name: true,
+              contact: true,
+              address: true,
+              email: true,
+            },
+          },
+          items: {
+            include: {
+              stock: {
+                select: { size: true, color: true },
+              },
+            },
+          },
+          redeliveries: {
+            select: { id: true, status: true },
+          },
+        },
+        orderBy: { [sortBy ?? 'updatedAt']: sortOrder ?? 'desc' },
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+
+    return {
+      data: orders,
+      meta: {
+        total,
+        page,
+        lastPage: Math.ceil(total / limit) || 1,
       },
-      orderBy: { createdAt: 'desc' },
-    });
+    };
   }
 
   async getOrderById(userId: number, orderId: number, isAdminOrManager: boolean) {
@@ -264,36 +304,41 @@ export class OrdersService {
   }
 
   async createRedelivery(user: User, orderId: number, dto: CreateRedeliveryOrderDto) {
-    const order = await this.prisma.order.findUnique({
-      where: { id: orderId },
-      include: {
-        user: {
-          select: { address: true, contact: true },
+    const redelivery = await this.prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { id: orderId },
+        include: {
+          user: {
+            select: { address: true, contact: true },
+          },
         },
-      },
-    });
+      });
+      
+      if (!order) throw new NotFoundException(`Not found Order ID ${orderId}!`);
 
-    if (!order) {
-      throw new NotFoundException(`Not found Order ID ${orderId}!`);
-    }
+      if (order.status !== 'cancelled') throw new BadRequestException(`Cannot create a redelivery for an order with status "${order.status}"!`);
 
-    if (order.status === 'cancelled') {
-      throw new BadRequestException(
-        `Cannot create a redelivery for an order with status "${order.status}"!`,
-      );
-    }
+      const existingRedelivery = await tx.redeliveryOrder.findFirst({
+        where: { 
+          orderId, 
+          status: { not: 'cancelled' }
+        },
+      })
 
-    const redelivery = await this.prisma.redeliveryOrder.create({
-      data: {
-        order: { connect: { id: orderId } },
-        createdBy: { connect: { id: user.id } },
-        reason: dto.reason,
-        note: dto.note ?? null,
-        address: dto.address ?? order.address ?? order.user.address,
-        contact: dto.contact ?? order.contact ?? order.user.contact,
-        total: order.total,
-        paymentMethod: dto.paymentMethod ?? order.paymentMethod ?? 'delivery',
-      },
+      if (existingRedelivery) throw new ConflictException(`Order #${orderId} already has an active redelivery request`);
+
+      return tx.redeliveryOrder.create({
+        data: {
+          order: { connect: { id: orderId } },
+          createdBy: { connect: { id: user.id } },
+          reason: dto.reason,
+          note: dto.note ?? null,
+          address: dto.address ?? order.address ?? order.user.address,
+          contact: dto.contact ?? order.contact ?? order.user.contact,
+          total: order.total,
+          paymentMethod: dto.paymentMethod ?? order.paymentMethod ?? 'delivery',
+        },
+      });
     });
 
     return {

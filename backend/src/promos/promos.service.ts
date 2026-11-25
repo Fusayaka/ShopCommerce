@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePromoDto } from './dto/create-promo.dto.js';
 import { UpdatePromoDto } from './dto/update-promo.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -12,7 +12,20 @@ export class PromosService {
     const promo = await this.prisma.promoCodes.findUnique({
       where: {code: dto.code}
     });
-    if (promo) throw new ConflictException(`Code ${dto.code} already exists`);
+    if (promo){
+      if (!promo.deletedAt) throw new ConflictException(`Code ${dto.code} already exists`);
+      return this.prisma.promoCodes.update({
+        where: { code: dto.code},
+        data: {
+          discountNum: dto.discountNum,
+          discountPer: dto.discountPer,
+          maxDiscountNum: dto.maxDiscountNum,
+          minToApply: dto.minToApply,
+          expiredAt: dto.expiredAt,
+          deletedAt: null
+        }
+      })
+    }
 
     return this.prisma.promoCodes.create({
       data: {
@@ -27,7 +40,7 @@ export class PromosService {
   }
 
   async getCode(code: string) {
-    const code_details = await this.prisma.promoCodes.findUnique({where: {code}});
+    const code_details = await this.prisma.promoCodes.findFirst({where: {code, deletedAt: null}});
     if (!code_details) throw new NotFoundException(`Not found code ${code}`);
     return code_details;
   }
@@ -42,7 +55,7 @@ export class PromosService {
 
   async validateCode(dto: ValidatePromoDto){
     const { code, subtotal } = dto;
-    const promo = await this.prisma.promoCodes.findUnique({where: {code: code.trim()}});
+    const promo = await this.prisma.promoCodes.findFirst({where: {code: code.trim(), deletedAt: null}});
     if (!promo) return {
         isValid: false,
         message: "Code not found",
@@ -87,7 +100,7 @@ export class PromosService {
   }
 
   async update(dto: UpdatePromoDto) {
-    const code_details = await this.prisma.promoCodes.findUnique({where: {code: dto.code}});
+    const code_details = await this.prisma.promoCodes.findFirst({where: {code: dto.code, deletedAt: null}});
     if (!code_details) throw new NotFoundException(`Not found code ${dto.code}`);
 
     const {code, ...data} = dto;
@@ -98,9 +111,12 @@ export class PromosService {
   }
 
   async remove(code: string) {
-    const code_details = await this.prisma.promoCodes.findUnique({where: {code}});
+    const code_details = await this.prisma.promoCodes.findFirst({where: {code, deletedAt: null}});
     if (!code_details) throw new NotFoundException(`Not found code ${code}`);
 
-    return this.prisma.promoCodes.delete({where: {code}})
+    return this.prisma.promoCodes.update({
+      where: {code},
+      data: {deletedAt: new Date()}
+    })
   }
 }
