@@ -66,14 +66,32 @@ export default function OrderCard({ order, kind = 'order', orderId, reason }: Or
             return;
         }
         setBuyingAgain(true);
+
+        let addedCount = 0;
+        const failedList: typeof items = [];
+
         try {
-            await Promise.all(
-                items.map((item) =>
-                    cartApi.addToCart({ stockId: item.stockId as number, quantity: item.quantity }),
-                ),
-            );
-            toast.success('Items added to your cart.');
-            navigate('/cart');
+            for (const item of items){
+                try {
+                    await cartApi.addToCart({
+                        stockId: item.stockId as number,
+                        quantity: item.quantity,
+                    })
+                    addedCount++;
+                } catch {
+                    failedList.push(item);
+                }
+            }
+
+            if (addedCount > 0 && failedList.length === 0){
+                toast.success('Items added to your cart.');
+                navigate('/cart');
+            }
+            else if (addedCount > 0){
+                toast.warning(`Add ${addedCount} item${addedCount > 1 && 's'} to your cart. ${failedList.length} unavailable item${failedList.length > 1 ? 's were': ' was'} skipped.`);
+                navigate('/cart');
+            }
+            else toast.error('None of the items from this order are available anymore.');
         } catch {
             // axiosClient surfaces the error toast.
         } finally {
