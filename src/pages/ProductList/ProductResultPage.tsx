@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ProductCard } from "@/components";
+import { ProductCard, DropDownSelector } from "@/components";
 import { type Product } from '@/types';
 import filterMenu from '@/assets/filter.svg'
 import { useSearchParams } from 'react-router-dom';
@@ -166,21 +166,22 @@ export default function ProductResultPage({ onOpenFilter }: ProductResultPagePro
             </div>
             <div className="mb-5 flex items-center justify-end gap-2">
                 <label htmlFor="product-sort-select" className="text-sm font-medium text-[#666]">Sort by</label>
-                <select
+                <DropDownSelector
+                    variant="pill"
                     id="product-sort-select"
                     value={sort}
-                    onChange={(e) => handleSortChange(e.target.value)}
-                    className="cursor-pointer appearance-none rounded-lg border border-[#eaeaea] bg-white bg-no-repeat py-[9px] pr-9 pl-3.5 text-sm font-medium text-black transition-colors [background-position:right_12px_center] hover:border-black focus:border-black focus:outline-none"
-                    style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E\")" }}
-                >
-                    <option value="latest">Latest</option>
-                    <option value="rating-asc">Rating &#8593;</option>
-                    <option value="rating-desc">Rating &#8595;</option>
-                    <option value="title-asc">Name &#8593;</option>
-                    <option value="title-desc">Name &#8595;</option>
-                    <option value="price-asc">Price &#8593;</option>
-                    <option value="price-desc">Price &#8595;</option>
-                </select>
+                    onChange={handleSortChange}
+                    aria-label="Sort by"
+                    options={[
+                        { value: 'latest', label: 'Latest' },
+                        { value: 'rating-asc', label: 'Rating ↑' },
+                        { value: 'rating-desc', label: 'Rating ↓' },
+                        { value: 'title-asc', label: 'Name ↑' },
+                        { value: 'title-desc', label: 'Name ↓' },
+                        { value: 'price-asc', label: 'Price ↑' },
+                        { value: 'price-desc', label: 'Price ↓' },
+                    ]}
+                />
             </div>
 
             {isLoading ? (

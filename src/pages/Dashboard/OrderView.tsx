@@ -6,7 +6,7 @@ import { RedeliveryForm, type RedeliveryFormData } from './Form';
 import { formatPrice, formatDate } from '@/utils/format';
 import { NEXT_STATUS, PAYMENT_LABELS } from '@/constants/order';
 import { FIELD_LIMITS } from '@/constants/commerce';
-import { StatusBadge } from '@/components';
+import { StatusBadge, DropDownSelector, SubmitButton } from '@/components';
 
 interface OrderDetailModalProps {
     order: Order | null;
@@ -251,26 +251,25 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClo
                                         </h3>
                                         {canUpdateStatus && (
                                             <div className="flex shrink-0 items-center gap-2">
-                                                <select
+                                                <DropDownSelector
+                                                    variant="compact"
+                                                    className="capitalize"
                                                     value={selectedStatus}
-                                                    onChange={(e) => setTargetStatus(e.target.value as OrderStatus)}
+                                                    onChange={(v) => setTargetStatus(v as OrderStatus)}
                                                     disabled={updatingStatus}
-                                                    className="cursor-pointer rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-semibold capitalize text-slate-700 outline-none focus:border-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
-                                                >
-                                                    {statusOptions.map((s) => (
-                                                        <option key={s} value={s} className="capitalize">
-                                                            {s}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                                <button
+                                                    aria-label="Order status"
+                                                    options={statusOptions.map((s) => ({ value: s, label: s }))}
+                                                />
+                                                <SubmitButton
                                                     type="button"
                                                     onClick={() => selectedStatus && applyStatus(selectedStatus)}
-                                                    disabled={updatingStatus || !selectedStatus}
+                                                    loading={updatingStatus}
+                                                    loadingText="Updating…"
+                                                    disabled={!selectedStatus}
                                                     className="inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
                                                 >
-                                                    {updatingStatus ? 'Updating…' : 'Update status'}
-                                                </button>
+                                                    Update status
+                                                </SubmitButton>
                                             </div>
                                         )}
                                     </div>
@@ -525,31 +524,29 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClo
                                                         const busy = updatingRedeliveryId === r.id;
                                                         return (
                                                             <>
-                                                                <select
+                                                                <DropDownSelector
+                                                                    variant="compact"
+                                                                    className="capitalize"
                                                                     value={sel}
-                                                                    onChange={(e) =>
+                                                                    onChange={(v) =>
                                                                         setRedeliveryTargets((prev) => ({
                                                                             ...prev,
-                                                                            [r.id]: e.target.value as OrderStatus,
+                                                                            [r.id]: v as OrderStatus,
                                                                         }))
                                                                     }
                                                                     disabled={busy}
-                                                                    className="cursor-pointer rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold capitalize text-slate-700 outline-none focus:border-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
-                                                                >
-                                                                    {opts.map((s) => (
-                                                                        <option key={s} value={s} className="capitalize">
-                                                                            {s}
-                                                                        </option>
-                                                                    ))}
-                                                                </select>
-                                                                <button
+                                                                    aria-label="Redelivery status"
+                                                                    options={opts.map((s) => ({ value: s, label: s }))}
+                                                                />
+                                                                <SubmitButton
                                                                     type="button"
                                                                     onClick={() => applyRedeliveryStatus(r, sel)}
-                                                                    disabled={busy}
+                                                                    loading={busy}
+                                                                    loadingText="Updating…"
                                                                     className="inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-slate-900 px-2.5 py-1 text-xs font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
                                                                 >
-                                                                    {busy ? 'Updating…' : 'Update status'}
-                                                                </button>
+                                                                    Update status
+                                                                </SubmitButton>
                                                             </>
                                                         );
                                                     })()}
@@ -620,14 +617,15 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClo
                             >
                                 Cancel
                             </button>
-                            <button
+                            <SubmitButton
                                 type="button"
                                 onClick={saveNote}
-                                disabled={savingNote}
+                                loading={savingNote}
+                                loadingText="Saving…"
                                 className="cursor-pointer rounded-md border border-transparent bg-slate-900 px-4 py-1.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                                {savingNote ? 'Saving…' : 'Save note'}
-                            </button>
+                                Save note
+                            </SubmitButton>
                         </div>
                     </div>
                 </div>

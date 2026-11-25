@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { productApi } from '@/api/productApi';
-import { ImageUploader, FormField } from '@/components';
+import { ImageUploader, FormField, SubmitButton } from '@/components';
 import plhImg from '/images/cloth-placeholder.jpeg';
 
 export interface ProductFormData {
@@ -103,13 +103,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         >
           Cancel
         </button>
-        <button
-          type="submit"
-          disabled={isSubmitting}
+        <SubmitButton
+          loading={isSubmitting}
+          loadingText="Saving…"
           className="cursor-pointer rounded-md border-none bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
         >
-          {isSubmitting ? 'Saving…' : isEditing ? 'Save changes' : 'Create product'}
-        </button>
+          {isEditing ? 'Save changes' : 'Create product'}
+        </SubmitButton>
       </div>
     </form>
   );
@@ -222,13 +222,13 @@ export const RedeliveryForm: React.FC<RedeliveryFormProps> = ({
         >
           Cancel
         </button>
-        <button
-          type="submit"
-          disabled={isSubmitting}
+        <SubmitButton
+          loading={isSubmitting}
+          loadingText="Creating…"
           className="cursor-pointer rounded-md border-none bg-slate-900 px-4 py-1.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isSubmitting ? 'Creating…' : 'Create redelivery'}
-        </button>
+          Create redelivery
+        </SubmitButton>
       </div>
     </form>
   );

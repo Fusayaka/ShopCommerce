@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { StarRating, ConfirmModal } from '@/components';
+import { StarRating, ConfirmModal, DropDownSelector, SubmitButton } from '@/components';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { type Comment as CommentType } from '@/types';
 import { commentApi } from '@/api/commentApi';
@@ -200,14 +200,15 @@ return (
               Cancel
             </button>
 
-            <button
+            <SubmitButton
               type="button"
               className={FORM_SUBMIT}
               onClick={handleSave}
-              disabled={isUpdating}
+              loading={isUpdating}
+              loadingText="Saving..."
             >
-              {isUpdating ? 'Saving...' : 'Save'}
-            </button>
+              Save
+            </SubmitButton>
           </div>
         </div>
       ) : (
@@ -431,29 +432,30 @@ export default function Comment() {
 
           {submitError && <p className="m-0 text-sm text-[#ff3333]">{submitError}</p>}
 
-          <button
-            type="submit"
+          <SubmitButton
             className={FORM_SUBMIT}
-            disabled={isSubmitting}
+            loading={isSubmitting}
+            loadingText="Posting..."
           >
-            {isSubmitting ? 'Posting...' : 'Post'}
-          </button>
+            Post
+          </SubmitButton>
         </form>
       )}
 
       {sortedComments.length > 0 && (
         <div className="mb-5 flex items-center justify-end gap-2 [&_label]:text-sm [&_label]:font-medium [&_label]:text-[#666]">
           <label htmlFor="comment-sort-select">Sort by</label>
-          <select
+          <DropDownSelector
+            variant="pill"
             id="comment-sort-select"
             value={sort}
-            onChange={e => handleSortChange(e.target.value)}
-            className="cursor-pointer appearance-none rounded-lg border border-[#eaeaea] bg-white bg-no-repeat py-[9px] pr-9 pl-3.5 text-sm font-medium text-black transition-colors [background-position:right_12px_center] hover:border-black focus:border-black focus:outline-none"
-            style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E\")" }}
-          >
-            <option value="date">Newest</option>
-            <option value="rating">Rating</option>
-          </select>
+            onChange={handleSortChange}
+            aria-label="Sort by"
+            options={[
+              { value: 'date', label: 'Newest' },
+              { value: 'rating', label: 'Rating' },
+            ]}
+          />
         </div>
       )}
 

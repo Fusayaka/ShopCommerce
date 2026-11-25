@@ -10,6 +10,7 @@ import promoIcon from '@/assets/promo-code.svg';
 import { formatPrice } from '@/utils/format';
 import { PAYMENT_METHODS } from '@/constants/order';
 import { DELIVERY_FEE, FIELD_LIMITS } from '@/constants/commerce';
+import { SubmitButton } from '@/components';
 import { ROUTES } from '@/constants/routes';
 
 interface PaymentProps {
@@ -245,14 +246,15 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
             value={promoInput}
             onChange={(e) => setPromoInput(e.target.value)}
           />
-          <button
+          <SubmitButton
             type="button"
             className="cursor-pointer rounded-full border-none bg-[#111827] px-3.5 py-1.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#1f2937]"
-            disabled={validatingPromo}
+            loading={validatingPromo}
+            loadingText="Checking..."
             onClick={handleApplyPromo}
           >
-            {validatingPromo ? 'Checking...' : 'Apply'}
-          </button>
+            Apply
+          </SubmitButton>
         </div>
         {promoMessage && (
           <p className={`mt-1.5 mb-0 w-full max-w-[360px] text-right text-[12.5px] font-medium max-[645px]:max-w-fit ${promoMessage.type === 'success' ? 'text-[#16a34a]' : 'text-[#dc2626]'}`}>{promoMessage.text}</p>
@@ -288,14 +290,16 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
           </div>
 
           <div className="mt-2 flex justify-end">
-            <button
+            <SubmitButton
               type="button"
               className="w-full cursor-pointer rounded-full border-none bg-[#111827] px-5 py-3 text-[15px] font-bold tracking-[0.3px] text-white shadow-[0_2px_6px_rgba(0,0,0,0.08)] transition-[background-color,transform] enabled:hover:bg-[#1f2937] enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
-              disabled={submitting || itemCount === 0}
+              loading={submitting}
+              loadingText="Placing Order..."
+              disabled={itemCount === 0}
               onClick={handlePlaceOrder}
             >
-              {submitting ? 'Placing Order...' : 'Place order'}
-            </button>
+              Place order
+            </SubmitButton>
           </div>
         </div>
       </div>

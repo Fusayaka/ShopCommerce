@@ -5,7 +5,7 @@ import type { Order } from '@/types';
 import { cartApi } from '@/api/cartApi';
 import { formatPrice, formatDate, formatDateTime } from '@/utils/format';
 import { ROUTES } from '@/constants/routes';
-import { StatusBadge } from '@/components';
+import { StatusBadge, SubmitButton } from '@/components';
 
 interface OrderCardProps {
     order: Order;
@@ -196,14 +196,15 @@ export default function OrderCard({ order, kind = 'order', orderId, reason, onVi
                 {/* Row 2: actions */}
                 <div className="flex flex-wrap items-center justify-end gap-3">
                     {kind === 'order' && (
-                        <button
+                        <SubmitButton
                             type="button"
                             onClick={handleBuyAgain}
-                            disabled={buyingAgain}
+                            loading={buyingAgain}
+                            loadingText="Adding…"
                             className="cursor-pointer rounded-lg border border-transparent bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                            {buyingAgain ? 'Adding…' : 'Buy again'}
-                        </button>
+                            Buy again
+                        </SubmitButton>
                     )}
 
                     <button

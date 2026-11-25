@@ -4,7 +4,7 @@ import avatarPlaceholder from '@/assets/avatar-placeholder.svg';
 import cameraIcon from '@/assets/camera.svg';
 import { userApi } from '@/api/userApi';
 import { useAuth, setAuth, getToken } from '@/utils/auth';
-import { ImageUploader, FormField } from '@/components';
+import { ImageUploader, FormField, SubmitButton } from '@/components';
 
 type Tab = 'profile' | 'password';
 
@@ -189,9 +189,9 @@ export default function Profile() {
                             inputClassName="min-h-[96px] leading-normal"
                         />
 
-                        <button type="submit" className={SAVE} disabled={savingProfile}>
-                            {savingProfile ? 'Saving…' : 'Save'}
-                        </button>
+                        <SubmitButton loading={savingProfile} loadingText="Saving…" className={SAVE}>
+                            Save
+                        </SubmitButton>
                     </div>
                 </form>
             ) : (
@@ -224,9 +224,9 @@ export default function Profile() {
                             required
                         />
 
-                        <button type="submit" className={SAVE} disabled={savingPassword}>
-                            {savingPassword ? 'Saving…' : 'Change Password'}
-                        </button>
+                        <SubmitButton loading={savingPassword} loadingText="Saving…" className={SAVE}>
+                            Change Password
+                        </SubmitButton>
                     </div>
                 </form>
             )}

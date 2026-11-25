@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { setAuth, setToken, useAuth } from '@/utils/auth';
 import { loginApi } from '@/api/loginApi';
-import { FormField } from '@/components';
+import { FormField, SubmitButton } from '@/components';
 
 const SOCIAL_ICON = "h-[18px] w-[18px] shrink-0";
 const CARD = "flex max-h-full w-[90%] max-w-[420px] flex-col overflow-y-auto p-8 max-md:px-[1.3rem] max-md:py-[1.5rem] md:p-10";
@@ -247,9 +247,9 @@ export default function Login(){
                                 wrapperClassName={GROUP}
                             />
 
-                            <button type="submit" disabled={isLoading} className={BUTTON}>
-                                {isLoading ? 'Processing...' : 'Sign In'}
-                            </button>
+                            <SubmitButton loading={isLoading} loadingText="Processing..." className={BUTTON}>
+                                Sign In
+                            </SubmitButton>
                         </form>
 
                         <div className={DIVIDER}>
@@ -313,9 +313,9 @@ export default function Login(){
                                 wrapperClassName={GROUP}
                             />
 
-                            <button type="submit" disabled={isLoading} className={BUTTON}>
-                                {isLoading ? 'Processing...' : 'Register'}
-                            </button>
+                            <SubmitButton loading={isLoading} loadingText="Processing..." className={BUTTON}>
+                                Register
+                            </SubmitButton>
                         </form>
 
                         <div className={DIVIDER}>

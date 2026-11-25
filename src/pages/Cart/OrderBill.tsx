@@ -6,6 +6,7 @@ import type { CartLineItem } from '@/types';
 import { formatPrice } from '@/utils/format';
 import { DELIVERY_FEE } from '@/constants/commerce';
 import { ROUTES } from '@/constants/routes';
+import { SubmitButton } from '@/components';
 
 interface OrderBillProps {
   items: CartLineItem[];
@@ -153,14 +154,15 @@ export default function OrderBill({ items }: OrderBillProps) {
           value={promoInput}
           onChange={(e) => setPromoInput(e.target.value)}
         />
-        <button
+        <SubmitButton
           className="shrink-0 cursor-pointer rounded-[20px] border-none bg-black px-2.5 py-1.5 md:px-3.5 font-base text-white transition-opacity hover:opacity-80 max-md:px-4"
           type="button"
-          disabled={validatingPromo}
+          loading={validatingPromo}
+          loadingText="..."
           onClick={handlePromoCode}
         >
-          {validatingPromo ? '...' : 'Apply'}
-        </button>
+          Apply
+        </SubmitButton>
       </div>
 
       {message && (
