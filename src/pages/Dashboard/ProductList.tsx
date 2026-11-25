@@ -385,7 +385,7 @@ export default function ProductList() {
             </header>
 
             {filtersOpen && (
-                <div className="absolute right-0 top-full z-[30] -mt-10 flex w-full justify-end">
+                <div className="absolute right-0 top-full z-[30] mt-2 flex w-full justify-end">
                     <div className={`${fs.filterCard} shadow-xl`} style={{ width: 340, maxWidth: '100%' }}>
                         <div className={fs.filterHeader}>
                             <h3>Filters</h3>
