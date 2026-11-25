@@ -1,4 +1,5 @@
 import React from 'react';
+import SubmitButton from './SubmitButton';
 
 export interface ConfirmModalProps {
   isOpen: boolean;
@@ -53,14 +54,15 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
           >
             {cancelText}
           </button>
-          <button
+          <SubmitButton
             type="button"
-            disabled={isLoading}
+            loading={isLoading}
+            loadingText="Processing..."
             onClick={onConfirm}
             className={`${btnBase} ${confirmClass}`}
           >
-            {isLoading ? "Processing..." : confirmText}
-          </button>
+            {confirmText}
+          </SubmitButton>
         </div>
       </div>
     </div>
