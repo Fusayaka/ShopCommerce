@@ -125,8 +125,15 @@ export interface Order {
     user?: OrderUser;
     items: OrderItem[];
     status: OrderStatus;
-    // Minimal redelivery info included by getAllOrders (id + status).
-    redeliveries?: { id: number; status: OrderStatus }[];
+    redeliveries?: {
+        id: number;
+        status: OrderStatus;
+        reason?: string | null;
+        note?: string | null;
+        total?: number | null;
+        createdAt?: string;
+        updatedAt?: string;
+    }[];
 
     subtotal: number;
     discount: number;

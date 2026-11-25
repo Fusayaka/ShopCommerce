@@ -52,7 +52,7 @@ export const orderApi = {
   },
 
   getUserOrders() {
-    return axiosClient.get<Order[], Order[]>(`/orders/me`);
+    return axiosClient.get<ApiEnvelope<Order[]>, ApiEnvelope<Order[]>>(`/orders/me`);
   },
 
   getAllOrders(params?: GetAllOrdersQuery) {

@@ -142,7 +142,7 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
 
       notifyCartChanged();
       toast.success('Order placed successfully!');
-      navigate('/purchases');
+      navigate('/orders');
     } catch (err: unknown) {
       console.error('Failed to place order:', err);
       const apiErr = err as { response?: { data?: { message?: string } }; message?: string };
