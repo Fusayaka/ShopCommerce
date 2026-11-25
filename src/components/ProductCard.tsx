@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import plhImg from '/images/cloth-placeholder.jpeg'
-import StarRating from "../StarRating/StarRating";
+import StarRating from "./StarRating";
 import { getCardPrice } from "@/utils/pricing";
 import type { Product } from "@/types";
 
