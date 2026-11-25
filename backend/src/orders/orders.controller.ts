@@ -1,8 +1,9 @@
-import { 
-  Controller, Get, Post, Patch, Body, Param, ParseIntPipe, UseGuards
+import {
+  Controller, Get, Post, Patch, Body, Param, ParseIntPipe, UseGuards, Query
 } from '@nestjs/common';
 import { OrdersService } from './orders.service.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
+import { GetAllOrderDto } from './dto/get-all-order.dto.js';
 import { UpdateOrderDto } from './dto/update-order.dto.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard.js';
@@ -71,8 +72,8 @@ export class OrdersController {
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.admin, UserRole.manager)
-  getAllOrders() {
-    return this.ordersService.getAllOrders();
+  getAllOrders(@Query() dto: GetAllOrderDto) {
+    return this.ordersService.getAllOrders(dto);
   }
 
   // 3. GET /orders/:id

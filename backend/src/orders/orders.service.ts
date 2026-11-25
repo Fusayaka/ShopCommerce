@@ -5,6 +5,7 @@ import { UpdateOrderDto } from './dto/update-order.dto.js';
 import { CreateRedeliveryOrderDto } from './dto/create-redelivery-order.dto.js';
 import { UpdateRedeliveryOrderDto } from './dto/update-redelivery-order.dto.js';
 import { Prisma, OrderStatus, type User } from '@prisma/client';
+import { GetAllOrderDto } from './dto/get-all-order.dto.js';
 
 interface OrderItemInput {
   stock: {
@@ -193,31 +194,61 @@ export class OrdersService {
     };
   }
 
-  async getAllOrders(){
-    return this.prisma.order.findMany({
-      include: {
-        user: {
-          select: {
-            avatar: true,
-            name: true,
-            contact: true,
-            address: true,      // As delivered based on user's address
-            email: true,
-          }
-        },
-        items: {
-          include: {
-            stock: {
-              select: { size: true, color: true },
+  async getAllOrders(dto: GetAllOrderDto){
+    const {page, limit, status, search, sortBy, sortOrder} = dto;
+
+    const skip = (page - 1) * limit;
+
+    const where: Prisma.OrderWhereInput = {
+      ...(status && { status }),
+      ...(search && {
+        OR:  [
+          ...(/^\d+$/.test(search) ? [{ id: Number(search) }] : []),
+          { user: { name: { contains: search, mode: 'insensitive'}}},
+          { user: { email: { contains: search, mode: 'insensitive'}}},
+        ],
+      }),
+    };
+
+    const [orders, total] = await this.prisma.$transaction([
+      this.prisma.order.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          user: {
+            select: {
+              avatar: true,
+              name: true,
+              contact: true,
+              address: true,
+              email: true,
             },
           },
+          items: {
+            include: {
+              stock: {
+                select: { size: true, color: true },
+              },
+            },
+          },
+          redeliveries: {
+            select: { id: true, status: true },
+          },
         },
-        redeliveries: {
-          select: { id: true, status: true },
-        },
+        orderBy: { [sortBy ?? 'updatedAt']: sortOrder ?? 'desc' },
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+
+    return {
+      data: orders,
+      meta: {
+        total,
+        page,
+        lastPage: Math.ceil(total / limit) || 1,
       },
-      orderBy: { createdAt: 'desc' },
-    });
+    };
   }
 
   async getOrderById(userId: number, orderId: number, isAdminOrManager: boolean) {
