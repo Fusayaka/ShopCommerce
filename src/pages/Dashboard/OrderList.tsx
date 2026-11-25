@@ -34,13 +34,6 @@ const SORT_COLUMN: Record<SortKey, 'createdAt' | 'status'> = {
     status: 'status',
 };
 
-function formatDate(value?: string) {
-    if (!value) return '—';
-    const d = new Date(value);
-    if (Number.isNaN(d.getTime())) return '—';
-    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-}
-
 function StatusBadge({ status }: { status: OrderStatus }) {
     return (
         <span
