@@ -81,11 +81,16 @@ export default function Orders() {
     }, [cards]);
 
     const filteredCards = useMemo(() => {
-        const q = search.trim().toLowerCase();
+        const q = search.trim().replace(/^#/, '').toLowerCase();
+        const idQuery = /^\d+$/.test(q) ? Number(q) : null;
         return cards.filter((c) => {
             if (!matchesTab(c, activeTab)) return false;
             if (!q) return true;
-            if (String(c.order.id).includes(q)) return true;
+            if (idQuery !== null) {
+                const owningOrderId = c.kind === 'order' ? c.order.id : c.orderId;
+                if (owningOrderId === idQuery) return true;
+                if (c.kind === 'redelivery' && c.order.id === idQuery) return true;
+            }
             return c.order.items.some((item) => item.title.toLowerCase().includes(q));
         });
     }, [cards, activeTab, search]);
