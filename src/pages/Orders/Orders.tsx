@@ -21,6 +21,13 @@ const TABS: { key: TabKey; label: string }[] = [
 
 const PAGE_SIZE = 10;
 
+const matchesTab = (c: { kind: 'order' | 'redelivery'; order: Order }, tab: TabKey) =>
+    tab === 'all'
+        ? true
+        : tab === 'redelivery'
+          ? c.kind === 'redelivery'
+          : c.kind === 'order' && c.order.status === tab;
+
 export default function Orders() {
     const { loggedIn, user } = useAuth();
 
@@ -68,15 +75,15 @@ export default function Orders() {
     }, [orders]);
 
     const counts = useMemo(() => {
-        const map: Record<string, number> = { all: cards.length };
-        for (const c of cards) map[c.order.status] = (map[c.order.status] ?? 0) + 1;
+        const map: Record<string, number> = {};
+        for (const { key } of TABS) map[key] = cards.filter((c) => matchesTab(c, key)).length;
         return map;
     }, [cards]);
 
     const filteredCards = useMemo(() => {
         const q = search.trim().toLowerCase();
         return cards.filter((c) => {
-            if (activeTab !== 'all' && c.order.status !== activeTab) return false;
+            if (!matchesTab(c, activeTab)) return false;
             if (!q) return true;
             if (String(c.order.id).includes(q)) return true;
             return c.order.items.some((item) => item.title.toLowerCase().includes(q));
