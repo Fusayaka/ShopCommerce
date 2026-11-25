@@ -34,7 +34,6 @@ export interface CreateProductDto {
     title: string;
     description?: string;
     image?: string;
-    stocks?: UpsertStockDto[];
     rating?: number;
     numReviews?: number;
 }
