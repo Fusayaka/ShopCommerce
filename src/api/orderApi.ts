@@ -1,5 +1,14 @@
 import axiosClient from "./axiosClient";
-import { type Order, type OrderStatus, type PaymentMethod, type RedeliveryOrder } from "@/types";
+import { type Order, type OrderStatus, type Paginated, type PaymentMethod, type RedeliveryOrder } from "@/types";
+
+export interface GetAllOrdersQuery {
+  page?: number;
+  limit?: number;
+  status?: OrderStatus;
+  search?: string;
+  sortBy?: 'createdAt' | 'updatedAt' | 'status';
+  sortOrder?: 'asc' | 'desc';
+}
 
 export interface CreateOrderDto {
   paymentMethod: PaymentMethod;
@@ -46,8 +55,10 @@ export const orderApi = {
     return axiosClient.get<Order[], Order[]>(`/orders/me`);
   },
 
-  getAllOrders() {
-    return axiosClient.get<Order[], Order[]>(`/orders`);
+  getAllOrders(params?: GetAllOrdersQuery) {
+    return axiosClient.get<Paginated<Order>, Paginated<Order>>(`/orders`, {
+      params,
+    });
   },
 
   getOrderById(orderId: number) {

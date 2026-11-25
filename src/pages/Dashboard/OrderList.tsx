@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { orderApi } from '@/api/orderApi';
 import type { Order, OrderStatus } from '@/types';
 import { Pagination } from '@/components';
@@ -28,6 +28,11 @@ type SortDir = 'asc' | 'desc';
 
 const LIMIT = 10;
 
+const SORT_COLUMN: Record<SortKey, 'createdAt' | 'status'> = {
+    date: 'createdAt',
+    status: 'status',
+};
+
 function formatPrice(value?: number | null) {
     if (value === undefined || value === null) return '—';
     return `${Number(value).toLocaleString('en-US', {
@@ -53,55 +58,61 @@ function StatusBadge({ status }: { status: OrderStatus }) {
     );
 }
 
-type ParsedSearchQuery =
-  | { type: 'empty', value: null }
-  | { type: 'id'; value: number }
-  | { type: 'name'; value: string };
-
-function parseSearchQuery(rawQuery: string): ParsedSearchQuery {
-  const trimmed = rawQuery.trim();
-
-  if (!trimmed) {
-    return { type: 'empty', value: null};
-  }
-
-  const normalized = trimmed.replace(/^#/, '');
-  if (/^\d+$/.test(normalized)) {
-    const value = Number(normalized);
-    if (Number.isSafeInteger(value) && value > 0) {
-      return { type: 'id', value };
-    }
-  }
-
-  return { type: 'name', value: trimmed };
-}
-
 export default function OrderList() {
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const page = Math.max(1, Number(searchParams.get('page')) || 1);
+    const qSearch = searchParams.get('search') ?? '';
+
+    const rawStatus = searchParams.get('status');
+    const statusFilter: OrderStatus | 'all' = ALL_STATUSES.includes(rawStatus as OrderStatus)
+        ? (rawStatus as OrderStatus)
+        : 'all';
+
+    const sortKey: SortKey = searchParams.get('sort') === 'status' ? 'status' : 'date';
+    const sortDir: SortDir = searchParams.get('dir') === 'asc' ? 'asc' : 'desc';
+
+    const updateParams = (mutate: (p: URLSearchParams) => void) => {
+        const params = new URLSearchParams(searchParams);
+        mutate(params);
+        setSearchParams(params);
+    };
+
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [lastPage, setLastPage] = useState<number>(1);
+    const [total, setTotal] = useState<number>(0);
     const [reloadToken, setReloadToken] = useState<number>(0);
 
-    const [searchParams, setSearchParams] = useSearchParams();
-
-    const [search, setSearch] = useState<string>('');
-    const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
-    const [sortKey, setSortKey] = useState<SortKey>('date');
-    const [sortDir, setSortDir] = useState<SortDir>(() => {
-        const d = searchParams.get('date');
-        return d === 'asc' || d === 'desc' ? d : 'desc';
-    });
-    const [page, setPage] = useState<number>(1);
-
+    const [search, setSearch] = useState<string>(qSearch);
     const [viewOrder, setViewOrder] = useState<Order | null>(null);
+
+    const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
         let cancelled = false;
+        const rawStatusParam = searchParams.get('status');
+        const statusParam = ALL_STATUSES.includes(rawStatusParam as OrderStatus)
+            ? (rawStatusParam as OrderStatus)
+            : undefined;
+        const sortParam: SortKey = searchParams.get('sort') === 'status' ? 'status' : 'date';
+        const dirParam: SortDir = searchParams.get('dir') === 'asc' ? 'asc' : 'desc';
+
         (async () => {
             try {
-                const res = await orderApi.getAllOrders();
+                const res = await orderApi.getAllOrders({
+                    page: Math.max(1, Number(searchParams.get('page')) || 1),
+                    limit: LIMIT,
+                    status: statusParam,
+                    search: searchParams.get('search') || undefined,
+                    sortBy: SORT_COLUMN[sortParam],
+                    sortOrder: dirParam,
+                });
                 if (cancelled) return;
-                setOrders(Array.isArray(res) ? res : []);
+                setOrders(res?.data ?? []);
+                setLastPage(res?.meta?.lastPage ?? 1);
+                setTotal(res?.meta?.total ?? 0);
                 setError(null);
             } catch (err) {
                 console.error('Failed to load orders:', err);
@@ -113,89 +124,45 @@ export default function OrderList() {
         return () => {
             cancelled = true;
         };
-    }, [reloadToken]);
+    }, [searchParams, reloadToken]);
 
     const toggleSort = (key: SortKey) => {
-        const nextKey = key;
         const nextDir: SortDir = sortKey === key ? (sortDir === 'asc' ? 'desc' : 'asc') : 'desc';
-
-        setSortKey(nextKey);
-        setSortDir(nextDir);
-        setPage(1);
-
-        const searchParam = new URLSearchParams(searchParams);
-        searchParam.delete('page');
-        if (nextKey === 'date') {
-            searchParam.set('date', nextDir);
-        } else {
-            searchParam.delete('date');
-        }
-        setSearchParams(searchParam);
+        updateParams((p) => {
+            p.set('sort', key);
+            p.set('dir', nextDir);
+            p.delete('page');
+        });
     };
 
     const changeFilter = (value: OrderStatus | 'all') => {
-        setStatusFilter(value);
-        setPage(1);
+        updateParams((p) => {
+            if (value === 'all') p.delete('status');
+            else p.set('status', value);
+            p.delete('page');
+        });
     };
 
     const changeSearch = (value: string) => {
         setSearch(value);
-        setPage(1);
+        if (searchTimer.current) clearTimeout(searchTimer.current);
+        searchTimer.current = setTimeout(() => {
+            updateParams((p) => {
+                const v = value.trim();
+                if (v) p.set('search', v);
+                else p.delete('search');
+                p.delete('page');
+            });
+        }, 400);
     };
-
-    const visibleOrders = useMemo(() => {
-        const { type, value } = parseSearchQuery(search);
-
-        const filtered = orders.filter((o) => {
-            if (statusFilter !== 'all' && o.status !== statusFilter) return false;
-
-            
-            if (type === 'id') {
-                return String(o.id).includes(value.toString());
-            }
-
-            if (type === 'name') {
-                const keyword = value.toLowerCase();
-                const name = (o.user?.name ?? '').toLowerCase();
-                const email = (o.user?.email ?? '').toLowerCase();
-                return name.includes(keyword) || email.includes(keyword);
-            }
-
-            return true;
-        });
-
-        const sorted = [...filtered].sort((a, b) => {
-            const cmp =
-            sortKey === 'date'
-                ? new Date(a.createdAt ?? 0).getTime() - new Date(b.createdAt ?? 0).getTime()
-                : a.status.localeCompare(b.status);
-            return sortDir === 'asc' ? cmp : -cmp;
-        });
-
-        return sorted;
-    }, [orders, search, statusFilter, sortKey, sortDir]);
-
-    const lastPage = Math.max(1, Math.ceil(visibleOrders.length / LIMIT));
-    const safePage = Math.min(page, lastPage);
-
-    const pagedOrders = useMemo(
-        () => visibleOrders.slice((safePage - 1) * LIMIT, safePage * LIMIT),
-        [visibleOrders, safePage],
-    );
 
     const goToPage = (p: number) => {
-        if (p < 1 || p > lastPage || p === safePage) return;
-        setPage(p);
-
-        const searchParam = new URLSearchParams(searchParams);
-        if (p === 1) searchParam.delete('page');
-        else searchParam.set('page', p.toString());
-        setSearchParams(searchParam);
-    };
-
-    const sortArrow = (key: SortKey) => {
-        if (sortKey !== key) return '↕';
-        return sortDir === 'asc' ? '↑' : '↓';
+        if (p < 1 || p > lastPage || p === page || loading) return;
+        setLoading(true);
+        updateParams((params) => {
+            if (p <= 1) params.delete('page');
+            else params.set('page', String(p));
+        });
     };
 
     return (
@@ -204,7 +171,7 @@ export default function OrderList() {
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900 pl-4">Orders</h1>
                     <p className="text-sm text-slate-500 text-left pl-5">
-                        {loading ? 'Loading…' : `${visibleOrders.length} order${visibleOrders.length === 1 ? '' : 's'}`}
+                        {loading ? 'Loading…' : `${total} order${total === 1 ? '' : 's'}`}
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -236,7 +203,7 @@ export default function OrderList() {
                     <div className="p-8 text-center text-sm text-red-600">{error}</div>
                 ) : loading ? (
                     <div className="p-8 text-center text-sm text-slate-400">Loading orders…</div>
-                ) : visibleOrders.length === 0 ? (
+                ) : orders.length === 0 ? (
                     <div className="p-8 text-center text-sm text-slate-400">No orders found.</div>
                 ) : (
                     <>
@@ -252,7 +219,7 @@ export default function OrderList() {
                                             onClick={() => toggleSort('date')}
                                             className="inline-flex cursor-pointer items-center justify-center gap-1 border-none bg-transparent p-0 align-middle text-xs font-semibold uppercase tracking-wide text-slate-500 hover:text-slate-900"
                                         >
-                                            Date <span className="text-slate-400">{sortArrow('date')}</span>
+                                            Date
                                         </button>
                                     </th>
                                     <th className="px-4 py-3 font-semibold">Address</th>
@@ -264,14 +231,14 @@ export default function OrderList() {
                                             onClick={() => toggleSort('status')}
                                             className="inline-flex cursor-pointer items-center justify-center gap-1 border-none bg-transparent p-0 align-middle text-xs font-semibold uppercase tracking-wide text-slate-500 hover:text-slate-900"
                                         >
-                                            Status <span className="text-slate-400">{sortArrow('status')}</span>
+                                            Status
                                         </button>
                                     </th>
                                     <th className="w-28 px-4 py-3 font-semibold text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {pagedOrders.map((order) => {
+                                {orders.map((order) => {
                                     const address = order.address ?? order.user?.address ?? '—';
                                     const contact = order.contact ?? order.user?.contact ?? '—';
                                     return (
@@ -344,9 +311,9 @@ export default function OrderList() {
                     {lastPage > 1 && (
                         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 px-4 py-3 text-sm">
                             <span className="text-slate-500">
-                                Page {safePage} of {lastPage}
+                                Page {page} of {lastPage}
                             </span>
-                            <Pagination page={safePage} totalPages={lastPage} onPageChange={goToPage} />
+                            <Pagination page={page} totalPages={lastPage} onPageChange={goToPage} />
                         </div>
                     )}
                     </>
