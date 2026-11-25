@@ -68,7 +68,6 @@ type Tab = 'items' | 'redeliver';
 
 export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClose, onChanged }) => {
     const [tab, setTab] = useState<Tab>('items');
-    const [status, setStatus] = useState<OrderStatus>(order?.status ?? 'pending');
 
     const [targetStatus, setTargetStatus] = useState<OrderStatus | null>(null);
     const [updatingStatus, setUpdatingStatus] = useState(false);
@@ -125,6 +124,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClo
 
     if (!order) return null;
 
+    const status = order.status;
     const badgeClass = STATUS_STYLES[status];
     const address = order.address ?? order.user?.address ?? '—';
     const contact = order.contact ?? order.user?.contact ?? '—';
@@ -143,7 +143,6 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClo
         try {
             await orderApi.updateOrder(order.id, { status: next });
             toast.success(`Order #${order.id} → ${next}`);
-            setStatus(next);
             setTargetStatus(null);
             onChanged?.();
         } catch (err) {

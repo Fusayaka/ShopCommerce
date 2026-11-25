@@ -110,7 +110,9 @@ export default function OrderList() {
                     sortOrder: dirParam,
                 });
                 if (cancelled) return;
-                setOrders(res?.data ?? []);
+                const data = res?.data ?? [];
+                setOrders(data);
+                setViewOrder((prev) => (prev ? data.find((o) => o.id === prev.id) ?? prev : prev));
                 setLastPage(res?.meta?.lastPage ?? 1);
                 setTotal(res?.meta?.total ?? 0);
                 setError(null);
