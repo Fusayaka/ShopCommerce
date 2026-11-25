@@ -2,14 +2,11 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { cartApi, type CartItemResponse } from '@/api/cartApi';
 import { notifyCartChanged } from '@/utils/cartCount';
-import { ConfirmModal } from '@/components';
+import { ConfirmModal, QuantityStepper } from '@/components';
 import plhImg from '/images/cloth-placeholder.jpeg';
 import { formatPrice } from '@/utils/format';
 import { ROUTES } from '@/constants/routes';
 
-const QTY_STEPPER = "inline-flex items-center rounded-full bg-[#f0f0f0] px-2 py-1";
-const QTY_BTN = "flex h-6 w-6 cursor-pointer items-center justify-center border-none bg-transparent text-[15px] font-semibold text-[#111827] select-none enabled:hover:text-black enabled:hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-30";
-const QTY_VALUE = "min-w-3 px-1 text-center text-[13px] font-semibold text-[#111827] select-none";
 const IMG_BOX = "h-20 w-16 shrink-0 overflow-hidden rounded-md border border-[#e5e7eb] bg-[#f9fafb] [&_img]:block [&_img]:h-full [&_img]:w-full [&_img]:object-cover";
 
 export interface CheckoutLineItem {
@@ -223,25 +220,13 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
 
                   <td className="text-center">
                     {editable ? (
-                      <div className={QTY_STEPPER}>
-                        <button
-                          type="button"
-                          className={QTY_BTN}
-                          disabled={isBusy}
-                          onClick={() => handleQuantityChange(item.stockId, item.quantity - 1)}
-                        >
-                          -
-                        </button>
-                        <span className={QTY_VALUE}>{item.quantity}</span>
-                        <button
-                          type="button"
-                          className={QTY_BTN}
-                          disabled={isBusy}
-                          onClick={() => handleQuantityChange(item.stockId, item.quantity + 1)}
-                        >
-                          +
-                        </button>
-                      </div>
+                      <QuantityStepper
+                        value={item.quantity}
+                        onChange={(q) => handleQuantityChange(item.stockId, q)}
+                        min={0}
+                        disabled={isBusy}
+                        size="sm"
+                      />
                     ) : (
                       <span className="text-[13.5px] font-semibold text-[#111827]">{item.quantity}</span>
                     )}
@@ -311,25 +296,13 @@ export default function ProductList({ editable = true, onDataLoaded }: ProductLi
 
                   <div>
                     {editable ? (
-                      <div className={QTY_STEPPER}>
-                        <button
-                          type="button"
-                          className={QTY_BTN}
-                          disabled={isBusy}
-                          onClick={() => handleQuantityChange(item.stockId, item.quantity - 1)}
-                        >
-                          -
-                        </button>
-                        <span className={QTY_VALUE}>{item.quantity}</span>
-                        <button
-                          type="button"
-                          className={QTY_BTN}
-                          disabled={isBusy}
-                          onClick={() => handleQuantityChange(item.stockId, item.quantity + 1)}
-                        >
-                          +
-                        </button>
-                      </div>
+                      <QuantityStepper
+                        value={item.quantity}
+                        onChange={(q) => handleQuantityChange(item.stockId, q)}
+                        min={0}
+                        disabled={isBusy}
+                        size="sm"
+                      />
                     ) : (
                       <span className="text-[13px] text-[#374151]">
                         Quantity: <strong>{item.quantity}</strong>

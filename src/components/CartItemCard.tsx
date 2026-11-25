@@ -3,7 +3,7 @@ import trashIcon from '@/assets/trash-icon.svg';
 import plhImg from '/images/cloth-placeholder.jpeg';
 import type { CartLineItem } from '@/types';
 import { Link } from 'react-router-dom';
-import { ConfirmModal } from '@/components';
+import { ConfirmModal, QuantityStepper } from '@/components';
 
 interface CartItemCardProps {
   item: CartLineItem;
@@ -17,16 +17,6 @@ export default function CartItemCard({
   onRemoveItem,
 }: CartItemCardProps) {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-
-  const increase = () => onUpdateQuantity(item, item.quantity + 1);
-
-  const decrease = () => {
-    if (item.quantity <= 1) {
-      setShowConfirmModal(true);
-    } else {
-      onUpdateQuantity(item, item.quantity - 1);
-    }
-  };
 
   const handleConfirmDelete = () => {
     onRemoveItem(item);
@@ -66,7 +56,7 @@ export default function CartItemCard({
             </button>
           </div>
 
-          <div className="mt-1.5 [&_p]:my-0.5 [&_p]:text-sm [&_p]:leading-[1.4] [&_p]:text-black [&_span]:text-[#888]">
+          <div className="mt-1.5 [&_p]:my-0.5 [&_p]:text-sm [&_p]:leading-[1.4] [&_p]:text-[#6b7280] [&_span]:font-semibold [&_span]:text-[#374151]">
             <p>
               Size: <span>{item.size}</span>
             </p>
@@ -79,15 +69,16 @@ export default function CartItemCard({
           </div>
 
           <div className="mt-auto flex items-center justify-between pt-3 max-md:mt-3">
-            <p className="m-0 flex items-center pr-2.5 text-base font-medium text-black max-md:text-[13px]">
+            <p className="m-0 flex items-center whitespace-nowrap pr-2.5 text-base font-medium text-black max-md:text-[13px]">
               Total Price <span className="ml-1.5 text-xl font-bold text-[#ff3333] max-md:text-base">${currentTotalPrice}</span>
             </p>
 
-            <div className="flex h-[30px] w-1/5 min-w-[60px] items-center justify-between rounded-3xl bg-[#f0f0f0] px-2 py-1 max-md:h-auto [&_button]:flex [&_button]:cursor-pointer [&_button]:items-center [&_button]:justify-center [&_button]:border-none [&_button]:bg-none [&_button]:p-0 [&_button]:text-lg [&_button]:font-medium [&_button]:text-black [&_span]:text-center [&_span]:text-[15px] [&_span]:font-medium max-md:[&_span]:text-sm">
-              <button onClick={decrease}>-</button>
-              <span>{item.quantity}</span>
-              <button onClick={increase}>+</button>
-            </div>
+            <QuantityStepper
+              value={item.quantity}
+              onChange={(q) => onUpdateQuantity(item, q)}
+              onDecreaseBelowMin={() => setShowConfirmModal(true)}
+              className="shrink-0 max-md:w-auto"
+            />
           </div>
         </div>
       </div>

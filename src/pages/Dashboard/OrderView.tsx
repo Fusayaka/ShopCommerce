@@ -4,8 +4,9 @@ import { toast } from 'react-toastify';
 import { orderApi } from '@/api/orderApi';
 import { RedeliveryForm, type RedeliveryFormData } from './Form';
 import { formatPrice, formatDate } from '@/utils/format';
-import { NEXT_STATUS, PAYMENT_LABELS, STATUS_STYLES } from '@/constants/order';
+import { NEXT_STATUS, PAYMENT_LABELS } from '@/constants/order';
 import { FIELD_LIMITS } from '@/constants/commerce';
+import { StatusBadge } from '@/components';
 
 interface OrderDetailModalProps {
     order: Order | null;
@@ -15,16 +16,6 @@ interface OrderDetailModalProps {
 
 function getTotalItems(order: Order) {
     return order.items.reduce((count, item) => count + item.quantity, 0);
-}
-
-function StatusBadge({ status }: { status: OrderStatus }) {
-    return (
-        <span
-            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${STATUS_STYLES[status]}`}
-        >
-            {status}
-        </span>
-    );
 }
 
 type Tab = 'items' | 'redeliver';
@@ -88,7 +79,6 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClo
     if (!order) return null;
 
     const status = order.status;
-    const badgeClass = STATUS_STYLES[status];
     const address = order.address ?? order.user?.address ?? '—';
     const contact = order.contact ?? order.user?.contact ?? '—';
     const paymentLabel = order.paymentMethod ? PAYMENT_LABELS[order.paymentMethod] : '—';
@@ -208,11 +198,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClo
                     <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/70 px-6 py-4">
                         <div className="flex flex-wrap items-center gap-3">
                             <h2 className="text-base font-bold text-slate-900">Order #{order.id}</h2>
-                            <span
-                                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${badgeClass}`}
-                            >
-                                {status}
-                            </span>
+                            <StatusBadge status={status} />
                             {order.createdAt && (
                                 <span className="text-xs text-slate-500">{formatDate(order.createdAt)}</span>
                             )}

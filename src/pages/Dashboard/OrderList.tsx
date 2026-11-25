@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { orderApi } from '@/api/orderApi';
 import type { Order, OrderStatus } from '@/types';
-import { Pagination } from '@/components';
+import { Pagination, StatusBadge, DropDownSelector } from '@/components';
 import { OrderDetailModal } from './OrderView';
 import { useSearchParams } from 'react-router-dom';
 import { formatPrice, formatDate } from '@/utils/format';
-import { STATUS_STYLES, ALL_STATUSES } from '@/constants/order';
+import { ALL_STATUSES } from '@/constants/order';
 import { CONFIG } from '@/config';
 
 type SortKey = 'date' | 'status';
@@ -17,16 +17,6 @@ const SORT_COLUMN: Record<SortKey, 'createdAt' | 'status'> = {
     date: 'createdAt',
     status: 'status',
 };
-
-function StatusBadge({ status }: { status: OrderStatus }) {
-    return (
-        <span
-            className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${STATUS_STYLES[status]}`}
-        >
-            {status}
-        </span>
-    );
-}
 
 export default function OrderList() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -154,19 +144,16 @@ export default function OrderList() {
                         placeholder="Search by order ID or customer name"
                         className="w-70 h-10 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-slate-900"
                     />
-                    <label className="text-xs font-medium text-slate-500">Status</label>
-                    <select
+                    <DropDownSelector<OrderStatus | 'all'>
+                        label="Status"
                         value={statusFilter}
-                        onChange={(e) => changeFilter(e.target.value as OrderStatus | 'all')}
-                        className="h-10 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm capitalize text-slate-800 outline-none focus:border-slate-900"
-                    >
-                        <option value="all">All</option>
-                        {ALL_STATUSES.map((s) => (
-                            <option key={s} value={s} className="capitalize">
-                                {s}
-                            </option>
-                        ))}
-                    </select>
+                        onChange={changeFilter}
+                        options={[
+                            { value: 'all', label: 'All' },
+                            ...ALL_STATUSES.map((s) => ({ value: s, label: s })),
+                        ]}
+                        className="capitalize"
+                    />
                 </div>
             </header>
 

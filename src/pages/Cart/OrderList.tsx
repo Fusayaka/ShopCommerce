@@ -9,7 +9,7 @@ interface OrderListProps{
 
 export default function OrderList({items, onUpdateQuantity, onRemoveItem}: OrderListProps) {
     return (
-        <div className="box-border flex flex-col rounded-[20px] border border-[#e0e0e0] bg-white py-6 px-2 text-left max-md:rounded-2xl max-md:p-4">
+        <div className="box-border flex flex-col rounded-[20px] border border-[#e0e0e0] bg-white py-6 px-5 text-left max-md:rounded-2xl max-md:p-4">
             {items.map((item) => (
                 <CartItemCard
                     key={item.id}

@@ -5,3 +5,6 @@ export { default as ProductCard } from './ProductCard';
 export { default as StarRating } from './StarRating';
 export { default as ConfirmModal } from './Modal';
 export { default as Pagination } from './Pagination';
+export { default as StatusBadge } from './StatusBadge';
+export { default as QuantityStepper } from './QuantityStepper';
+export { default as DropDownSelector } from './DropDownSelector';

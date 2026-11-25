@@ -4,8 +4,8 @@ import { toast } from 'react-toastify';
 import type { Order } from '@/types';
 import { cartApi } from '@/api/cartApi';
 import { formatPrice, formatDate, formatDateTime } from '@/utils/format';
-import { STATUS_STYLES } from '@/constants/order';
 import { ROUTES } from '@/constants/routes';
+import { StatusBadge } from '@/components';
 
 interface OrderCardProps {
     order: Order;
@@ -167,11 +167,7 @@ export default function OrderCard({ order, kind = 'order', orderId, reason, onVi
                         <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                             Status
                         </span>
-                        <span
-                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold capitalize ring-[1px] ${STATUS_STYLES[order.status]}`}
-                        >
-                            {order.status}
-                        </span>
+                        <StatusBadge status={order.status} className="ring-[1px]" />
                         <span className="group relative inline-flex">
                             <button
                                 type="button"
