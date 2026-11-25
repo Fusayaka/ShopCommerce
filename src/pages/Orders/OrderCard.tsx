@@ -46,17 +46,16 @@ interface OrderCardProps {
     kind?: 'order' | 'redelivery';
     orderId?: number;
     reason?: string | null;
+    onViewParentOrder?: (orderId: number) => void;
 }
 
-export default function OrderCard({ order, kind = 'order', orderId, reason }: OrderCardProps) {
+export default function OrderCard({ order, kind = 'order', orderId, reason, onViewParentOrder }: OrderCardProps) {
     const navigate = useNavigate();
     const [buyingAgain, setBuyingAgain] = useState(false);
 
     const viewParentOrder = () => {
         if (orderId == null) return;
-        document
-            .getElementById(`order-card-${orderId}`)
-            ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        onViewParentOrder?.(orderId);
     };
 
     const handleBuyAgain = async () => {

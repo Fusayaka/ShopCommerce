@@ -34,6 +34,8 @@ export default function Orders() {
     const [visibleOrder, setVisibleOrder] = useState(PAGE_SIZE);
     const sentinelRef = useRef<HTMLDivElement>(null);
 
+    const pendingScrollRef = useRef<number | null>(null);
+
     const cards = useMemo(() => {
         const list: {
             key: string;
@@ -138,6 +140,38 @@ export default function Orders() {
         await fetchOrders();
         setLoading(false);
     };
+
+    const scrollToOrderCard = (orderId: number) => {
+        const el = document.getElementById(`order-card-${orderId}`);
+        if (!el) return false;
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return true;
+    };
+
+    const handleViewParentOrder = (orderId: number) => {
+        const index = cards.findIndex((c) => c.kind === 'order' && c.order.id === orderId);
+        if (index === -1) return;
+
+        const needsReveal =
+            search.trim() !== '' || activeTab !== 'all' || visibleOrder < index + 1;
+
+        setSearch('');
+        setActiveTab('all');
+        setVisibleOrder((curr) => Math.max(curr, index + 1));
+
+        if (needsReveal) {
+            pendingScrollRef.current = orderId;
+        } else {
+            scrollToOrderCard(orderId);
+        }
+    };
+
+    useEffect(() => {
+        if (pendingScrollRef.current == null) return;
+        if (scrollToOrderCard(pendingScrollRef.current)) {
+            pendingScrollRef.current = null;
+        }
+    }, [visibleCards]);
 
     if (!loggedIn) return <Navigate to="/login" replace />;
 
@@ -312,6 +346,7 @@ export default function Orders() {
                                         kind={c.kind}
                                         orderId={c.orderId}
                                         reason={c.reason}
+                                        onViewParentOrder={handleViewParentOrder}
                                     />
                                 ))}
                                 {hasMore && (
