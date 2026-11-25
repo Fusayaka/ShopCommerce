@@ -24,7 +24,7 @@ export const filterSelect =
 export const filterSwitch = 'relative flex h-6 w-11 items-center justify-start';
 export const filterSwitchInput = 'peer absolute h-0 w-0 opacity-0';
 export const filterSlider =
-  "absolute inset-0 cursor-pointer rounded-3xl bg-[#ccc] transition-all duration-300 before:absolute before:bottom-[3px] before:left-[3px] before:h-[18px] before:w-[18px] before:rounded-full before:bg-white before:transition-all before:duration-300 before:content-[''] peer-checked:bg-black peer-checked:before:translate-x-5";
+  "absolute inset-0 cursor-pointer rounded-3xl bg-[#ccc] transition-all duration-300 before:absolute before:top-1/2 before:left-[3px] before:h-[18px] before:w-[18px] before:-translate-y-1/2 before:rounded-full before:bg-white before:transition-all before:duration-300 before:content-[''] peer-checked:bg-black peer-checked:before:translate-x-5";
 
 export const dualRangeContainer = 'w-full py-2';
 export const priceRangeValues =
