@@ -3,6 +3,8 @@ import { productApi } from '@/api/productApi';
 import type { Product } from '@/types';
 import plhImg from '/images/cloth-placeholder.jpeg';
 import trashIcon from '@/assets/trash-icon.svg';
+import eyeIcon from '@/assets/eye-icon.svg';
+import boxIcon from '@/assets/box-icon.svg';
 import upArrow from '@/assets/up-arrow.svg';
 import downArrow from '@/assets/down-arrow.svg';
 import filterMenu from '@/assets/filter.svg';
@@ -34,34 +36,11 @@ function totalStock(product: Product) {
     return product.stocks.reduce((sum, s) => sum + (s.stock ?? 0), 0);
 }
 
-function EyeIcon() {
-    return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
-            strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
-            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
-            <circle cx="12" cy="12" r="3" />
-        </svg>
-    );
-}
-
-function BoxIcon() {
-    return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
-            strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-            <path d="m3.3 7 8.7 5 8.7-5" />
-            <path d="M12 22V12" />
-        </svg>
-    );
-}
-
 const LIMIT = CONFIG.DEFAULT_PAGE_SIZE;
 
 export default function ProductList() {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // The applied query lives in the URL (?search=&minPrice=&maxPrice=&hasDiscount=&sort=&page=),
-    // so it's shareable and survives refresh. The `tab` param is preserved by cloning.
     const page = Math.max(1, Number(searchParams.get('page')) || 1);
     const qSearch = searchParams.get('search') ?? '';
     const qMin = searchParams.get('minPrice');
@@ -519,18 +498,18 @@ export default function ProductList() {
                                                         onClick={() => editProduct(product)}
                                                         title="View / edit"
                                                         aria-label="View / edit product"
-                                                        className="cursor-pointer border-none bg-transparent p-1.5 text-slate-500 transition-colors hover:text-slate-900"
+                                                        className="cursor-pointer border-none bg-transparent p-1.5 transition-opacity hover:opacity-60"
                                                     >
-                                                        <EyeIcon />
+                                                        <img src={eyeIcon} alt="" className="h-4 w-4" />
                                                     </button>
                                                     <button
                                                         type="button"
                                                         onClick={() => setStockProduct(product)}
                                                         title="Edit stock & pricing"
                                                         aria-label="Edit stock & pricing"
-                                                        className="cursor-pointer border-none bg-transparent p-1.5 text-slate-500 transition-colors hover:text-slate-900"
+                                                        className="cursor-pointer border-none bg-transparent p-1.5 transition-opacity hover:opacity-60"
                                                     >
-                                                        <BoxIcon />
+                                                        <img src={boxIcon} alt="" className="h-4 w-4" />
                                                     </button>
                                                     <button
                                                         type="button"
