@@ -2,10 +2,8 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { productApi, type UpdateStockDto } from '@/api/productApi';
 import type { ProductStock, Size, Color } from '@/types';
-import { ConfirmModal } from '@/components';
-
-const SIZES: Size[] = ['S', 'M', 'L', 'XL', 'XXL'];
-const COLORS: Color[] = ['Red', 'Green', 'Blue'];
+import { ConfirmModal, SubmitButton } from '@/components';
+import { SIZES, COLORS } from '@/constants/catalog';
 
 interface StockEditorProps {
     productId: number;
@@ -312,14 +310,16 @@ export default function StockEditor({ productId, productTitle, onClose, onSaved 
                                             </td>
                                             <td className="py-2 text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <button
+                                                    <SubmitButton
                                                         type="button"
                                                         onClick={() => saveRow(row)}
-                                                        disabled={savingId === row.id || deletingId === row.id}
+                                                        loading={savingId === row.id}
+                                                        loadingText="Saving…"
+                                                        disabled={deletingId === row.id}
                                                         className="cursor-pointer rounded-md border-none bg-slate-900 px-3 py-1 text-xs font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
                                                     >
-                                                        {savingId === row.id ? 'Saving…' : 'Save'}
-                                                    </button>
+                                                        Save
+                                                    </SubmitButton>
                                                     <button
                                                         type="button"
                                                         onClick={() => setPendingDelete(row)}
@@ -418,14 +418,15 @@ export default function StockEditor({ productId, productTitle, onClose, onSaved 
                         </div>
 
                         <div className="flex justify-end">
-                            <button
+                            <SubmitButton
                                 type="button"
                                 onClick={addVariant}
-                                disabled={adding}
+                                loading={adding}
+                                loadingText="Adding…"
                                 className="cursor-pointer rounded-md border-none bg-slate-900 px-4 py-1.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                                {adding ? 'Adding…' : 'Add'}
-                            </button>
+                                Add
+                            </SubmitButton>
                         </div>
                     </div>
 

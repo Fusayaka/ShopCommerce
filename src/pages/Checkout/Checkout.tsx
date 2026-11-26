@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/utils/auth';
 import ProductList from './ProductList';
 import Payment from './Payment';
-import './checkout.css';
+import { ROUTES } from '@/constants/routes';
+import { Breadcrumb } from '@/components';
 
 export default function Checkout() {
   const { loggedIn } = useAuth();
@@ -13,22 +14,19 @@ export default function Checkout() {
     setCartSummary({ subtotal, count });
   }, []);
 
+  const sectionCls = "mx-auto box-border px-[5%] py-6 text-[#111827] max-md:px-[30px] max-md:py-5";
+  const titleCls = "text-center text-[32px] leading-[1.1] font-extrabold text-[#111827] uppercase max-md:mb-5 max-[500px]:text-[26px]";
+
   if (!loggedIn) {
     return (
-      <section className="checkout-page-section">
-        <nav className="checkout-breadcrumb">
-          <Link to="/">Home</Link>
-          <span className="checkout-breadcrumb-separator">{'>'}</span>
-          <Link to="/cart">Cart</Link>
-          <span className="checkout-breadcrumb-separator">{'>'}</span>
-          <span>Checkout</span>
-        </nav>
+      <section className={sectionCls}>
+        <Breadcrumb className="max-[500px]:text-xs" />
 
-        <h1 className="checkout-page-title">CHECKOUT</h1>
+        <h1 className={titleCls}>CHECKOUT</h1>
 
-        <div className="checkout-login-prompt">
+        <div className="mx-auto my-10 flex max-w-[480px] flex-col items-center justify-center gap-4 rounded-2xl border border-[#e5e7eb] bg-white px-6 py-16 text-center shadow-[0_4px_20px_rgba(0,0,0,0.03)] [&_p]:m-0 [&_p]:text-[15px] [&_p]:leading-normal [&_p]:text-[#4b5563]">
           <p>Please log in to proceed with your checkout.</p>
-          <Link to="/login" className="checkout-login-btn">
+          <Link to={ROUTES.LOGIN} className="inline-flex items-center justify-center rounded-xl bg-[#111827] px-9 py-3 text-sm font-semibold text-white no-underline shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all hover:-translate-y-px hover:bg-[#1f2937] hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)]">
             Login
           </Link>
         </div>
@@ -37,18 +35,12 @@ export default function Checkout() {
   }
 
   return (
-    <section className="checkout-page-section">
-      <nav className="checkout-breadcrumb">
-        <Link to="/">Home</Link>
-        <span className="checkout-breadcrumb-separator">{'>'}</span>
-        <Link to="/cart">Cart</Link>
-        <span className="checkout-breadcrumb-separator">{'>'}</span>
-        <span>Checkout</span>
-      </nav>
+    <section className={sectionCls}>
+      <Breadcrumb className="max-[500px]:text-xs" />
 
-      <h1 className="checkout-page-title">Checkout</h1>
+      <h1 className={titleCls}>Checkout</h1>
 
-      <div className="checkout-content-container">
+      <div className="flex flex-col gap-8">
         <ProductList onDataLoaded={handleDataLoaded} />
 
         {cartSummary.count > 0 && (

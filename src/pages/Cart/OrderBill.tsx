@@ -3,14 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import promo from '@/assets/promo-code.svg';
 import { promoApi } from '@/api/promoApi';
 import type { CartLineItem } from '@/types';
-import './orderBill.css';
+import { formatPrice } from '@/utils/format';
+import { DELIVERY_FEE } from '@/constants/commerce';
+import { ROUTES } from '@/constants/routes';
+import { SubmitButton } from '@/components';
 
 interface OrderBillProps {
   items: CartLineItem[];
-}
-
-function getDeliveryFee() {
-  return 15;
 }
 
 export default function OrderBill({ items }: OrderBillProps) {
@@ -27,14 +26,8 @@ export default function OrderBill({ items }: OrderBillProps) {
   const [validatingPromo, setValidatingPromo] = useState<boolean>(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
-  const deliveryFee = subtotal > 0 ? getDeliveryFee() : 0;
+  const deliveryFee = subtotal > 0 ? DELIVERY_FEE : 0;
   const total = Math.max(0, subtotal - discount + deliveryFee);
-
-  const formatPrice = (price: number) =>
-    price.toLocaleString('en-US', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    });
 
   useEffect(() => {
     if (!appliedCode) return;
@@ -123,50 +116,53 @@ export default function OrderBill({ items }: OrderBillProps) {
     }
   };
 
-  return (
-    <div className="order-bill-box">
-      <h2 className="bill-title">Order Summary</h2>
+  const billRow = "mb-4 flex items-center justify-between text-base max-md:mb-3 max-md:text-sm";
 
-      <div className="bill-row">
-        <span className="bill-label">Subtotal</span>
-        <span className="bill-value">${formatPrice(subtotal)}</span>
+  return (
+    <div className="flex flex-col rounded-[20px] border border-[#e0e0e0] p-6 text-left max-md:p-4">
+      <h2 className="m-0 mb-6 text-2xl font-bold text-black max-md:mb-4 max-md:text-xl">Order Summary</h2>
+
+      <div className={billRow}>
+        <span className="text-[#666]">Subtotal</span>
+        <span className="font-semibold text-black">${formatPrice(subtotal)}</span>
       </div>
 
       {discount > 0 && (
-        <div className="bill-row">
-          <span className="bill-label">Discount</span>
-          <span className="bill-value discount">-${formatPrice(discount)}</span>
+        <div className={billRow}>
+          <span className="text-[#666]">Discount</span>
+          <span className="font-semibold text-[#ff3333]">-${formatPrice(discount)}</span>
         </div>
       )}
 
-      <div className="bill-row">
-        <span className="bill-label">Delivery Fee</span>
-        <span className="bill-value">${formatPrice(deliveryFee)}</span>
+      <div className={billRow}>
+        <span className="text-[#666]">Delivery Fee</span>
+        <span className="font-semibold text-black">${formatPrice(deliveryFee)}</span>
       </div>
 
-      <div className="bill-divider"></div>
+      <div className="mt-2 mb-6 h-px bg-[#e0e0e0]"></div>
 
-      <div className="bill-row bill-total">
+      <div className="mb-6 flex items-center justify-between text-xl font-bold text-black max-md:mb-5 max-md:text-lg">
         <span>Total</span>
         <span>${formatPrice(total)}</span>
       </div>
 
-      <div className="promo-box">
-        <img src={promo} alt="Promo code" className="promo-icon-img" />
+      <div className="mb-6 box-border flex w-full items-center rounded-3xl bg-[#f0f0f0] py-1.5 pr-1.5 pl-4 max-md:py-1 max-md:pr-1 max-md:pl-3 [&_input]:min-w-0 [&_input]:flex-1 [&_input]:border-none [&_input]:bg-transparent [&_input]:px-[5px] [&_input]:text-sm [&_input]:text-black [&_input]:uppercase [&_input]:outline-none [&_input::placeholder]:text-[#888] [&_input::placeholder]:normal-case">
+        <img src={promo} alt="Promo code" />
         <input
           type="text"
           placeholder="Add promo code"
           value={promoInput}
           onChange={(e) => setPromoInput(e.target.value)}
         />
-        <button
-          className="apply-btn"
+        <SubmitButton
+          className="shrink-0 cursor-pointer rounded-[20px] border-none bg-black px-2.5 py-1.5 md:px-3.5 font-base text-white transition-opacity hover:opacity-80 max-md:px-4"
           type="button"
-          disabled={validatingPromo}
+          loading={validatingPromo}
+          loadingText="..."
           onClick={handlePromoCode}
         >
-          {validatingPromo ? '...' : 'Apply'}
-        </button>
+          Apply
+        </SubmitButton>
       </div>
 
       {message && (
@@ -183,8 +179,8 @@ export default function OrderBill({ items }: OrderBillProps) {
         </p>
       )}
 
-      <button className="checkout-btn" onClick={() => navigate('/checkout')}>
-        Go to Checkout <span className="arrow">→</span>
+      <button className="flex w-full cursor-pointer items-center justify-center rounded-3xl border-none bg-black px-4 py-2 text-base font-medium text-white transition-opacity hover:opacity-80 hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)]" onClick={() => navigate(ROUTES.CHECKOUT)}>
+        Go to Checkout <span className="ml-2 text-lg">→</span>
       </button>
     </div>
   );

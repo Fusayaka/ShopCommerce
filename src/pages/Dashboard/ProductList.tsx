@@ -3,75 +3,23 @@ import { productApi } from '@/api/productApi';
 import type { Product } from '@/types';
 import plhImg from '/images/cloth-placeholder.jpeg';
 import trashIcon from '@/assets/trash-icon.svg';
+import eyeIcon from '@/assets/eye-icon.svg';
+import boxIcon from '@/assets/box-icon.svg';
 import upArrow from '@/assets/up-arrow.svg';
 import downArrow from '@/assets/down-arrow.svg';
 import filterMenu from '@/assets/filter.svg';
-import { ConfirmModal, Pagination } from '@/components';
+import { ConfirmModal, Pagination, PriceRangeSlider } from '@/components';
 import { toast } from 'react-toastify';
 import { ProductForm, type ProductFormData } from './Form';
 import StockEditor from './StockEditor';
-import '../ProductList/filter.css';
+import * as fs from '../ProductList/filterStyles';
 import { useSearchParams } from 'react-router-dom';
-
-interface DualPriceRangeProps {
-    minPrice: number;
-    maxPrice: number;
-    minLimit: number;
-    maxLimit: number;
-    onMinChange: (value: number) => void;
-    onMaxChange: (value: number) => void;
-}
-
-function DualPriceRange({ minPrice, maxPrice, minLimit, maxLimit, onMinChange, onMaxChange }: DualPriceRangeProps) {
-    const span = maxLimit - minLimit || 1;
-    const minPercent = ((minPrice - minLimit) / span) * 100;
-    const maxPercent = ((maxPrice - minLimit) / span) * 100;
-    const minPos = `calc(${minPercent}% + ${9 - minPercent * 0.18}px)`;
-    const maxPos = `calc(${maxPercent}% + ${9 - maxPercent * 0.18}px)`;
-
-    return (
-        <div className="dual-range-container">
-            <div className="price-range-values">
-                <span style={{ left: minPos }}>${minPrice}</span>
-                <span style={{ left: maxPos }}>${maxPrice}</span>
-            </div>
-            <div
-                className="price-slider-track-wrapper"
-                style={{ '--min-pos': minPos, '--max-pos': maxPos } as React.CSSProperties}
-            >
-                <div className="price-slider-active-range"></div>
-                <input
-                    type="range"
-                    min={minLimit}
-                    max={maxLimit}
-                    value={minPrice}
-                    onChange={(e) => onMinChange(Number(e.target.value))}
-                    className="price-range-input min-input"
-                />
-                <input
-                    type="range"
-                    min={minLimit}
-                    max={maxLimit}
-                    value={maxPrice}
-                    onChange={(e) => onMaxChange(Number(e.target.value))}
-                    className="price-range-input max-input"
-                />
-            </div>
-        </div>
-    );
-}
+import { formatPrice } from '@/utils/format';
+import { CONFIG } from '@/config';
 
 interface PriceRange {
     minPrice: number;
     maxPrice: number;
-}
-
-function formatPrice(value?: number) {
-    if (value === undefined || value === null) return '—';
-    return `${Number(value).toLocaleString('en-US', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    })}`;
 }
 
 function displayPrice(product: Product): PriceRange | undefined {
@@ -88,34 +36,11 @@ function totalStock(product: Product) {
     return product.stocks.reduce((sum, s) => sum + (s.stock ?? 0), 0);
 }
 
-function EyeIcon() {
-    return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
-            strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
-            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
-            <circle cx="12" cy="12" r="3" />
-        </svg>
-    );
-}
-
-function BoxIcon() {
-    return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
-            strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-            <path d="m3.3 7 8.7 5 8.7-5" />
-            <path d="M12 22V12" />
-        </svg>
-    );
-}
-
-const LIMIT = 10;
+const LIMIT = CONFIG.DEFAULT_PAGE_SIZE;
 
 export default function ProductList() {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // The applied query lives in the URL (?search=&minPrice=&maxPrice=&hasDiscount=&sort=&page=),
-    // so it's shareable and survives refresh. The `tab` param is preserved by cloning.
     const page = Math.max(1, Number(searchParams.get('page')) || 1);
     const qSearch = searchParams.get('search') ?? '';
     const qMin = searchParams.get('minPrice');
@@ -391,22 +316,22 @@ export default function ProductList() {
             </header>
 
             {filtersOpen && (
-                <div className="absolute right-0 top-full z-[30] -mt-10 flex w-full justify-end">
-                    <div className="filter-card shadow-xl" style={{ width: 340, maxWidth: '100%' }}>
-                        <div className="filter-header">
+                <div className="absolute right-0 top-full z-[30] mt-2 flex w-full justify-end">
+                    <div className={`${fs.filterCard} shadow-xl`} style={{ width: 340, maxWidth: '100%' }}>
+                        <div className={fs.filterHeader}>
                             <h3>Filters</h3>
-                            <img src={filterMenu} alt="" className="filter-main-icon" />
+                            <img src={filterMenu} alt="" className={fs.filterMainIcon} />
                         </div>
 
-                        <hr className="filter-divider" />
+                        <hr className={fs.filterDivider} />
 
-                        <div className="filter-group">
-                            <div className="filter-group-header" onClick={() => setIsPriceOpen(!isPriceOpen)}>
+                        <div className={fs.filterGroup}>
+                            <div className={fs.filterGroupHeader} onClick={() => setIsPriceOpen(!isPriceOpen)}>
                                 <span>Price Range</span>
-                                <img src={isPriceOpen ? upArrow : downArrow} alt="toggle" className="filter-arrow-icon" />
+                                <img src={isPriceOpen ? upArrow : downArrow} alt="toggle" className={fs.filterArrowIcon} />
                             </div>
                             {isPriceOpen && (
-                                <DualPriceRange
+                                <PriceRangeSlider
                                     minPrice={minPrice}
                                     maxPrice={maxPrice}
                                     minLimit={minLimit}
@@ -417,38 +342,39 @@ export default function ProductList() {
                             )}
                         </div>
 
-                        <hr className="filter-divider" />
+                        <hr className={fs.filterDivider} />
 
-                        <div className="filter-group">
-                            <div className="filter-group-header" onClick={() => setIsDiscountOpen(!isDiscountOpen)}>
+                        <div className={fs.filterGroup}>
+                            <div className={fs.filterGroupHeader} onClick={() => setIsDiscountOpen(!isDiscountOpen)}>
                                 <span>Only discount</span>
-                                <img src={isDiscountOpen ? upArrow : downArrow} alt="toggle" className="filter-arrow-icon" />
+                                <img src={isDiscountOpen ? upArrow : downArrow} alt="toggle" className={fs.filterArrowIcon} />
                             </div>
                             {isDiscountOpen && (
-                                <label className="filter-switch">
+                                <label className={fs.filterSwitch}>
                                     <input
                                         type="checkbox"
                                         checked={discountDraft}
                                         onChange={(e) => setDiscountDraft(e.target.checked)}
+                                        className={fs.filterSwitchInput}
                                     />
-                                    <span className="filter-slider"></span>
+                                    <span className={fs.filterSlider}></span>
                                 </label>
                             )}
                         </div>
 
-                        <hr className="filter-divider" />
+                        <hr className={fs.filterDivider} />
 
-                        <div className="filter-group">
-                            <div className="filter-group-header" onClick={() => setIsSortOpen(!isSortOpen)}>
+                        <div className={fs.filterGroup}>
+                            <div className={fs.filterGroupHeader} onClick={() => setIsSortOpen(!isSortOpen)}>
                                 <span>Sort by</span>
-                                <img src={isSortOpen ? upArrow : downArrow} alt="toggle" className="filter-arrow-icon" />
+                                <img src={isSortOpen ? upArrow : downArrow} alt="toggle" className={fs.filterArrowIcon} />
                             </div>
                             {isSortOpen && (
-                                <div className="filter-select-wrapper">
+                                <div className={fs.filterSelectWrapper}>
                                     <select
                                         value={sortDraft}
                                         onChange={(e) => setSortDraft(e.target.value)}
-                                        className="filter-select"
+                                        className={fs.filterSelect}
                                     >
                                         <option value="latest">Latest</option>
                                         <option value="rating-desc">Rating: High → Low</option>
@@ -462,7 +388,7 @@ export default function ProductList() {
                             )}
                         </div>
 
-                        <button className="filter-apply-btn" onClick={applyFilters}>
+                        <button className={fs.filterApplyBtn} onClick={applyFilters}>
                             Apply Filter
                         </button>
                         {hasActiveFilters && (
@@ -572,18 +498,18 @@ export default function ProductList() {
                                                         onClick={() => editProduct(product)}
                                                         title="View / edit"
                                                         aria-label="View / edit product"
-                                                        className="cursor-pointer border-none bg-transparent p-1.5 text-slate-500 transition-colors hover:text-slate-900"
+                                                        className="cursor-pointer border-none bg-transparent p-1.5 transition-opacity hover:opacity-60"
                                                     >
-                                                        <EyeIcon />
+                                                        <img src={eyeIcon} alt="" className="h-4 w-4" />
                                                     </button>
                                                     <button
                                                         type="button"
                                                         onClick={() => setStockProduct(product)}
                                                         title="Edit stock & pricing"
                                                         aria-label="Edit stock & pricing"
-                                                        className="cursor-pointer border-none bg-transparent p-1.5 text-slate-500 transition-colors hover:text-slate-900"
+                                                        className="cursor-pointer border-none bg-transparent p-1.5 transition-opacity hover:opacity-60"
                                                     >
-                                                        <BoxIcon />
+                                                        <img src={boxIcon} alt="" className="h-4 w-4" />
                                                     </button>
                                                     <button
                                                         type="button"

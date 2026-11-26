@@ -1,11 +1,10 @@
 import Banner from "./Banner";
 import BrandMarquee from "./BrandMarquee";
-import './home.css'
 import Trending from "./Trending";
 
 export default function Home(){
     return (
-        <div className="home-page">
+        <div className="flex w-full flex-col">
             <Banner/>
             <BrandMarquee/>
             <Trending/>

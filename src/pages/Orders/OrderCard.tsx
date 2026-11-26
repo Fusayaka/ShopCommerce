@@ -1,45 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import type { Order, OrderStatus } from '@/types';
+import type { Order } from '@/types';
 import { cartApi } from '@/api/cartApi';
-
-const STATUS_STYLES: Record<OrderStatus, string> = {
-    pending: 'bg-amber-50 text-amber-700 ring-amber-200',
-    processing: 'bg-violet-100 text-violet-600 ring-violet-200',
-    shipping: 'bg-indigo-50 text-indigo-700 ring-indigo-200',
-    delivered: 'bg-green-50 text-green-700 ring-green-200',
-    cancelled: 'bg-red-50 text-red-700 ring-red-200',
-    redelivery: 'bg-purple-50 text-purple-700 ring-purple-200',
-};
-
-function formatPrice(value?: number | null): string {
-    if (value === undefined || value === null) return '—';
-    return Number(value).toLocaleString('en-US', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    });
-}
-
-function formatDateTime(value?: string): string {
-    if (!value) return '—';
-    const d = new Date(value);
-    if (Number.isNaN(d.getTime())) return '—';
-    return d.toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-    });
-}
-
-function formatDate(value?: string): string {
-    if (!value) return '';
-    const d = new Date(value);
-    if (Number.isNaN(d.getTime())) return '';
-    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-}
+import { formatPrice, formatDate, formatDateTime } from '@/utils/format';
+import { ROUTES } from '@/constants/routes';
+import { StatusBadge, SubmitButton } from '@/components';
 
 interface OrderCardProps {
     order: Order;
@@ -84,11 +50,11 @@ export default function OrderCard({ order, kind = 'order', orderId, reason, onVi
 
             if (addedCount > 0 && failedList.length === 0){
                 toast.success('Items added to your cart.');
-                navigate('/cart');
+                navigate(ROUTES.CART);
             }
             else if (addedCount > 0){
                 toast.warning(`Add ${addedCount} item${addedCount > 1 && 's'} to your cart. ${failedList.length} unavailable item${failedList.length > 1 ? 's were': ' was'} skipped.`);
-                navigate('/cart');
+                navigate(ROUTES.CART);
             }
             else toast.error('None of the items from this order are available anymore.');
         } catch {
@@ -100,10 +66,6 @@ export default function OrderCard({ order, kind = 'order', orderId, reason, onVi
 
     const totalUnits = order.items.reduce((sum, item) => sum + item.quantity, 0);
 
-    const statusColor = STATUS_STYLES[order.status]
-        .split(' ')
-        .filter((cls) => !cls.startsWith('bg-'))
-        .join(' ');
 
     const label = kind === 'redelivery' ? 'Redelivery' : 'Order';
 
@@ -118,7 +80,7 @@ export default function OrderCard({ order, kind = 'order', orderId, reason, onVi
                         {label} #{order.id}
                     </span>
                     {order.createdAt && (
-                        <span className="text-xs text-slate-500">{formatDate(order.createdAt)}</span>
+                        <span className="text-xs text-slate-500">{formatDate(order.createdAt, '')}</span>
                     )}
                 </div>
                 <span className="text-xs text-slate-500">
@@ -205,11 +167,7 @@ export default function OrderCard({ order, kind = 'order', orderId, reason, onVi
                         <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                             Status
                         </span>
-                        <span
-                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold capitalize ring-[1px] ${statusColor}`}
-                        >
-                            {order.status}
-                        </span>
+                        <StatusBadge status={order.status} className="ring-[1px]" />
                         <span className="group relative inline-flex">
                             <button
                                 type="button"
@@ -238,14 +196,15 @@ export default function OrderCard({ order, kind = 'order', orderId, reason, onVi
                 {/* Row 2: actions */}
                 <div className="flex flex-wrap items-center justify-end gap-3">
                     {kind === 'order' && (
-                        <button
+                        <SubmitButton
                             type="button"
                             onClick={handleBuyAgain}
-                            disabled={buyingAgain}
+                            loading={buyingAgain}
+                            loadingText="Adding…"
                             className="cursor-pointer rounded-lg border border-transparent bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                            {buyingAgain ? 'Adding…' : 'Buy again'}
-                        </button>
+                            Buy again
+                        </SubmitButton>
                     )}
 
                     <button

@@ -1,62 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { orderApi } from '@/api/orderApi';
 import type { Order, OrderStatus } from '@/types';
-import { Pagination } from '@/components';
+import { Pagination, StatusBadge, DropDownSelector, Avatar } from '@/components';
 import { OrderDetailModal } from './OrderView';
 import { useSearchParams } from 'react-router-dom';
-
-const STATUS_STYLES: Record<OrderStatus, string> = {
-    pending: 'bg-amber-50 text-amber-700',
-    processing: 'bg-violet-100 text-violet-500',
-    shipping: 'bg-indigo-50 text-indigo-700',
-    delivered: 'bg-green-50 text-green-700',
-    cancelled: 'bg-red-50 text-red-700',
-    redelivery: 'bg-purple-50 text-purple-700',
-};
-
-const ALL_STATUSES: OrderStatus[] = [
-    'pending',
-    'processing',
-    'shipping',
-    'delivered',
-    'cancelled',
-    'redelivery',
-];
+import { formatPrice, formatDate } from '@/utils/format';
+import { ALL_STATUSES } from '@/constants/order';
+import { CONFIG } from '@/config';
 
 type SortKey = 'date' | 'status';
 type SortDir = 'asc' | 'desc';
 
-const LIMIT = 10;
+const LIMIT = CONFIG.DEFAULT_PAGE_SIZE;
 
 const SORT_COLUMN: Record<SortKey, 'createdAt' | 'status'> = {
     date: 'createdAt',
     status: 'status',
 };
-
-function formatPrice(value?: number | null) {
-    if (value === undefined || value === null) return '—';
-    return `${Number(value).toLocaleString('en-US', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    })}`;
-}
-
-function formatDate(value?: string) {
-    if (!value) return '—';
-    const d = new Date(value);
-    if (Number.isNaN(d.getTime())) return '—';
-    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-}
-
-function StatusBadge({ status }: { status: OrderStatus }) {
-    return (
-        <span
-            className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${STATUS_STYLES[status]}`}
-        >
-            {status}
-        </span>
-    );
-}
 
 export default function OrderList() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -184,19 +144,16 @@ export default function OrderList() {
                         placeholder="Search by order ID or customer name"
                         className="w-70 h-10 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-slate-900"
                     />
-                    <label className="text-xs font-medium text-slate-500">Status</label>
-                    <select
+                    <DropDownSelector<OrderStatus | 'all'>
+                        label="Status"
                         value={statusFilter}
-                        onChange={(e) => changeFilter(e.target.value as OrderStatus | 'all')}
-                        className="h-10 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm capitalize text-slate-800 outline-none focus:border-slate-900"
-                    >
-                        <option value="all">All</option>
-                        {ALL_STATUSES.map((s) => (
-                            <option key={s} value={s} className="capitalize">
-                                {s}
-                            </option>
-                        ))}
-                    </select>
+                        onChange={changeFilter}
+                        options={[
+                            { value: 'all', label: 'All' },
+                            ...ALL_STATUSES.map((s) => ({ value: s, label: s })),
+                        ]}
+                        className="capitalize"
+                    />
                 </div>
             </header>
 
@@ -251,17 +208,12 @@ export default function OrderList() {
                                             <td className="px-4 py-3 font-medium text-slate-900">#{order.id}</td>
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-2">
-                                                    {order.user?.avatar ? (
-                                                        <img
-                                                            src={order.user.avatar}
-                                                            alt={order.user?.name ?? 'Customer'}
-                                                            className="h-8 w-8 shrink-0 rounded-full object-cover"
-                                                        />
-                                                    ) : (
-                                                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600">
-                                                            {(order.user?.name?.trim()?.[0] ?? 'U').toUpperCase()}
-                                                        </div>
-                                                    )}
+                                                    <Avatar
+                                                        src={order.user?.avatar}
+                                                        name={order.user?.name}
+                                                        className="h-8 w-8 shrink-0 rounded-full"
+                                                        fallbackClassName="bg-slate-200 text-xs text-slate-600"
+                                                    />
                                                     <div className="min-w-0">
                                                         <p className="truncate text-left font-medium text-slate-800">
                                                             {order.user?.name ?? `User #${order.userId}`}

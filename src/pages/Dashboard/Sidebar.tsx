@@ -1,4 +1,5 @@
 import type { User } from '@/types';
+import { Avatar } from '@/components';
 import { type DashboardTab } from './Dashboard';
 
 interface SidebarProps {
@@ -15,7 +16,6 @@ const MAIN_ITEMS: { label: string; tab: DashboardTab }[] = [
 
 export default function Sidebar({ activeTab, onSelectTab, user }: SidebarProps) {
     const isAdmin = user.role === 'admin';
-    const initial = (user.name?.trim()?.[0] ?? 'U').toUpperCase();
 
     const renderNavButton = (label: string, tab: DashboardTab) => (
         <button
@@ -42,17 +42,12 @@ export default function Sidebar({ activeTab, onSelectTab, user }: SidebarProps) 
 
             {/* User info card */}
             <div className="flex items-center gap-3 px-4 py-3">
-                {user.avatar ? (
-                    <img
-                        src={user.avatar}
-                        alt={user.name}
-                        className="h-12 w-12 rounded-xl object-cover"
-                    />
-                ) : (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-lg font-bold text-white">
-                        {initial}
-                    </div>
-                )}
+                <Avatar
+                    src={user.avatar}
+                    name={user.name}
+                    className="h-12 w-12 rounded-xl"
+                    fallbackClassName="bg-slate-900 text-lg text-white"
+                />
                 <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-slate-900 text-start pl-2">{user.name}</p>
                     <span className="mt-0.5 inline-block px-2 py-0.5 text-xs font-medium capitalize text-slate-600">

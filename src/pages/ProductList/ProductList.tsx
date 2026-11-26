@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import Filter from "./Filter";
 import ProductResultPage from "./ProductResultPage";
-import './productList.css'
-import { Link, useSearchParams } from "react-router-dom";
-
+import { useSearchParams } from "react-router-dom";
+import { Breadcrumb } from "@/components";
 
 export default function ProductList(){
     const [isDesktop, setIsDesktop] = useState(true);
@@ -63,22 +62,18 @@ export default function ProductList(){
     };
 
     return (
-        <section className="product-list-section">
-            <nav className='detail-breadcrumb'>
-                <Link to='/'>Home</Link> 
-                {'  >  '}
-                <span>Product</span>
-            </nav>
+        <section className="px-[5%] py-6 max-md:px-[30px] max-md:py-5">
+            <Breadcrumb className="mx-auto w-full p-0" />
 
-            <div className="product-list-container">
-                <div className={`filter-sidebar-wrapper ${!isDesktop && isMobileFilterOpen ? 'mobile-modal-open' : ''}`}>
+            <div className="mx-auto flex w-full max-w-[1150px] items-start gap-8 max-md:flex-col">
+                <div className={`w-[30%] shrink-0 max-md:w-full ${isMobileFilterOpen ? 'max-md:fixed max-md:inset-0 max-md:z-[1000] max-md:block max-md:h-screen max-md:w-screen' : 'max-md:hidden'}`}>
                     {!isDesktop && isMobileFilterOpen && (
-                        <div className="mobile-overlay" onClick={() => setIsMobileFilterOpen(false)}></div>
+                        <div className="absolute inset-0 h-full w-full bg-black/50" onClick={() => setIsMobileFilterOpen(false)}></div>
                     )}
-                    
-                    <div className="filter-content">
-                        <Filter 
-                            onClose={() => setIsMobileFilterOpen(false)} 
+
+                    <div className="max-md:absolute max-md:bottom-0 max-md:left-[10%] max-md:z-[1001] max-md:max-h-[85vh] max-md:w-[80%] max-md:overflow-hidden max-md:rounded-t-[20px] max-md:bg-white max-md:shadow-[0_-4px_12px_rgba(0,0,0,0.1)]">
+                        <Filter
+                            onClose={() => setIsMobileFilterOpen(false)}
                             onApplyFilter={handleApplyFilter}
                         />
                     </div>

@@ -7,18 +7,16 @@ import type { PaymentMethod } from '@/types';
 import { useAuth } from '@/utils/auth';
 import { notifyCartChanged } from '@/utils/cartCount';
 import promoIcon from '@/assets/promo-code.svg';
-import './payment.css';
+import { formatPrice } from '@/utils/format';
+import { PAYMENT_METHODS } from '@/constants/order';
+import { DELIVERY_FEE, FIELD_LIMITS } from '@/constants/commerce';
+import { SubmitButton } from '@/components';
+import { ROUTES } from '@/constants/routes';
 
 interface PaymentProps {
   subtotal: number;
   itemCount: number;
 }
-
-const PAYMENT_METHODS: { id: PaymentMethod; label: string; description: string }[] = [
-  { id: 'delivery', label: 'Cash on Delivery (COD)', description: 'Pay with cash upon delivery' },
-  { id: 'bank', label: 'Bank Transfer', description: 'Direct bank transfer to our store account' },
-  { id: 'card', label: 'Credit / Debit Card', description: 'Pay securely using Visa, Mastercard, etc.' },
-];
 
 export default function Payment({ subtotal, itemCount }: PaymentProps) {
   const navigate = useNavigate();
@@ -35,15 +33,8 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
   const [submitting, setSubmitting] = useState<boolean>(false);
 
   const safeSubtotal = Number(subtotal) || 0;
-  const deliveryFee = safeSubtotal > 0 ? 15 : 0;
+  const deliveryFee = safeSubtotal > 0 ? DELIVERY_FEE : 0;
   const totalPayment = Math.max(1, safeSubtotal + deliveryFee - discount);
-
-  const formatPrice = (val: number): string => {
-    return `$${val.toLocaleString('en-US', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    })}`;
-  };
 
   const validateAndApplyPromo = useCallback(async (codeToValidate: string, currentSubtotal: number, isAutoRevalidate = true) => {
     if (!codeToValidate) return;
@@ -59,7 +50,7 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
         setdiscount(discountVal);
         setAppliedPromo(codeToValidate);
         setPromoMessage({
-          text: `Applied successfully! Saved ${formatPrice(discountVal)}`,
+          text: `Applied successfully! Saved $${formatPrice(discountVal)}`,
           type: 'success',
         });
       } else {
@@ -142,7 +133,7 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
 
       notifyCartChanged();
       toast.success('Order placed successfully!');
-      navigate('/orders');
+      navigate(ROUTES.ORDERS);
     } catch (err: unknown) {
       console.error('Failed to place order:', err);
       const apiErr = err as { response?: { data?: { message?: string } }; message?: string };
@@ -155,53 +146,57 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
 
   const activeMethodObj = PAYMENT_METHODS.find((m) => m.id === selectedMethod) || PAYMENT_METHODS[0];
 
-  return (
-    <div className="checkout-payment-section">
-      <div className="checkout-shipping-box">
-        <p className="checkout-shipping-title">Delivery Details</p>
+  const summaryRow = "flex items-center justify-between text-sm";
+  const summaryLabel = "font-medium text-[#4b5563]";
+  const summaryVal = "font-semibold text-[#111827]";
 
-        <div className="checkout-shipping-field">
+  return (
+    <div className="mt-4 box-border w-full">
+      <div className="mb-5 box-border rounded-xl border border-[#e5e7eb] bg-white px-5 py-4 max-md:px-3 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+        <p className="m-0 mb-3.5 text-[15px] font-bold text-[#111827]">Delivery Details</p>
+
+        <div className="mb-3 text-left flex flex-col gap-1.5 [&_input]:box-border [&_input]:w-full [&_input]:rounded-lg [&_input]:border [&_input]:border-[#e5e7eb] [&_input]:bg-[#f9fafb] [&_input]:px-3.5 [&_input]:py-2.5 [&_input]:text-sm [&_input]:text-[#111827] [&_input]:outline-none [&_input]:transition-colors [&_input:focus]:border-[#111827] [&_input:focus]:bg-white [&_label]:pl-4 [&_label]:max-md:pl-3 [&_label]:text-[12.5px] [&_label]:font-semibold [&_label]:tracking-[0.02em] [&_label]:text-[#4b5563] [&_label]:uppercase">
           <label htmlFor="shipping-address">Address</label>
           <input
             id="shipping-address"
             type="text"
             placeholder="Enter delivery address"
             value={address}
-            maxLength={255}
+            maxLength={FIELD_LIMITS.address}
             onChange={(e) => setAddress(e.target.value)}
           />
         </div>
 
-        <div className="checkout-shipping-field">
+        <div className="mb-3 text-left flex flex-col gap-1.5 [&_input]:box-border [&_input]:w-full [&_input]:rounded-lg [&_input]:border [&_input]:border-[#e5e7eb] [&_input]:bg-[#f9fafb] [&_input]:px-3.5 [&_input]:py-2.5 [&_input]:text-sm [&_input]:text-[#111827] [&_input]:outline-none [&_input]:transition-colors [&_input:focus]:border-[#111827] [&_input:focus]:bg-white [&_label]:pl-4 [&_label]:max-md:pl-3 [&_label]:text-[12.5px] [&_label]:font-semibold [&_label]:tracking-[0.02em] [&_label]:text-[#4b5563] [&_label]:uppercase">
           <label htmlFor="shipping-contact">Contact</label>
           <input
             id="shipping-contact"
             type="text"
             placeholder="Enter contact number"
             value={contact}
-            maxLength={20}
+            maxLength={FIELD_LIMITS.contact}
             onChange={(e) => setContact(e.target.value)}
           />
         </div>
 
-        <p className="checkout-shipping-hint">
+        <p className="mt-0.5 mb-0 text-xs text-[#6b7280]">
           Prefilled from your profile — edit if this order ships elsewhere.
         </p>
       </div>
 
-      <div className="payment-method-box">
-        <div className="payment-method-left">
-          <span className="payment-method-title">Payment Method</span>
+      <div className="mb-5 box-border flex items-center justify-between gap-4 rounded-xl border border-[#111827] bg-white px-5 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] max-[645px]:flex-col max-[645px]:items-start max-[645px]:gap-2.5 max-[645px]:px-4 max-[645px]:py-3.5">
+        <div className="shrink-0">
+          <span className="text-[15px] font-bold text-[#111827]">Payment Method</span>
         </div>
 
-        <div className="payment-method-center">
-          <span className="payment-method-name">{activeMethodObj.label}</span>
+        <div className="flex flex-1 flex-wrap items-center justify-center gap-2 max-[645px]:justify-start">
+          <span className="text-[14.5px] font-semibold text-[#111827]">{activeMethodObj.label}</span>
         </div>
 
-        <div className="payment-method-right">
+        <div className="shrink-0 max-[645px]:self-end">
           <button
             type="button"
-            className="change-method-btn"
+            className="w-[60px] cursor-pointer border-none bg-none px-2 py-1 text-[13.5px] font-semibold text-[#2563eb] transition-colors hover:text-[#1d4ed8] hover:underline"
             onClick={() => setIsChangingMethod((prev) => !prev)}
           >
             {isChangingMethod ? 'Done' : 'Change'}
@@ -210,13 +205,17 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
       </div>
 
       {isChangingMethod && (
-        <div className="payment-method-selector-panel">
-          <p className="selector-heading">Select Payment Option:</p>
-          <div className="selector-options">
+        <div className="mb-5 rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-4">
+          <p className="m-0 mb-3 text-[13.5px] font-bold tracking-[0.02em] text-[#374151] uppercase">Select Payment Option:</p>
+          <div className="flex flex-col gap-2.5">
             {PAYMENT_METHODS.map((method) => (
               <label
                 key={method.id}
-                className={`selector-option-card ${selectedMethod === method.id ? 'active' : ''}`}
+                className={`flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 transition-all [&_input]:h-4 [&_input]:w-4 [&_input]:cursor-pointer [&_input]:accent-[#111827] ${
+                  selectedMethod === method.id
+                    ? 'border-[#111827] bg-white shadow-[0_0_0_1px_#111827]'
+                    : 'border-[#e5e7eb] bg-white hover:border-[#d1d5db] hover:bg-[#fafafa]'
+                }`}
               >
                 <input
                   type="radio"
@@ -228,9 +227,9 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
                     setIsChangingMethod(false);
                   }}
                 />
-                <div className="option-text">
-                  <div className="option-label">{method.label}</div>
-                  <div className="option-sub">{method.description}</div>
+                <div>
+                  <div className="text-left text-sm font-semibold text-[#111827]">{method.label}</div>
+                  <div className="mt-0.5 text-left text-[12.5px] text-[#6b7280] max-[645px]:text-left max-[645px]:text-xs">{method.description}</div>
                 </div>
               </label>
             ))}
@@ -238,64 +237,69 @@ export default function Payment({ subtotal, itemCount }: PaymentProps) {
         </div>
       )}
 
-      <div className="checkout-promo-wrapper">
-        <div className="checkout-promo-input-group">
-          <img src={promoIcon} alt="Promo" className="checkout-promo-icon" />
+      <div className="mb-6 flex flex-col items-end max-[645px]:items-center">
+        <div className="box-border flex w-full h-11 max-w-[360px] items-center gap-2.5 rounded-full border border-[#e5e7eb] bg-[#f3f4f6] py-1.5 pr-1.5 pl-4 transition-colors focus-within:border-[#111827] focus-within:bg-white max-[645px]:max-w-full [&_input]:min-w-0 [&_input]:flex-1 [&_input]:border-none [&_input]:bg-transparent [&_input]:text-[13.5px] [&_input]:text-[#111827] [&_input]:uppercase [&_input]:outline-none [&_input::placeholder]:normal-case">
+          <img src={promoIcon} alt="Promo" className="h-[18px] w-[18px] opacity-50" />
           <input
             type="text"
             placeholder="Add promo code"
             value={promoInput}
             onChange={(e) => setPromoInput(e.target.value)}
           />
-          <button
+          <SubmitButton
             type="button"
-            className="apply-promo-btn"
-            disabled={validatingPromo}
+            className="cursor-pointer rounded-full border-none bg-[#111827] px-3.5 py-1.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#1f2937]"
+            loading={validatingPromo}
+            loadingText="Checking..."
             onClick={handleApplyPromo}
           >
-            {validatingPromo ? 'Checking...' : 'Apply'}
-          </button>
+            Apply
+          </SubmitButton>
         </div>
         {promoMessage && (
-          <p className={`checkout-promo-msg ${promoMessage.type}`}>{promoMessage.text}</p>
+          <p className={`mt-1.5 mb-0 w-full max-w-[360px] text-right text-[12.5px] font-medium max-[645px]:max-w-fit ${promoMessage.type === 'success' ? 'text-[#16a34a]' : 'text-[#dc2626]'}`}>{promoMessage.text}</p>
         )}
       </div>
 
-      <div className="checkout-summary-section">
-        <div className="checkout-summary-details">
-          <div className="summary-row">
-            <span className="summary-label">Subtotal</span>
-            <span className="summary-val">{formatPrice(safeSubtotal)}</span>
+      <div className="mt-2.5 mb-8 flex justify-end">
+        <div className="flex w-full max-w-[360px] flex-col gap-2.5 max-[645px]:max-w-full">
+          <div className={summaryRow}>
+            <span className={summaryLabel}>Subtotal</span>
+            <span className={summaryVal}>${formatPrice(safeSubtotal)}</span>
           </div>
 
-          <div className="summary-row">
-            <span className="summary-label">Shipping</span>
-            <span className="summary-val">{formatPrice(deliveryFee)}</span>
+          <div className={summaryRow}>
+            <span className={summaryLabel}>Shipping</span>
+            <span className={summaryVal}>${formatPrice(deliveryFee)}</span>
           </div>
 
           {discount > 0 && (
-            <div className="summary-row discount">
-              <span className="summary-label">Discount</span>
-              <span className="summary-val">-{formatPrice(discount)}</span>
+            <div className={summaryRow}>
+              <span className="font-medium text-[#dc2626]">Discount</span>
+              <span className="font-semibold text-[#dc2626]">-${formatPrice(discount)}</span>
             </div>
           )}
 
-          <div className="summary-divider-thick"></div>
+          <div className="my-2 h-0 w-full border-t-2 border-[#111827]"></div>
 
-          <div className="summary-row total-row">
-            <span className="summary-label total-label">Total payment</span>
-            <span className="summary-val total-val">{formatPrice(totalPayment)}</span>
+          <div className="mb-2 flex items-baseline justify-between">
+            <span className="text-base font-semibold text-[#111827]">Total payment</span>
+            <span className="text-xl font-bold text-[#111827] tabular-nums">
+              ${formatPrice(totalPayment)}
+            </span>
           </div>
 
-          <div className="place-order-wrapper">
-            <button
+          <div className="mt-2 flex justify-end">
+            <SubmitButton
               type="button"
-              className="place-order-btn"
-              disabled={submitting || itemCount === 0}
+              className="w-full cursor-pointer rounded-full border-none bg-[#111827] px-5 py-3 text-[15px] font-bold tracking-[0.3px] text-white shadow-[0_2px_6px_rgba(0,0,0,0.08)] transition-[background-color,transform] enabled:hover:bg-[#1f2937] enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+              loading={submitting}
+              loadingText="Placing Order..."
+              disabled={itemCount === 0}
               onClick={handlePlaceOrder}
             >
-              {submitting ? 'Placing Order...' : 'Place order'}
-            </button>
+              Place order
+            </SubmitButton>
           </div>
         </div>
       </div>

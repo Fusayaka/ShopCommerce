@@ -1,67 +1,21 @@
-import type { Order, OrderStatus, PaymentMethod, RedeliveryOrder } from '@/types';
+import type { Order, OrderStatus, RedeliveryOrder } from '@/types';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { orderApi } from '@/api/orderApi';
 import { RedeliveryForm, type RedeliveryFormData } from './Form';
+import { formatPrice, formatDate } from '@/utils/format';
+import { NEXT_STATUS, PAYMENT_LABELS } from '@/constants/order';
+import { FIELD_LIMITS } from '@/constants/commerce';
+import { StatusBadge, DropDownSelector, SubmitButton } from '@/components';
 
 interface OrderDetailModalProps {
     order: Order | null;
     onClose: () => void;
-    /** Called after a status change or redelivery create/update so the list can refresh. */
     onChanged?: () => void;
-}
-
-const STATUS_STYLES: Record<OrderStatus, string> = {
-    pending: 'bg-amber-50 text-amber-700',
-    processing: 'bg-violet-100 text-violet-500',
-    shipping: 'bg-indigo-50 text-indigo-700',
-    delivered: 'bg-green-50 text-green-700',
-    cancelled: 'bg-red-50 text-red-700',
-    redelivery: 'bg-purple-50 text-purple-700',
-};
-
-const PAYMENT_LABELS: Record<PaymentMethod, string> = {
-    delivery: 'Cash on delivery',
-    bank: 'Bank transfer',
-    card: 'Credit / debit card',
-};
-
-const NEXT_STATUS: Record<OrderStatus, OrderStatus[]> = {
-    pending: ['processing', 'cancelled'],
-    redelivery: ['processing', 'cancelled'],
-    processing: ['shipping', 'cancelled'],
-    shipping: ['delivered', 'cancelled'],
-    delivered: [],
-    cancelled: [],
-};
-
-function formatPrice(value?: number | null) {
-    if (value === undefined || value === null) return '—';
-    return `${Number(value).toLocaleString('en-US', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    })}`;
-}
-
-function formatDate(value?: string) {
-    if (!value) return '';
-    const d = new Date(value);
-    if (Number.isNaN(d.getTime())) return '';
-    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 function getTotalItems(order: Order) {
     return order.items.reduce((count, item) => count + item.quantity, 0);
-}
-
-function StatusBadge({ status }: { status: OrderStatus }) {
-    return (
-        <span
-            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${STATUS_STYLES[status]}`}
-        >
-            {status}
-        </span>
-    );
 }
 
 type Tab = 'items' | 'redeliver';
@@ -125,7 +79,6 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClo
     if (!order) return null;
 
     const status = order.status;
-    const badgeClass = STATUS_STYLES[status];
     const address = order.address ?? order.user?.address ?? '—';
     const contact = order.contact ?? order.user?.contact ?? '—';
     const paymentLabel = order.paymentMethod ? PAYMENT_LABELS[order.paymentMethod] : '—';
@@ -245,11 +198,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClo
                     <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/70 px-6 py-4">
                         <div className="flex flex-wrap items-center gap-3">
                             <h2 className="text-base font-bold text-slate-900">Order #{order.id}</h2>
-                            <span
-                                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${badgeClass}`}
-                            >
-                                {status}
-                            </span>
+                            <StatusBadge status={status} />
                             {order.createdAt && (
                                 <span className="text-xs text-slate-500">{formatDate(order.createdAt)}</span>
                             )}
@@ -302,26 +251,25 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClo
                                         </h3>
                                         {canUpdateStatus && (
                                             <div className="flex shrink-0 items-center gap-2">
-                                                <select
+                                                <DropDownSelector
+                                                    variant="compact"
+                                                    className="capitalize"
                                                     value={selectedStatus}
-                                                    onChange={(e) => setTargetStatus(e.target.value as OrderStatus)}
+                                                    onChange={(v) => setTargetStatus(v as OrderStatus)}
                                                     disabled={updatingStatus}
-                                                    className="cursor-pointer rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-semibold capitalize text-slate-700 outline-none focus:border-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
-                                                >
-                                                    {statusOptions.map((s) => (
-                                                        <option key={s} value={s} className="capitalize">
-                                                            {s}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                                <button
+                                                    aria-label="Order status"
+                                                    options={statusOptions.map((s) => ({ value: s, label: s }))}
+                                                />
+                                                <SubmitButton
                                                     type="button"
                                                     onClick={() => selectedStatus && applyStatus(selectedStatus)}
-                                                    disabled={updatingStatus || !selectedStatus}
+                                                    loading={updatingStatus}
+                                                    loadingText="Updating…"
+                                                    disabled={!selectedStatus}
                                                     className="inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
                                                 >
-                                                    {updatingStatus ? 'Updating…' : 'Update status'}
-                                                </button>
+                                                    Update status
+                                                </SubmitButton>
                                             </div>
                                         )}
                                     </div>
@@ -576,31 +524,29 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClo
                                                         const busy = updatingRedeliveryId === r.id;
                                                         return (
                                                             <>
-                                                                <select
+                                                                <DropDownSelector
+                                                                    variant="compact"
+                                                                    className="capitalize"
                                                                     value={sel}
-                                                                    onChange={(e) =>
+                                                                    onChange={(v) =>
                                                                         setRedeliveryTargets((prev) => ({
                                                                             ...prev,
-                                                                            [r.id]: e.target.value as OrderStatus,
+                                                                            [r.id]: v as OrderStatus,
                                                                         }))
                                                                     }
                                                                     disabled={busy}
-                                                                    className="cursor-pointer rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold capitalize text-slate-700 outline-none focus:border-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
-                                                                >
-                                                                    {opts.map((s) => (
-                                                                        <option key={s} value={s} className="capitalize">
-                                                                            {s}
-                                                                        </option>
-                                                                    ))}
-                                                                </select>
-                                                                <button
+                                                                    aria-label="Redelivery status"
+                                                                    options={opts.map((s) => ({ value: s, label: s }))}
+                                                                />
+                                                                <SubmitButton
                                                                     type="button"
                                                                     onClick={() => applyRedeliveryStatus(r, sel)}
-                                                                    disabled={busy}
+                                                                    loading={busy}
+                                                                    loadingText="Updating…"
                                                                     className="inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-slate-900 px-2.5 py-1 text-xs font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
                                                                 >
-                                                                    {busy ? 'Updating…' : 'Update status'}
-                                                                </button>
+                                                                    Update status
+                                                                </SubmitButton>
                                                             </>
                                                         );
                                                     })()}
@@ -642,7 +588,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClo
                             value={reasonDraft}
                             onChange={(e) => setReasonDraft(e.target.value)}
                             disabled={savingNote}
-                            maxLength={100}
+                            maxLength={FIELD_LIMITS.redeliveryReason}
                             placeholder="Reason for this redelivery…"
                             className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-slate-900 disabled:opacity-50"
                         />
@@ -656,7 +602,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClo
                             onChange={(e) => setNoteDraft(e.target.value)}
                             disabled={savingNote}
                             rows={4}
-                            maxLength={255}
+                            maxLength={FIELD_LIMITS.redeliveryNote}
                             placeholder="Add a note for this redelivery…"
                             className="mt-1.5 w-full resize-none rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-slate-900 disabled:opacity-50"
                         />
@@ -671,14 +617,15 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClo
                             >
                                 Cancel
                             </button>
-                            <button
+                            <SubmitButton
                                 type="button"
                                 onClick={saveNote}
-                                disabled={savingNote}
+                                loading={savingNote}
+                                loadingText="Saving…"
                                 className="cursor-pointer rounded-md border border-transparent bg-slate-900 px-4 py-1.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                                {savingNote ? 'Saving…' : 'Save note'}
-                            </button>
+                                Save note
+                            </SubmitButton>
                         </div>
                     </div>
                 </div>
