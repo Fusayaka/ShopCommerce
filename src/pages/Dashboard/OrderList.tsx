@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { orderApi } from '@/api/orderApi';
 import type { Order, OrderStatus } from '@/types';
-import { Pagination, StatusBadge, DropDownSelector } from '@/components';
+import { Pagination, StatusBadge, DropDownSelector, Avatar } from '@/components';
 import { OrderDetailModal } from './OrderView';
 import { useSearchParams } from 'react-router-dom';
 import { formatPrice, formatDate } from '@/utils/format';
@@ -208,17 +208,12 @@ export default function OrderList() {
                                             <td className="px-4 py-3 font-medium text-slate-900">#{order.id}</td>
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-2">
-                                                    {order.user?.avatar ? (
-                                                        <img
-                                                            src={order.user.avatar}
-                                                            alt={order.user?.name ?? 'Customer'}
-                                                            className="h-8 w-8 shrink-0 rounded-full object-cover"
-                                                        />
-                                                    ) : (
-                                                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600">
-                                                            {(order.user?.name?.trim()?.[0] ?? 'U').toUpperCase()}
-                                                        </div>
-                                                    )}
+                                                    <Avatar
+                                                        src={order.user?.avatar}
+                                                        name={order.user?.name}
+                                                        className="h-8 w-8 shrink-0 rounded-full"
+                                                        fallbackClassName="bg-slate-200 text-xs text-slate-600"
+                                                    />
                                                     <div className="min-w-0">
                                                         <p className="truncate text-left font-medium text-slate-800">
                                                             {order.user?.name ?? `User #${order.userId}`}

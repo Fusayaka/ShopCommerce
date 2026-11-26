@@ -12,3 +12,5 @@ export { default as EyeToggle } from './EyeToggle';
 export { default as ImageUploader } from './ImageUploader';
 export { default as FormField } from './FormField';
 export { default as SubmitButton } from './SubmitButton';
+export { default as PriceRangeSlider } from './PriceRangeSlider';
+export { default as Avatar } from './Avatar';

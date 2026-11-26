@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { StarRating, ConfirmModal, DropDownSelector, SubmitButton } from '@/components';
+import { StarRating, ConfirmModal, DropDownSelector, SubmitButton, Avatar } from '@/components';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { type Comment as CommentType } from '@/types';
 import { commentApi } from '@/api/commentApi';
@@ -98,13 +98,12 @@ const CommentCard = ({
 return (
     <div className="mb-5 flex flex-col gap-[5px] rounded-[20px] border-2 border-[#f0f0f0] bg-white px-6 pt-[15px] pb-2.5 text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] max-md:rounded-2xl max-md:px-[18px] max-md:py-3">
       <div className="flex items-center gap-3 border-b border-[#f0f0f0] pb-4">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#f2f0f1] font-bold text-[#666] max-md:h-10 max-md:w-10 [&_img]:h-full [&_img]:w-full [&_img]:object-cover">
-          {avatar ? (
-            <img src={avatar} alt={displayName} />
-          ) : (
-            displayName.charAt(0).toUpperCase()
-          )}
-        </div>
+        <Avatar
+          src={avatar}
+          name={displayName}
+          className="h-11 w-11 shrink-0 overflow-hidden rounded-full max-md:h-10 max-md:w-10"
+          fallbackClassName="bg-[#f2f0f1] text-[#666]"
+        />
 
         <h4 className="m-0 text-lg font-bold text-black max-md:text-base">{displayName}</h4>
 

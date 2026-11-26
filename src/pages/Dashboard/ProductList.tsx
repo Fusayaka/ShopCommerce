@@ -6,7 +6,7 @@ import trashIcon from '@/assets/trash-icon.svg';
 import upArrow from '@/assets/up-arrow.svg';
 import downArrow from '@/assets/down-arrow.svg';
 import filterMenu from '@/assets/filter.svg';
-import { ConfirmModal, Pagination } from '@/components';
+import { ConfirmModal, Pagination, PriceRangeSlider } from '@/components';
 import { toast } from 'react-toastify';
 import { ProductForm, type ProductFormData } from './Form';
 import StockEditor from './StockEditor';
@@ -14,54 +14,6 @@ import * as fs from '../ProductList/filterStyles';
 import { useSearchParams } from 'react-router-dom';
 import { formatPrice } from '@/utils/format';
 import { CONFIG } from '@/config';
-
-interface DualPriceRangeProps {
-    minPrice: number;
-    maxPrice: number;
-    minLimit: number;
-    maxLimit: number;
-    onMinChange: (value: number) => void;
-    onMaxChange: (value: number) => void;
-}
-
-function DualPriceRange({ minPrice, maxPrice, minLimit, maxLimit, onMinChange, onMaxChange }: DualPriceRangeProps) {
-    const span = maxLimit - minLimit || 1;
-    const minPercent = ((minPrice - minLimit) / span) * 100;
-    const maxPercent = ((maxPrice - minLimit) / span) * 100;
-    const minPos = `calc(${minPercent}% + ${9 - minPercent * 0.18}px)`;
-    const maxPos = `calc(${maxPercent}% + ${9 - maxPercent * 0.18}px)`;
-
-    return (
-        <div className={fs.dualRangeContainer}>
-            <div className={fs.priceRangeValues}>
-                <span style={{ left: minPos }}>${minPrice}</span>
-                <span style={{ left: maxPos }}>${maxPrice}</span>
-            </div>
-            <div
-                className={fs.priceSliderTrackWrapper}
-                style={{ '--min-pos': minPos, '--max-pos': maxPos } as React.CSSProperties}
-            >
-                <div className={fs.priceSliderActiveRange}></div>
-                <input
-                    type="range"
-                    min={minLimit}
-                    max={maxLimit}
-                    value={minPrice}
-                    onChange={(e) => onMinChange(Number(e.target.value))}
-                    className={fs.priceRangeInput}
-                />
-                <input
-                    type="range"
-                    min={minLimit}
-                    max={maxLimit}
-                    value={maxPrice}
-                    onChange={(e) => onMaxChange(Number(e.target.value))}
-                    className={fs.priceRangeInput}
-                />
-            </div>
-        </div>
-    );
-}
 
 interface PriceRange {
     minPrice: number;
@@ -400,7 +352,7 @@ export default function ProductList() {
                                 <img src={isPriceOpen ? upArrow : downArrow} alt="toggle" className={fs.filterArrowIcon} />
                             </div>
                             {isPriceOpen && (
-                                <DualPriceRange
+                                <PriceRangeSlider
                                     minPrice={minPrice}
                                     maxPrice={maxPrice}
                                     minLimit={minLimit}

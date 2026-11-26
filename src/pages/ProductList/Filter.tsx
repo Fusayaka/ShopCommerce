@@ -4,6 +4,7 @@ import downArrow from '@/assets/down-arrow.svg'
 import filterMenu from '@/assets/filter.svg'
 import { useSearchParams } from 'react-router-dom';
 import { productApi } from '@/api/productApi';
+import { PriceRangeSlider } from '@/components';
 import * as fs from './filterStyles';
 
 interface FilterProps{
@@ -18,65 +19,6 @@ interface FilterProps{
         isDiscountOnly: boolean
     }) => void;
 }
-
-interface DualPriceRangeProps {
-    minPrice: number;
-    maxPrice: number;
-    minLimit: number;
-    maxLimit: number;
-    minPercent: number;
-    maxPercent: number;
-    onMinChange: (value: number) => void;
-    onMaxChange: (value: number) => void;
-}
-
-const DualPriceRange = ({
-    minPrice,
-    maxPrice,
-    minLimit,
-    maxLimit,
-    minPercent,
-    maxPercent,
-    onMinChange,
-    onMaxChange
-}: DualPriceRangeProps) => {
-    const minPos = `calc(${minPercent}% + ${9 - minPercent * 0.18}px)`;
-    const maxPos = `calc(${maxPercent}% + ${9 - maxPercent * 0.18}px)`;
-
-    return (
-        <div className={fs.dualRangeContainer}>
-            <div className={fs.priceRangeValues}>
-                <span style={{ left: minPos }}>${minPrice}</span>
-                <span style={{ left: maxPos }}>${maxPrice}</span>
-            </div>
-            <div
-                className={fs.priceSliderTrackWrapper}
-                style={{
-                    '--min-pos': minPos,
-                    '--max-pos': maxPos
-                } as React.CSSProperties}
-            >
-                <div className={fs.priceSliderActiveRange}></div>
-                <input
-                    type="range"
-                    min={minLimit}
-                    max={maxLimit}
-                    value={minPrice}
-                    onChange={(e) => onMinChange(Number(e.target.value))}
-                    className={fs.priceRangeInput}
-                />
-                <input
-                    type="range"
-                    min={minLimit}
-                    max={maxLimit}
-                    value={maxPrice}
-                    onChange={(e) => onMaxChange(Number(e.target.value))}
-                    className={fs.priceRangeInput}
-                />
-            </div>
-        </div>
-    );
-};
 
 export default function Filter({onClose, onApplyFilter}: FilterProps){
     const [searchParams] = useSearchParams();
@@ -114,9 +56,6 @@ export default function Filter({onClose, onApplyFilter}: FilterProps){
     const [isDiscountOpen, setIsDiscountOpen] = useState<boolean>(true);
     const [isPriceOpen, setIsPriceOpen] = useState<boolean>(true);
     const [isFilterBodyOpen, setIsFilterBodyOpen] = useState<boolean>(true);
-
-    const minPercent = ((minPrice - minLimit) / (maxLimit - minLimit)) * 100;
-    const maxPercent = ((maxPrice - minLimit) / (maxLimit - minLimit)) * 100;
 
     const handleApply = () => {
         if (onApplyFilter){
@@ -230,13 +169,11 @@ export default function Filter({onClose, onApplyFilter}: FilterProps){
                             />
                         </div>
                         {isPriceOpen && (
-                            <DualPriceRange
+                            <PriceRangeSlider
                                 minPrice={minPrice}
                                 maxPrice={maxPrice}
                                 minLimit={minLimit}
                                 maxLimit={maxLimit}
-                                minPercent={minPercent}
-                                maxPercent={maxPercent}
                                 onMinChange={(val) => {
                                     if (val <= maxPrice) setMinPrice(val);
                                 }}
