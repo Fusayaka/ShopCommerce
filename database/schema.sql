@@ -147,7 +147,7 @@ CREATE TABLE promo_codes (
         (discount_num IS NOT NULL AND discount_per IS NULL) OR
         (discount_per IS NOT NULL AND discount_num IS NULL)
     )
-)
+);
 
 -- 10. Redelivery Order
 CREATE TABLE redelivery_orders (
@@ -164,4 +164,4 @@ CREATE TABLE redelivery_orders (
     created_by INT NOT NULL REFERENCES users(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
+);
