@@ -1,4 +1,4 @@
-import type { User } from "@/types";
+import type { User, Role } from "@/types";
 import axiosClient from "./axiosClient";
 
 export interface ChangePasswordPayload {
@@ -9,6 +9,18 @@ export interface ChangePasswordPayload {
 export const userApi = {
     getMe() {
         return axiosClient.get<User, User>(`/users/me`);
+    },
+
+    getAll() {
+        return axiosClient.get<User[], User[]>(`/users`);
+    },
+
+    updateRole(id: number, role: Role) {
+        return axiosClient.patch(`/users/${id}/role`, { role });
+    },
+
+    remove(id: number) {
+        return axiosClient.delete(`/users/${id}`);
     },
 
     updateProfile: async (
