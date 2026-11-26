@@ -18,6 +18,9 @@ _None open._
   that relies on the cookie (e.g. refresh) needs `withCredentials`.
 - **`resend` is installed but unused** — email isn't wired anywhere in `backend/src`, though the
   README lists it. Either implement it or drop the dep + mention.
+- **`PATCH /api/users/:id` is implemented on the backend but unused on the frontend.** Admin user
+management currently only calls `PATCH /api/users/:id/role` and `DELETE /api/users/:id`; profile
+edits go exclusively through `PATCH /api/users/me`.
 - **`ROUTES.ORDER_DETAIL`** (`src/constants/routes.ts`) is marked *"Not implement yet"*.
 
 ## 3. TODO
@@ -25,3 +28,5 @@ _None open._
 - [ ] Decide on email: wire Resend, or remove the dependency and the README claim.
 - [ ] Implement the order-detail route/page, or remove `ROUTES.ORDER_DETAIL`.
 - [ ] Implement login with social network account(Facebook, Google).
+- [ ] Implement notification for user when admin changes role.
+- [ ] Decide on `PATCH /api/users/:id`: wire an admin user-detail edit modal on the frontend, or remove the endpoint if admins shouldn't edit user profiles directly.
