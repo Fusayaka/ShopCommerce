@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { StarRating } from '@/components';
+import { useNavigate, useParams } from 'react-router-dom';
+import { StarRating, Breadcrumb } from '@/components';
 import plhImg from '/images/cloth-placeholder.jpeg'
 import type { Product } from '@/types';
 import { getCardPrice } from '@/utils/pricing';
@@ -238,11 +238,7 @@ export default function Overview() {
 
     return (
             <section className='px-[5%] py-6 text-left text-black max-md:px-[30px] max-md:pt-5 max-md:pb-0'>
-                <nav className='mb-6 text-sm text-[#666] [&_a]:text-[#666] [&_a]:no-underline [&_a]:transition-colors [&_a:hover]:text-black [&_a:hover]:underline'>
-                    <Link to={ROUTES.HOME}>Home</Link> {' > '}
-                    <Link to={ROUTES.PRODUCTS}>Product</Link> {' > '}
-                    <span className="font-medium text-black">{product.title}</span>
-                </nav>
+                <Breadcrumb current={product.title} />
 
                 <div className='flex items-start gap-10 max-md:flex-col max-md:gap-6'>
                     <div className='flex aspect-[3/4] shrink-0 grow-0 basis-[35%] items-center justify-center overflow-hidden rounded-[20px] bg-[#f2f0f1] max-md:mx-auto max-md:aspect-square max-md:w-4/5 max-md:basis-auto'>

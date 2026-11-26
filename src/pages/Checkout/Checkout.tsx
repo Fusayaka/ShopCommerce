@@ -4,6 +4,7 @@ import { useAuth } from '@/utils/auth';
 import ProductList from './ProductList';
 import Payment from './Payment';
 import { ROUTES } from '@/constants/routes';
+import { Breadcrumb } from '@/components';
 
 export default function Checkout() {
   const { loggedIn } = useAuth();
@@ -14,19 +15,12 @@ export default function Checkout() {
   }, []);
 
   const sectionCls = "mx-auto box-border px-[5%] py-6 text-[#111827] max-md:px-[30px] max-md:py-5";
-  const breadcrumbCls = "mb-6 flex items-center gap-2 text-sm text-[#606060] [&_a]:text-[#606060] [&_a]:no-underline [&_a:hover]:underline max-[500px]:text-xs";
   const titleCls = "text-center text-[32px] leading-[1.1] font-extrabold text-[#111827] uppercase max-md:mb-5 max-[500px]:text-[26px]";
 
   if (!loggedIn) {
     return (
       <section className={sectionCls}>
-        <nav className={breadcrumbCls}>
-          <Link to={ROUTES.HOME}>Home</Link>
-          <span className="text-xs">{'>'}</span>
-          <Link to={ROUTES.CART}>Cart</Link>
-          <span className="text-xs">{'>'}</span>
-          <span>Checkout</span>
-        </nav>
+        <Breadcrumb className="max-[500px]:text-xs" />
 
         <h1 className={titleCls}>CHECKOUT</h1>
 
@@ -42,13 +36,7 @@ export default function Checkout() {
 
   return (
     <section className={sectionCls}>
-      <nav className={breadcrumbCls}>
-        <Link to={ROUTES.HOME}>Home</Link>
-        <span className="text-xs">{'>'}</span>
-        <Link to={ROUTES.CART}>Cart</Link>
-        <span className="text-xs">{'>'}</span>
-        <span>Checkout</span>
-      </nav>
+      <Breadcrumb className="max-[500px]:text-xs" />
 
       <h1 className={titleCls}>Checkout</h1>
 

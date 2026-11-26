@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import Filter from "./Filter";
 import ProductResultPage from "./ProductResultPage";
-import { Link, useSearchParams } from "react-router-dom";
-import { ROUTES } from "@/constants/routes";
+import { useSearchParams } from "react-router-dom";
+import { Breadcrumb } from "@/components";
 
 export default function ProductList(){
     const [isDesktop, setIsDesktop] = useState(true);
@@ -63,11 +63,7 @@ export default function ProductList(){
 
     return (
         <section className="px-[5%] py-6 max-md:px-[30px] max-md:py-5">
-            <nav className='mx-auto mb-6 w-full p-0 text-left text-sm text-[#666] [&_a]:text-[#666] [&_a]:no-underline [&_a:hover]:text-black [&_a:hover]:underline'>
-                <Link to={ROUTES.HOME}>Home</Link>
-                {'  >  '}
-                <span>Product</span>
-            </nav>
+            <Breadcrumb className="mx-auto w-full p-0" />
 
             <div className="mx-auto flex w-full max-w-[1150px] items-start gap-8 max-md:flex-col">
                 <div className={`w-[30%] shrink-0 max-md:w-full ${isMobileFilterOpen ? 'max-md:fixed max-md:inset-0 max-md:z-[1000] max-md:block max-md:h-screen max-md:w-screen' : 'max-md:hidden'}`}>

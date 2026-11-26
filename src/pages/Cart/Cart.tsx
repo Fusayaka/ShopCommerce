@@ -8,6 +8,7 @@ import { notifyCartChanged } from "@/utils/cartCount";
 import { toast } from "react-toastify";
 import { useAuth } from "@/utils/auth";
 import { ROUTES } from "@/constants/routes";
+import { Breadcrumb } from "@/components";
 
 export default function Cart() {
     const { loggedIn, user } = useAuth();
@@ -55,18 +56,13 @@ export default function Cart() {
     }, [user])
 
     const sectionCls = "mx-auto max-w-full px-[5%] py-6 max-md:px-[30px] max-md:py-5";
-    const breadcrumbCls = "mb-6 flex items-center gap-2 text-sm text-[#606060] [&_a]:text-[#606060] [&_a]:no-underline [&_a:hover]:text-black max-[500px]:mb-4 max-[500px]:text-xs";
     const titleCls = "mb-6 overflow-hidden text-left text-[40px] leading-none font-black text-black uppercase max-md:mb-5 max-md:text-center max-md:text-[32px] max-[500px]:mb-4 max-[500px]:text-[26px]";
     const statusCls = "py-10 text-center text-base text-[#606060]";
 
     if (!loggedIn) {
         return (
             <section className={sectionCls}>
-                <nav className={breadcrumbCls}>
-                    <Link to={ROUTES.HOME}>Home</Link>
-                    <span className="text-xs">{'>'}</span>
-                    <span>Cart</span>
-                </nav>
+                <Breadcrumb className="max-[500px]:mb-4 max-[500px]:text-xs" />
 
                 <h1 className={titleCls}>SHOPPING CART</h1>
 
@@ -117,11 +113,7 @@ export default function Cart() {
 
     return (
         <section className={sectionCls}>
-            <nav className={breadcrumbCls}>
-                <Link to={ROUTES.HOME}>Home</Link>
-                <span className="text-xs">{'>'}</span>
-                <span>Cart</span>
-            </nav>
+            <Breadcrumb className="max-[500px]:mb-4 max-[500px]:text-xs" />
 
             <h1 className={titleCls}>SHOPPING CART</h1>
 
