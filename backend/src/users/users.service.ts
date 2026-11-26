@@ -114,19 +114,28 @@ export class UsersService {
         return { message: "Update User Role success"};
     }
 
-    async delete(id: number, userRole: UserRole){
-        const existUser = await this.prisma.user.findFirst({
+    async delete(id: number, currentUserRole: UserRole){
+        const roleLevel = {
+            'admin': 0,
+            'manager': 2,
+            'customer': 2,
+        }
+        const existUser = await this.prisma.user.findUnique({
             where: {id},
         });
         if(!existUser) throw new NotFoundException("Can not delete: User not found");
         
-        const admminCount = await this.prisma.user.count({
-            where: {
-                role: 'admin'
-            }
-        })
-        if (admminCount === 1 && userRole === UserRole.admin) throw new ForbiddenException("Can not delete: User is last admin")
+        if (roleLevel[currentUserRole] > roleLevel[existUser.role]) throw new ForbiddenException("Cannot delete: Insufficient permissions");
         
+        if (existUser.role === UserRole.admin) {
+            const adminCount = await this.prisma.user.count({
+                where: { role: UserRole.admin },
+            });
+            if (adminCount <= 1) {
+                throw new ForbiddenException('Cannot delete: User is the last admin');
+            }
+        }
+
         return this.prisma.user.delete({
             where: { id },
             omit: HIDDEN_USER_FIELDS
