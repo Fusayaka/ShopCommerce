@@ -16,7 +16,7 @@ interface UploadedImage extends UploadableFile {
 
 function extractPublicIdFromUrl(url: string): string | null {
     try {
-        const regex = /\/upload\/(?:v\d+\/)?([^\.]+)/;
+        const regex = /\/upload\/(?:v\d+\/)?([^.]+)/;
         const match = url.match(regex);
         return match ? match[1] : null;
     } catch {

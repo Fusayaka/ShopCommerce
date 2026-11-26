@@ -75,7 +75,7 @@ export class UsersController {
         @CurrentUser() user: User,
         @UploadedFile() file?: UploadedImage,
     ){
-        if (user.id !== id || user.role !== UserRole.admin) throw new ForbiddenException("You are not allowed to update another user's data");
+        if (user.role !== UserRole.admin) throw new ForbiddenException("You are not allowed to update another user's data");
         return this.usersService.update(+id, updateUSersDto, file);
     }
 
