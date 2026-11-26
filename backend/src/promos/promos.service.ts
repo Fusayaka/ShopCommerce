@@ -13,7 +13,7 @@ export class PromosService {
       where: {code: dto.code}
     });
     if (promo){
-      if (!promo.deletedAt) throw new ConflictException(`Code ${dto.code} already exists`);
+      if (promo.deletedAt) throw new ConflictException(`Code ${dto.code} already exists`);
       return this.prisma.promoCodes.update({
         where: { code: dto.code},
         data: {
@@ -47,9 +47,8 @@ export class PromosService {
 
   getAllCode() {
     return this.prisma.promoCodes.findMany({
-      select: {
-        code: true,
-      }
+      where: { deletedAt: null },
+      orderBy: { code: 'asc' },
     });
   }
 
@@ -106,7 +105,7 @@ export class PromosService {
     const {code, ...data} = dto;
     return this.prisma.promoCodes.update({
       where: {code},
-      data: {data}
+      data,
     })
   }
 
