@@ -43,6 +43,7 @@ export class JwtAuthGuard implements CanActivate{
 
         const user = await this.userService.findOne(payload.id).catch(() => null);
         if (!user) throw new UnauthorizedException("User no longer exist");
+        if (payload.role !== user.role) throw new UnauthorizedException("Role changed, please log in again");
         req.user = user;
 
         return true;

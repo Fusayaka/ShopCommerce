@@ -165,11 +165,11 @@ export interface RedeliveryOrder {
     updatedAt?: string;
 }
 
-export interface PromoCode{
+export interface PromoCode {
     code: string;
-    expiredAt: string;
-    discountPer: number;
-    discountNum: number;
-    maxDiscountNum: number;
-    minToApply: number;
+    discountPer: number | null;
+    discountNum: number | null;
+    maxDiscountNum: number | null;
+    minToApply: number | null;
+    expiredAt: string | null;
 }
