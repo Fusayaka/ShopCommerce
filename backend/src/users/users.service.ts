@@ -106,10 +106,15 @@ export class UsersService {
             throw new NotFoundException('User not found');
         }
 
-        await this.prisma.user.update({
-            where: {id},
-            data: {role: newRole},
-        })
+        await this.prisma.$transaction([
+            this.prisma.user.update({
+                where: {id},
+                data: {role: newRole},
+            }),
+            this.prisma.refreshToken.deleteMany({
+                where: { userId: id },
+            })
+        ])
 
         return { message: "Update User Role success"};
     }
